@@ -6,7 +6,8 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import reducers from './components/GraphicalView/reducers';
+//import reducers from './components/GraphicalView/reducers';
+import reducers from './reducers';
 
 async function init() {
   const store = createStore(reducers);
