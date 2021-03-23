@@ -10,7 +10,7 @@ class DataDictionaryValuesTable extends React.Component {
   render() {
     if (!this.props.open) return (<React.Fragment />);
 
-    if(this.props.type == 'all'){
+    if(this.props.type === 'all'){
       return (
         <tr className="values-row">
           <td colSpan="5" className="data-dictionary-property-table__data">

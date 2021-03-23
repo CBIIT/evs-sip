@@ -182,7 +182,7 @@ export const getMatchInsideProperty = (propertyIndex, propertyKey, property, all
           //console.log("yes");
           for(var a=0;a<type.length;a++){
             
-            if(type[a] == item.value){
+            if(type[a] === item.value){
               typeMatchList.push(item);
             }
           }

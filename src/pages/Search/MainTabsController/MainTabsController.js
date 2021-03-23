@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState }from 'react';
 import styled from 'styled-components';
 import { Tab, Row, Col, Nav, Container, Alert } from 'react-bootstrap';
-import TabsController from './TabsController';
-import GraphTabsController from './GraphTabsController';
-import SingleTabsController from './SingleTabsController';
+import TabsController from '../TabsController';
+import GraphTabsController from '../GraphTabsController';
+import SingleTabsController from '../SingleTabsController';
 
 const Result = styled.div`
   border-radius: 5px;
@@ -110,6 +110,7 @@ const Indicator = styled.div`
  `;
 
 const MainTabsController = (props) => {
+
   if (Object.keys(props.result).length !== 0 && props.result.returnList !== undefined && props.result.returnList.length !== 0) {
     return (
       <Result>
@@ -117,7 +118,7 @@ const MainTabsController = (props) => {
           <Container>
             <Row className="clearfix">
               <TabNavTextCol sm={12}>
-                <TabNavText>Search Results for <TabNavSpan>{props.keyword}</TabNavSpan> in:</TabNavText>
+                <TabNavText>Search Results for <TabNavSpan>{props.searchTerm}</TabNavSpan> in:</TabNavText>
                 {(props.result.total !== undefined && props.result.total >= 50) && 
                   <AlertContainer>
                   <Alert variant="warning">
@@ -203,7 +204,7 @@ const MainTabsController = (props) => {
       </Result>
     )
   }
-  else if (Object.keys(props.result).length === 0 && props.errors !== undefined && props.errors === true) {
+  else if (Object.keys(props.result).length === 0 && props.error !== undefined && props.error === true) {
     return(
       <Result>
           <Container>

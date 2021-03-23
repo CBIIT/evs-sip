@@ -116,7 +116,7 @@ export const getSearchResult = (graphType, searchData) => {
   if(searchData.length > 0){
     searchData.forEach((entry) => {
       let dt = entry._source;
-      if(dt.source == graphType){
+      if(dt.source === graphType){
         if(!(dt.node in result)){
           result[dt.node] = {};
           result[dt.node].props = {};

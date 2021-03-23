@@ -23,8 +23,6 @@ async function init() {
   );
 }
 
-
 init();
-
 
 serviceWorker.unregister();

@@ -128,7 +128,7 @@ class DataDictionaryPropertyTable extends React.Component {
                   );
 
                   //let hasValues = properties[pKey].enum.length > 0;
-                  let hasValues = properties[pKey].type == "enum";
+                  let hasValues = properties[pKey].type === "enum";
 
                   let type = properties[pKey].type;
 
@@ -206,14 +206,14 @@ class DataDictionaryPropertyTable extends React.Component {
                   let descriptionMatch = null;
                   let typeMatchList = null;
 
-                  if(original_source == 'gdc'){
+                  if(original_source === 'gdc'){
                     hasValues = property.enum && property.enum.length > 0;
                   }
-                  else if(original_source == 'ctdc' || original_source == 'icdc'){
+                  else if(original_source === 'ctdc' || original_source === 'icdc'){
                     hasValues = property.type && Array.isArray(property.type);
                   }
-                  else if(original_source == 'pcdc'){
-                    hasValues = property.type == "enum";
+                  else if(original_source === 'pcdc'){
+                    hasValues = property.type === "enum";
                   }
                   else{
                     hasValues = false;
@@ -232,7 +232,7 @@ class DataDictionaryPropertyTable extends React.Component {
                       if(Array.isArray(property.type)){
                         type = "enum";
                       }
-                      else if(typeof property.type == 'object'){
+                      else if(typeof property.type === 'object'){
                         type = 'object';
                       }
                       else{

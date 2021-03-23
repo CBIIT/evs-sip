@@ -142,7 +142,7 @@ export const calculateGraphLayout = (
       // draw edges
 
       const renderedEdges =
-        graphType.indexOf("pcdc") == 0
+        graphType.indexOf("pcdc") === 0
           ? []
           : renderedJSON.edges.map((edge) => {
               const controlPoints = edge._draw_[1].points;

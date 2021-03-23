@@ -1,7 +1,3 @@
-import { combineReducers } from 'redux';
-
-import ddgraph from './DataDictionary/reducers';
-
 export const getFileNodes = dictionary => Object.keys(dictionary).filter(node => dictionary[node].category === 'data_file');
 export const getNodeTypes = dictionary => Object.keys(dictionary).filter(node => node.charAt(0) !== '_');
 
@@ -71,9 +67,4 @@ const submission = (state = {}, action) => {
   }
 };
 
-const reducers = combineReducers({ 
-   submission,
-   ddgraph
-});
-
-export default reducers;
+export default submission;

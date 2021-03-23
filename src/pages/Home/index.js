@@ -15,10 +15,10 @@ const Home = () => {
   });
 
   return <Page>
-      <Search></Search>
-      <Graph></Graph>
-      <Tools></Tools>
-    </Page>;
+    <Search/>
+    <Graph/>
+    <Tools/>
+  </Page>;
 }
 
 export default Home;

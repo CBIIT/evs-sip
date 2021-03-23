@@ -28,28 +28,28 @@ class DataDictionary extends React.Component {
   async componentDidMount() {
     if(this.props.dictionary == null){
       let dict = {};
-      if(this.props.graphType == 'gdc'){
+      if(this.props.graphType === 'gdc'){
         dict = await apiGetGDCDictionary();
       }
-      else if(this.props.graphType == 'icdc'){
+      else if(this.props.graphType === 'icdc'){
         dict = await apiGetICDCDictionary();
       }
-      else if(this.props.graphType == 'ctdc'){
+      else if(this.props.graphType === 'ctdc'){
         dict = await apiGetCTDCDictionary();
       }
-      else if(this.props.graphType == 'pcdc'){
+      else if(this.props.graphType === 'pcdc'){
         dict = await apiGetPCDCDictionary();
       }
-      else if(this.props.graphType == 'gdc_readonly'){
+      else if(this.props.graphType === 'gdc_readonly'){
         dict = await apiGetGDCDictionary();
       }
-      else if(this.props.graphType == 'icdc_readonly'){
+      else if(this.props.graphType === 'icdc_readonly'){
         dict = await apiGetICDCDictionary();
       }
-      else if(this.props.graphType == 'ctdc_readonly'){
+      else if(this.props.graphType === 'ctdc_readonly'){
         dict = await apiGetCTDCDictionary();
       }
-      else if(this.props.graphType == 'pcdc_readonly'){
+      else if(this.props.graphType === 'pcdc_readonly'){
         dict = await apiGetPCDCDictionary();
       }
       else{
@@ -88,7 +88,7 @@ class DataDictionary extends React.Component {
 
   render() {
     if(this.state.isSearchFinished){
-      if(this.props.keyword && this.props.graphType.indexOf('readonly') == -1){
+      if(this.props.keyword && this.props.graphType.indexOf('readonly') === -1){
         this.search(this.props.keyword);
       }
 

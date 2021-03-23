@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
-import { apiSuggest } from '../../api';
+import { apiSuggest } from '../../../api';
 import styled from 'styled-components';
 import { Container, Row, Col, InputGroup, Button, Form} from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faCheck } from '@fortawesome/free-solid-svg-icons';
-import SuggestBox from '../Search/SuggestBox';
+import SuggestBox from '../../Search/SuggestBox';
 
-import bkgd from '../../assets/img/search-bkgd.jpg';
+import bkgd from '../../../assets/img/search-bkgd.jpg';
 
 
 const ContainerStyled = styled(Container)`
@@ -56,10 +56,6 @@ const SearchBox = styled.div`
   margin: auto 2rem;
   width: 100%;
 `;
-
-// const InputBoxContainer = styled(InputGroup)`
-//   margin-bottom: 3rem;
-// `;
 
 const InputBox = styled(Form.Control)`
   font-family: 'Lato-Bold', sans-serif;
@@ -206,45 +202,35 @@ const CheckboxInput = styled.input`
 `;
 
 
-const Search = () => {
-  let [searchState, setSearchState] = useState('');
+const Search = (props) => {
   let [suggestState, setSuggestState] = useState([]);
   let [selectIndexState, setSelectIndexState] = useState(-1);
   let [isToggleOnSource, setIsToggleOnSource] = useState(false);
-  let [selectDataSource, setSelectDataSource] = useState({
-    ctdc: false,
-    gdc: false,
-    icdc: false,
-    pcdc: false
-  });
 
   const history = useHistory();
 
-  const searchTriggerRoute = (id, source) => { 
-    history.push({
-      pathname: './search',
-      state: { 
-        keyword: id, 
-        dataSource: source 
-      }
-    });
-  }
+  const searchHandler = (keyword, sources) => {
+    let keywordCase = keyword.trim();
+    props.setKeyword(keywordCase);
+    props.setIsSearching(true);
+    history.push('./search');
+  };
 
   const suggestHandler = event => {
-    setSearchState(event.target.value);
+    props.setKeyword(event.target.value);
     apiSuggest(event.target.value).then(result => setSuggestState(result));
   };
 
   const suggestKeyPressHandler = event => {
     if (event.keyCode === 13 && selectIndexState === -1) {
-      setSearchState(event.target.value);
+      props.setKeyword(event.target.value);
       setSuggestState([]);
-      searchTriggerRoute(event.target.value, selectDataSource);
+      searchHandler(event.target.value, props.dataSources);
     }
     if (event.keyCode === 13 && suggestState.length !== 0 && selectIndexState !== -1) {
-      setSearchState(suggestState[selectIndexState].id);
+      props.setKeyword(suggestState[selectIndexState].id);
       setSuggestState([]);
-      searchTriggerRoute(suggestState[selectIndexState].id, selectDataSource);
+      searchHandler(suggestState[selectIndexState].id, props.dataSources);
     }
     if (event.keyCode === 38 || event.keyCode === 40) {
       let index = selectIndexState;
@@ -260,9 +246,9 @@ const Search = () => {
   };
 
   const suggestClickHandler = (id, event) => {
-    setSearchState(id);
+    props.setKeyword(id);
     setSuggestState([]);
-    searchTriggerRoute(id, selectDataSource);
+    searchHandler(id, props.dataSources);
   };
 
   const cleanSuggestHandler = () => {
@@ -271,22 +257,22 @@ const Search = () => {
   };
 
   const selectDataToggleHandler = event => {
-    setSelectDataSource({
-      ...selectDataSource,
+    props.setDataSources({
+      ...props.dataSources,
       [event.target.name]: !event.target.checked
     });
   };
 
   const selectDataAllToggleHandler = event => {
     if(isToggleOnSource === false){
-      setSelectDataSource({
+      props.setDataSources({
         ctdc: true,
         gdc: true,
         icdc: true,
         pcdc: true
       });
     } else {
-      setSelectDataSource({
+      props.setDataSources({
         ctdc: false,
         gdc: false,
         icdc: false,
@@ -315,12 +301,12 @@ const Search = () => {
                 placeholder="Search Values, Properties, NCIt Terms or ICD-O-3 Terms"
                 aria-label="Search Values, Properties, NCIt Terms or ICD-O-3 Terms"
                 type="text"
-                value={searchState}
+                value={props.keyword}
                 onChange={suggestHandler}
                 onKeyDown={suggestKeyPressHandler}
               />
               <InputBoxBtnContainer>
-                <InputBoxButton aria-label="search" onClick={() => searchTriggerRoute(searchState, selectDataSource)}>
+                <InputBoxButton aria-label="search" onClick={() => searchHandler(props.keyword, props.dataSources)}>
                   <InputBoxIcon icon={faArrowRight}/>
                 </InputBoxButton>
               </InputBoxBtnContainer>
@@ -339,21 +325,21 @@ const Search = () => {
               <Col xs={9}>
                 <FormGroupStyled>
                   <CheckboxLabel>
-                    <CheckboxInput name="gdc" type="checkbox" checked={selectDataSource['gdc']} onClick={selectDataToggleHandler}/>
+                    <CheckboxInput name="gdc" type="checkbox" checked={props.dataSources['gdc']} onClick={selectDataToggleHandler}/>
                     <CheckboxBtn>
                       <CheckboxIcon icon={faCheck}/>
                     </CheckboxBtn>
                     Genomic Data Commons
                   </CheckboxLabel>
                   <CheckboxLabel>
-                    <CheckboxInput name="ctdc" type="checkbox" checked={selectDataSource['ctdc']} onClick={selectDataToggleHandler}/>
+                    <CheckboxInput name="ctdc" type="checkbox" checked={props.dataSources['ctdc']} onClick={selectDataToggleHandler}/>
                     <CheckboxBtn>
                       <CheckboxIcon icon={faCheck}/>
                     </CheckboxBtn>
                     Clinical Trial Data Commons
                   </CheckboxLabel>
                   <CheckboxLabel>
-                    <CheckboxInput name="icdc" type="checkbox" checked={selectDataSource['icdc']} onClick={selectDataToggleHandler}/>
+                    <CheckboxInput name="icdc" type="checkbox" checked={props.dataSources['icdc']} onClick={selectDataToggleHandler}/>
                     <CheckboxBtn>
                       <CheckboxIcon icon={faCheck}/>
                     </CheckboxBtn>
@@ -362,7 +348,7 @@ const Search = () => {
                 </FormGroupStyled>
                 <FormGroupStyled>
                   <CheckboxLabel>
-                    <CheckboxInput name="pcdc" type="checkbox" checked={selectDataSource['pcdc']} onClick={selectDataToggleHandler}/>
+                    <CheckboxInput name="pcdc" type="checkbox" checked={props.dataSources['pcdc']} onClick={selectDataToggleHandler}/>
                     <CheckboxBtn>
                       <CheckboxIcon icon={faCheck}/>
                     </CheckboxBtn>

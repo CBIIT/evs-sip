@@ -33,11 +33,11 @@ class GraphCalculator extends React.Component {
   componentDidUpdate(prevProps) {
     // check if need update all node's svg elements
     // this only happens once, at the first time graph is rendered
-    if(this.props.graphType.indexOf("pcdc") == 0 && prevProps.dictionary){
+    if(this.props.graphType.indexOf("pcdc") === 0 && prevProps.dictionary){
       const prevNodes = Object.keys(prevProps.dictionary);
       const currentNodes = Object.keys(this.props.dictionary);
-      if(prevNodes.length != currentNodes.length 
-        || prevProps.dictionary[prevNodes[0]].category != this.props.dictionary[currentNodes[0]].category){
+      if(prevNodes.length !== currentNodes.length 
+        || prevProps.dictionary[prevNodes[0]].category !== this.props.dictionary[currentNodes[0]].category){
           calculateGraphLayout(
             this.props.dictionary,
             this.props.countsSearch,
