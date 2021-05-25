@@ -60,6 +60,9 @@ const GraphTabsController = (props) => {
                 <Nav.Item>
                   <NavLinkStyled eventKey="icdc">ICDC</NavLinkStyled>
                 </Nav.Item>
+                <Nav.Item>
+                  <NavLinkStyled eventKey="pcdc">PCDC</NavLinkStyled>
+                </Nav.Item>
               </NavStyled>
             </TabNavsCol>
             <Col sm={12}>
@@ -72,6 +75,9 @@ const GraphTabsController = (props) => {
                 </Tab.Pane>
                 <Tab.Pane unmountOnExit={true} eventKey="icdc">
                   <GraphicalView type="icdc" keyword={props.keyword} source={props.source}/>
+                </Tab.Pane>
+                <Tab.Pane unmountOnExit={true} eventKey="pcdc">
+                  <GraphicalView type="pcdc" keyword={props.keyword} source={props.source}/>
                 </Tab.Pane>
               </Tab.Content>
             </Col>

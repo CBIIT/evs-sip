@@ -21,12 +21,37 @@ class GraphCalculator extends React.Component {
         this.props.dictionary,
         this.props.countsSearch,
         this.props.linksSearch,
+        this.props.graphType,
       ).then((layoutResult) => {
         this.props.onGraphLayoutCalculated(layoutResult);
         const legendItems = getAllTypes(layoutResult.nodes);
         this.props.onGraphLegendCalculated(legendItems);
       });
     }
+  }
+
+  componentDidUpdate(prevProps) {
+    // check if need update all node's svg elements
+    // this only happens once, at the first time graph is rendered
+    if(this.props.graphType.indexOf("pcdc") === 0 && prevProps.dictionary){
+      const prevNodes = Object.keys(prevProps.dictionary);
+      const currentNodes = Object.keys(this.props.dictionary);
+      if(prevNodes.length !== currentNodes.length 
+        || prevProps.dictionary[prevNodes[0]].category !== this.props.dictionary[currentNodes[0]].category){
+          calculateGraphLayout(
+            this.props.dictionary,
+            this.props.countsSearch,
+            this.props.linksSearch,
+            this.props.graphType,
+          ).then((layoutResult) => {
+            this.props.onGraphLayoutCalculated(layoutResult);
+            const legendItems = getAllTypes(layoutResult.nodes);
+            this.props.onGraphLegendCalculated(legendItems);
+            this.props.onClearGraphHighlight(this.props.graphType);
+          });
+      }
+    }
+    
   }
 
   componentWillUpdate(nextProps) {
@@ -143,6 +168,7 @@ class GraphCalculator extends React.Component {
 }
 
 GraphCalculator.propTypes = {
+  graphType:PropTypes.string,
   dictionary: PropTypes.object,
   countsSearch: PropTypes.array,
   linksSearch: PropTypes.array,
@@ -157,9 +183,11 @@ GraphCalculator.propTypes = {
   onPathRelatedToSecondHighlightingNodeCalculated: PropTypes.func,
   onDataModelStructureCalculated: PropTypes.func,
   layoutInitialized: PropTypes.bool,
+  onClearGraphHighlight: PropTypes.func,
 };
 
 GraphCalculator.defaultProps = {
+  graphType: "gdc",
   dictionary: {},
   countsSearch: [],
   linksSearch: [],
@@ -174,6 +202,7 @@ GraphCalculator.defaultProps = {
   onPathRelatedToSecondHighlightingNodeCalculated: () => {},
   onDataModelStructureCalculated: () => {},
   layoutInitialized: false,
+  onClearGraphHighlight: () => {},
 };
 
 export default GraphCalculator;

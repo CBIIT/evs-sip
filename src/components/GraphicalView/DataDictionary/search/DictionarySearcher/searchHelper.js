@@ -1,11 +1,12 @@
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 import {
   parseDictionaryNodes,
   getPropertyDescription,
   getType,
-} from '../../utils';
+} from "../../utils";
 
-export const ZERO_RESULT_FOUND_MSG = '0 results found. Please try another keyword.';
+export const ZERO_RESULT_FOUND_MSG =
+  "0 results found. Please try another keyword.";
 
 /**
  * Prepare search items for Fuse.io library
@@ -13,30 +14,31 @@ export const ZERO_RESULT_FOUND_MSG = '0 results found. Please try another keywor
  * @returns [Object] search data
  */
 export const prepareSearchData = (dictionary) => {
-  const searchData = parseDictionaryNodes(dictionary)
-    .map((node) => {
-      const properties = Object.keys(node.properties).map((propertyKey) => {
-        let type = getType(node.properties[propertyKey]);
-        if (type === 'UNDEFINED') type = undefined;
-        const propertyDescription = getPropertyDescription(node.properties[propertyKey]);
-        return {
-          name: propertyKey,
-          description: propertyDescription,
-          type,
-        };
-      });
+  const searchData = parseDictionaryNodes(dictionary).map((node) => {
+    const properties = Object.keys(node.properties).map((propertyKey) => {
+      let type = getType(node.properties[propertyKey]);
+      if (type === "UNDEFINED") type = undefined;
+      const propertyDescription = getPropertyDescription(
+        node.properties[propertyKey]
+      );
       return {
-        id: node.id,
-        title: node.title,
-        description: node.description,
-        properties,
+        name: propertyKey,
+        description: propertyDescription,
+        type,
       };
     });
+    return {
+      id: node.id,
+      title: node.title,
+      description: node.description,
+      properties,
+    };
+  });
   return searchData;
 };
 
-export const ERR_KEYWORD_TOO_SHORT = 'Keyword too short, try longer keyword.';
-export const ERR_KEYWORD_TOO_LONG = 'Keyword too long (more than 32).';
+export const ERR_KEYWORD_TOO_SHORT = "Keyword too short, try longer keyword.";
+export const ERR_KEYWORD_TOO_LONG = "Keyword too long (more than 32).";
 
 /**
  * Call Fuse search and returns search result
@@ -62,11 +64,11 @@ export const searchKeyword = (searchData, keyword) => {
   const minMatchCharLength = Math.min(Math.max(halfLength, 10), keyword.length);
   const options = {
     keys: [
-      'title',
-      'description',
-      'properties.name',
-      'properties.description',
-      'properties.type',
+      "title",
+      "description",
+      "properties.name",
+      "properties.description",
+      "properties.type",
     ],
     includeMatches: true,
     threshold: 0.3,
@@ -75,11 +77,13 @@ export const searchKeyword = (searchData, keyword) => {
     minMatchCharLength,
   };
   const handler = new Fuse(searchData, options);
-  const result = handler.search(keyword)
+  const result = handler
+    .search(keyword)
     .map((resItem) => {
       // A bug in Fuse sometimes returns wrong indices that end < start
-      const matches = resItem.matches
-        .filter(matchItem => matchItem.indices[0][1] >= matchItem.indices[0][0]);
+      const matches = resItem.matches.filter(
+        (matchItem) => matchItem.indices[0][1] >= matchItem.indices[0][0]
+      );
       return {
         ...resItem,
         matches,
@@ -87,18 +91,17 @@ export const searchKeyword = (searchData, keyword) => {
     })
     .map((resItem) => {
       // filter out matches that is too shorter than keyword
-      const matches = resItem.matches
-        .filter((matchItem) => {
-          const matchLen = (matchItem.indices[0][1] - matchItem.indices[0][0]) + 1;
-          return matchLen >= halfLength;
-        });
+      const matches = resItem.matches.filter((matchItem) => {
+        const matchLen = matchItem.indices[0][1] - matchItem.indices[0][0] + 1;
+        return matchLen >= halfLength;
+      });
       return {
         ...resItem,
         matches,
       };
     })
-    .filter(resItem => resItem.matches.length > 0);
-  const errorMsg = (result && result.length > 0) ? '' : ZERO_RESULT_FOUND_MSG;
+    .filter((resItem) => resItem.matches.length > 0);
+  const errorMsg = result && result.length > 0 ? "" : ZERO_RESULT_FOUND_MSG;
   return {
     result,
     errorMsg,
@@ -107,34 +110,49 @@ export const searchKeyword = (searchData, keyword) => {
 
 /**
  * Filter out and reorgnize search result
- * @params [string] graph type 
+ * @params [string] graph type
  * @params [Object] searchData - see elasticsearch search API returns
  * @returns [SearchResultItemShape[]] (see ../../utils).
  */
-export const getSearchResult = (graphType, searchData) => {
+export const getSearchResult = (graphType, searchData, project_filter) => {
   let result = {};
-  if(searchData.length > 0){
+  if (graphType === "pcdc" && project_filter === undefined) {
+    project_filter = "AML";
+  }
+  if (searchData.length > 0) {
     searchData.forEach((entry) => {
       let dt = entry._source;
-      if(dt.source == graphType){
-        if(!(dt.node in result)){
+
+      if (project_filter && dt.category !== project_filter) {
+        return;
+      }
+      if (dt.source === graphType) {
+        if (!(dt.node in result)) {
           result[dt.node] = {};
           result[dt.node].props = {};
         }
         result[dt.node].props[dt.prop] = {};
-        if(entry.highlight){
-          result[dt.node].props[dt.prop].title = entry.highlight["prop.have"] ? entry.highlight["prop.have"][0] : dt.prop;
-          result[dt.node].props[dt.prop].desc = entry.highlight["prop_desc"] ? entry.highlight["prop_desc"][0] : dt.prop_desc;
-          if(entry.highlight["cde.id"]){
+        if (entry.highlight) {
+          result[dt.node].props[dt.prop].title = entry.highlight["prop.have"]
+            ? entry.highlight["prop.have"][0]
+            : dt.prop;
+          result[dt.node].props[dt.prop].desc = entry.highlight["prop_desc"]
+            ? entry.highlight["prop_desc"][0]
+            : dt.prop_desc;
+          if (entry.highlight["cde.id"]) {
             let icdo = entry.highlight["cde.id"][0];
-            result[dt.node].props[dt.prop].desc = result[dt.node].props[dt.prop].desc.replace(icdo.replace(/<b>/g,'').replace(/<\/b>/g, ''), icdo);
+            result[dt.node].props[dt.prop].desc = result[dt.node].props[
+              dt.prop
+            ].desc.replace(
+              icdo.replace(/<b>/g, "").replace(/<\/b>/g, ""),
+              icdo
+            );
           }
-        }
-        else{
+        } else {
           result[dt.node].props[dt.prop].title = dt.prop;
           result[dt.node].props[dt.prop].desc = dt.prop_desc;
         }
-        
+
         result[dt.node].props[dt.prop].type = dt.type;
         result[dt.node].props[dt.prop].enum = dt.enum ? dt.enum : [];
         result[dt.node].props[dt.prop].hits = entry.inner_hits.enum.hits.hits;

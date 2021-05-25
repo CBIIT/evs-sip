@@ -29,6 +29,18 @@ const Search = (props) => {
   let [loadingState, setLoadingState] = useState(false);
   let [errorState, setErrorState] = useState(false);
 
+  let [selectDataSource, setSelectDataSource] = useState(
+    props.location.state !== undefined &&
+    props.location.state.dataSource !== undefined ? 
+    props.location.state.dataSource 
+    : {    
+      ctdc: false,
+      gdc: false,
+      icdc: false,
+      pcdc: false
+    }
+  );
+
   const searchHandler = (keyword, match, options, sources) => {
     let keywordCase = keyword.trim();
     setKeywordState(keywordCase);
@@ -64,7 +76,7 @@ const Search = (props) => {
 
   return <Page>
         <PageTitle>Search EVS-SIP</PageTitle>
-        <SearchBox searchTrigger={searchHandler} keyword={keywordState} errors={errorState} />
+        <SearchBox searchTrigger={searchHandler} keyword={keywordState} errors={errorState} selectSource={selectDataSource} setSelectSource={setSelectDataSource} />
         <MainTabsController keyword={keywordState} result={resultState} errors={errorState} />
         {loadingState && <LoadingAnimation/>}
     </Page>;

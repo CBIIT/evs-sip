@@ -123,6 +123,11 @@ const DataSources = () => {
             <td><a title="Clinical Trials Data Commons" href="https://trialcommons.cancer.gov/" target="_blank" rel="noopener noreferrer">https://trialcommons.cancer.gov</a><FontAwesomeIconStyled icon={faAsterisk}/></td>
             <td>November 2020</td>
           </tr>
+          <tr>
+          <td><ContentThTitle>Pediatric Cancer<br/>Data Commons</ContentThTitle></td>
+            <td><a title="Clinical Trials Data Commons" href="https://commons.cri.uchicago.edu/" target="_blank" rel="noopener noreferrer">https://commons.cri.uchicago.edu/</a></td>
+            <td>November 2020</td>
+          </tr>
         </tbody>
       </ContentBoxTable>
       <ConstextBoxIndicator>

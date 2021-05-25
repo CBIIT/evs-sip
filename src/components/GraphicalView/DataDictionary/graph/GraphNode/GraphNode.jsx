@@ -75,7 +75,7 @@ class GraphNode extends React.Component {
             transform={`translate(${-this.props.node.iconRadius}, ${-this.props.node.iconRadius})`}
           >
             {
-              IconSVG ? <IconSVG /> : (
+              IconSVG ? <IconSVG fill={this.props.node.color}/> : (
                 <circle
                   cx={this.props.node.iconRadius}
                   cy={this.props.node.iconRadius}

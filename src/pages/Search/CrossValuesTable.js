@@ -12,7 +12,8 @@ const ContainerStyled = styled(Container)`
   padding-right: 15px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
-  height: 45rem;
+  // height: 45rem;
+  min-height: 45rem;
   border: 2px solid #535F74;
   overflow: hidden;
 `;
@@ -35,7 +36,8 @@ const TableTh = styled.div`
 
 const TableBody = styled(Row)`
   overflow-y: auto;
-  max-height: 42rem;
+  // max-height: 42rem;
+  max-height: 55rem;
 `;
 
 const TableCol = styled(Col)`
@@ -138,6 +140,9 @@ const PreferredTerm = styled.div`
   color: #475162;
   font-size: 1rem;
   font-weight: bold;
+  width: 10.5rem;
+  margin: auto;
+  word-wrap: break-word;
 `;
 
 const TableStyled = styled(Table)`
@@ -330,7 +335,7 @@ const CrossValuesTable = (props) => {
           }
 
           entry[1].vs = idValueObj[`${match}-${entry[1].id}`];
-          ncitObjs[match].push(entry[1]);
+          ncitObjs[match].push({ ...entry[1] });
         }
       });
     }
@@ -340,7 +345,7 @@ const CrossValuesTable = (props) => {
         icdo3Objs[entry[1].ic_match] = [];
       }
       entry[1].vs = idValueObj[`${entry[1].ic_match}-${entry[1].id}`];
-      icdo3Objs[entry[1].ic_match].push(entry[1]);
+      icdo3Objs[entry[1].ic_match].push({ ...entry[1] });
     };
 
     if ((entry[1].n_match === undefined || entry[1].n_match.length === 0) && entry[1].ic_match === undefined && entry[0] === `no-mapping-${entry[1].id}`){
@@ -348,7 +353,7 @@ const CrossValuesTable = (props) => {
         ncitObjs['no-mapping'] = [];
       }
       entry[1].vs = idValueObj[`no-mapping-${entry[1].id}`];
-      ncitObjs['no-mapping'].push(entry[1]);
+      ncitObjs['no-mapping'].push({ ...entry[1] });
     };
   });
 
@@ -358,6 +363,7 @@ const CrossValuesTable = (props) => {
     let ctdcValues = [];
     let gdcValues = [];
     let icdcValues = [];
+    let pcdcValues = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(value => {
@@ -369,6 +375,9 @@ const CrossValuesTable = (props) => {
         }
         if(value.source !== undefined && value.source === 'icdc'){
           icdcValues.push(value);
+        }
+        if(value.source !== undefined && value.source === 'pcdc'){
+          pcdcValues.push(value);
         }
       });
     }
@@ -381,6 +390,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
+        pcdcvalues: pcdcValues,
       }
     })
   });
@@ -389,6 +399,7 @@ const CrossValuesTable = (props) => {
     let gdcValues = [];
     let ctdcValues = [];
     let icdcValues = [];
+    let pcdcValues = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(value => {
@@ -401,6 +412,9 @@ const CrossValuesTable = (props) => {
         if(value.source !== undefined && value.source === 'icdc'){
           icdcValues.push(value);
         }
+        if(value.source !== undefined && value.source === 'pcdc'){
+          pcdcValues.push(value);
+        }
       });
     }
 
@@ -412,6 +426,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
+        pcdcvalues: pcdcValues,
       }
     })
   });
@@ -711,7 +726,7 @@ const CrossValuesTable = (props) => {
             <CodeSpan>{props.cross.code}<br/>({props.cross.ref})</CodeSpan><br/>
             {props.cross.ncitPreferredTerm !== undefined && <PreferredTerm dangerouslySetInnerHTML={{ __html: `${props.cross.ncitPreferredTerm.termName} (${props.cross.ncitPreferredTerm.termGroup})` }}></PreferredTerm>}
             {(props.cross.icdo3PreferredTerm !== undefined) && <PreferredTerm>{props.cross.icdo3PreferredTerm.n} ({props.cross.icdo3PreferredTerm.t})</PreferredTerm>}
-        </DivCenter>
+          </DivCenter>
         </TableColLeft>
         <TableColRight data-class="TableColRight" xs={10}>
           {props.cross.values.gdcvalues.length !== 0 &&
@@ -756,6 +771,20 @@ const CrossValuesTable = (props) => {
               </TableColRight>
             </TableRow>
           }
+          {props.cross.values.pcdcvalues.length !== 0 &&
+            <TableRow>
+              <TableColLeft data-class="TableColLeft" xs={2}>
+                <DivCenter>Pediatric Cancer Data Commons</DivCenter>
+              </TableColLeft>
+              <TableColRight data-class="TableColRight" xs={10}>
+                {props.cross.values.pcdcvalues.map((value, index) =>
+                  <TableRowValues data-class="TableRowValues" key={index}>
+                    <ValuesItems item={value}/>
+                  </TableRowValues>
+                )}
+              </TableColRight>
+            </TableRow>
+          }
         </TableColRight>
     </Row>
     );
@@ -763,7 +792,7 @@ const CrossValuesTable = (props) => {
 
   const LazyLoadContainer = (props) => {
     return (
-      <LazyLoad height={250} once overflow={true} offset={270} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-cross">
+      <LazyLoad height={250} once overflow={true} offset={500} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-cross">
         {props.children}
       </LazyLoad>
     );

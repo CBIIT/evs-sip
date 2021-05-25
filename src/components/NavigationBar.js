@@ -103,6 +103,12 @@ const NavigationBar = () => (
                 fromDataModel: 'icdc'
               }
             }}>ICDC</NavDropdownItem>
+            <NavDropdownItem as={Link} to={{
+              pathname: '/datamodel',
+              state: {
+                fromDataModel: 'pcdc'
+              }
+            }}>PCDC</NavDropdownItem>
           </NavDropdownStyled>
           <Nav.Link as={Link} to="/about">About</Nav.Link>
         </Nav>

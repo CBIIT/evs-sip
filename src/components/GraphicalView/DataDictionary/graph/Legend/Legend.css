@@ -44,7 +44,7 @@
   width: 20px !important;
 }
 
-.data-dictionary-graph-legend__question-icon{
+.data-dictionary-graph-legend__question-icon {
   width: 30px !important;
   margin-top: 7px;
   color: white;
@@ -93,4 +93,25 @@
   top: 6px;
   left: 11px;
   background-color: var(--g3-color__white);
+}
+
+.data-dictionary-graph-legend .list-group-item {
+  cursor: pointer;
+}
+
+.data-dictionary-graph-legend .list-group-item.active {
+  background-color: #78b9ce;
+  border-color: #78b9ce;
+}
+
+.data-dictionary-graph-legend
+  .list-group-item.active
+  .data-dictionary-graph-legend__text {
+  color: white;
+}
+
+.data-dictionary-graph-legend
+  .list-group-item:hover
+  .data-dictionary-graph-legend__text {
+  color: #6196aa;
 }

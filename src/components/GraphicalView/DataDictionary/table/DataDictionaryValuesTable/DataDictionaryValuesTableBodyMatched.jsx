@@ -76,7 +76,7 @@ class DataDictionaryValuesTableBodyMatched extends React.Component {
     return (
       <React.Fragment>
         <div class="data-dictionary-node__property-summary">
-          <span>{this.props.hits.length} Values Matched Out of {this.state.values.length} . </span>
+          <span>{this.props.hits.length + (this.props.hits.length < 2 ? ' Value Matched' :' Values Matched')} Out of {this.state.values.length} . </span>
           <Button
             className='data-dictionary-values-table__toggle-button'
             onClick={(e) => this.switchValuesList(e)}

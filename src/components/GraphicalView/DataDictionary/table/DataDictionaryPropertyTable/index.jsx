@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SearchResultItemShape } from '../../utils';
 import {
-  getMatchesSummaryForProperties,
   getPropertyNameFragment,
   getPropertyDescriptionFragment,
-  getPropertyTypeFragment,
 } from '../../highlightHelper';
 import Button from 'react-bootstrap/Button';
 import DataDictionaryValuesTable from '../DataDictionaryValuesTable/.';
@@ -128,7 +125,7 @@ class DataDictionaryPropertyTable extends React.Component {
                   );
 
                   //let hasValues = properties[pKey].enum.length > 0;
-                  let hasValues = properties[pKey].type == "enum";
+                  let hasValues = properties[pKey].type === "enum";
 
                   let type = properties[pKey].type;
 
@@ -176,7 +173,7 @@ class DataDictionaryPropertyTable extends React.Component {
                           {
                             hasValues ? (
                               <a href="javascript: void(0);" onClick={(e) => this.openOrCloseValuesTable(e, pKey)} >
-                                {properties[pKey].hits.length + ' Values Matched'}
+                                {properties[pKey].hits.length + (properties[pKey].hits.length < 2 ? ' Value Matched' :' Values Matched')}
                               </a>
                               
                             ) : ""
@@ -204,13 +201,15 @@ class DataDictionaryPropertyTable extends React.Component {
                   let hasValues = false;
                   let nameMatch = null;
                   let descriptionMatch = null;
-                  let typeMatchList = null;
-
-                  if(original_source == 'gdc'){
+                  
+                  if(original_source === 'gdc'){
                     hasValues = property.enum && property.enum.length > 0;
                   }
-                  else if(original_source == 'ctdc' || original_source == 'icdc'){
+                  else if(original_source === 'ctdc' || original_source === 'icdc'){
                     hasValues = property.type && Array.isArray(property.type);
+                  }
+                  else if(original_source === 'pcdc'){
+                    hasValues = property.type === "enum";
                   }
                   else{
                     hasValues = false;
@@ -229,7 +228,7 @@ class DataDictionaryPropertyTable extends React.Component {
                       if(Array.isArray(property.type)){
                         type = "enum";
                       }
-                      else if(typeof property.type == 'object'){
+                      else if(typeof property.type === 'object'){
                         type = 'object';
                       }
                       else{

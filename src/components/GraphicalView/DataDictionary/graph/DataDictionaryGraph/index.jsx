@@ -14,7 +14,7 @@ class DataDictionaryGraph extends React.Component {
     return (
       <React.Fragment>
         <ReduxGraphCalculator graphType={this.props.graphType}/>
-        <ReduxLegend graphType={this.props.graphType}/>
+        <ReduxLegend graphType={this.props.graphType} source={this.props.source}/>
         <ReduxCanvas graphType={this.props.graphType}>
           <ReduxGraphDrawer graphType={this.props.graphType}/>
         </ReduxCanvas>

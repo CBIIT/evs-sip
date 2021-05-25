@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import DataDictionarySynonymsTable from './DataDictionarySynonymsTable';
 import './DataDictionaryValuesTable.css';
 
@@ -9,7 +7,7 @@ class DataDictionaryValuesTableRows extends React.Component {
 
   render() {
 
-    if(this.props.syns.length == 0){
+    if(this.props.syns.length === 0){
       return (
           <tr key={this.props.name + "-0"} className={this.props.trClassName}>
             <td className="data-dictionary-property-table__data">
@@ -43,7 +41,7 @@ class DataDictionaryValuesTableRows extends React.Component {
         });
       }
 
-      if(index == 0){
+      if(index === 0){
         return (
           <tr key={this.props.name + "-" + index} className={this.props.trClassName}>
             <td className="data-dictionary-property-table__data" rowSpan={this.props.syns.length}>

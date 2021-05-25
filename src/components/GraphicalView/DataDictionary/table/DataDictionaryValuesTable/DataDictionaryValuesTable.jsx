@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DataDictionaryValuesTableBody from './DataDictionaryValuesTableBody';
 import DataDictionaryValuesTableBodyMatched from './DataDictionaryValuesTableBodyMatched';
-import DataDictionaryValuesTableRows from './DataDictionaryValuesTableRows';
 import './DataDictionaryValuesTable.css';
 
 class DataDictionaryValuesTable extends React.Component {
@@ -10,7 +9,7 @@ class DataDictionaryValuesTable extends React.Component {
   render() {
     if (!this.props.open) return (<React.Fragment />);
 
-    if(this.props.type == 'all'){
+    if(this.props.type === 'all'){
       return (
         <tr className="values-row">
           <td colSpan="5" className="data-dictionary-property-table__data">

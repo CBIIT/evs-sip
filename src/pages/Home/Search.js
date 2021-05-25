@@ -142,7 +142,6 @@ const SelectBtn = styled(Button)`
 
 const FormGroupStyled = styled(Form.Group)`
   width: 30rem;
-  height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -215,7 +214,8 @@ const Search = () => {
   let [selectDataSource, setSelectDataSource] = useState({
     ctdc: false,
     gdc: false,
-    icdc: false
+    icdc: false,
+    pcdc: false
   });
 
   const history = useHistory();
@@ -277,26 +277,20 @@ const Search = () => {
     });
   };
 
-  // // const selectDataAllToggleHandler = event => {
-  //   setSelectDataSource({
-  //     ctdc: true,
-  //     gdc: true,
-  //     icdc: true
-  //   });
-  // // };
-
   const selectDataAllToggleHandler = event => {
     if(isToggleOnSource === false){
       setSelectDataSource({
         ctdc: true,
         gdc: true,
-        icdc: true
+        icdc: true,
+        pcdc: true
       });
     } else {
       setSelectDataSource({
         ctdc: false,
         gdc: false,
-        icdc: false
+        icdc: false,
+        pcdc: false
       });
     }
     setIsToggleOnSource(!isToggleOnSource);
@@ -364,6 +358,15 @@ const Search = () => {
                       <CheckboxIcon icon={faCheck}/>
                     </CheckboxBtn>
                     Integrated Canine Data Commons
+                  </CheckboxLabel>
+                </FormGroupStyled>
+                <FormGroupStyled>
+                  <CheckboxLabel>
+                    <CheckboxInput name="pcdc" type="checkbox" checked={selectDataSource['pcdc']} onClick={selectDataToggleHandler}/>
+                    <CheckboxBtn>
+                      <CheckboxIcon icon={faCheck}/>
+                    </CheckboxBtn>
+                    Pediatric Cancer Data Model
                   </CheckboxLabel>
                 </FormGroupStyled>
               </Col>

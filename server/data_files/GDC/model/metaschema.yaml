@@ -3,8 +3,8 @@ $schema: "http://json-schema.org/draft-04/schema#"
 id: "metaschema"
 title: "GDC JSON schema extension"
 
-#allOf:
-#  - $ref: "http://json-schema.org/draft-04/schema#"
+allOf:
+  - $ref: "http://json-schema.org/draft-04/schema#"
 
 #GDC extensions
 required:
@@ -145,7 +145,7 @@ properties:
     type: string
     description: "Denotes the projects within the commons for which this schema may be used."
 
-  properties: 
+  properties:
     type: object
     properties: {}
     additionalProperties: false

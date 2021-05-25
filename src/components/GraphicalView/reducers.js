@@ -46,6 +46,10 @@ const submission = (state = {}, action) => {
     return { ...state,
       dictionary_ctdc: getDictionaryWithExcludeSystemProperties(action.dictionary),
     };
+  case 'RECEIVE_DICTIONARY_PCDC':
+    return { ...state,
+      dictionary_pcdc: action.dictionary,
+    };
   case 'RECEIVE_DICTIONARY_GDC_READONLY':
     return { ...state,
       dictionary_gdc_readonly: getDictionaryWithExcludeSystemProperties(action.dictionary),
@@ -57,6 +61,10 @@ const submission = (state = {}, action) => {
   case 'RECEIVE_DICTIONARY_CTDC_READONLY':
     return { ...state,
       dictionary_ctdc_readonly: getDictionaryWithExcludeSystemProperties(action.dictionary),
+    };
+  case 'RECEIVE_DICTIONARY_PCDC_READONLY':
+    return { ...state,
+      dictionary_pcdc_readonly: action.dictionary,
     };
   default:
     return state;

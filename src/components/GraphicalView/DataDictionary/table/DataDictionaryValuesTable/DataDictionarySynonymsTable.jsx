@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus, faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import './DataDictionaryValuesTable.css';
 
 class DataDictionarySynonymsTable extends React.Component {
@@ -31,7 +31,7 @@ class DataDictionarySynonymsTable extends React.Component {
     let highlights = this.props.highlights;
 
     highlights.forEach(function(hl){
-      if(hl.replace(/<b>/g, '').replace(/<\/b>/g, '') == pt){
+      if(hl.replace(/<b>/g, '').replace(/<\/b>/g, '') === pt){
         pt = hl;
       }
     });
@@ -56,7 +56,7 @@ class DataDictionarySynonymsTable extends React.Component {
 
     this.props.syns.forEach(function(syn){
       highlights.forEach(function(hl){
-        if(hl.replace(/<b>/g, '').replace(/<\/b>/g, '') == syn.n){
+        if(hl.replace(/<b>/g, '').replace(/<\/b>/g, '') === syn.n){
           syn.n = hl;
         }
       });
