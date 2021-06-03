@@ -229,6 +229,7 @@ const ToCompareModal = (props) => {
   };
 
   const ModalContainer = (props) => {
+    //const [userValues, setUserValues] = useState('');
     const [resultReport, setResultReport] = useState([]);
     const [resultPagination, setResultPagination] = useState([]);
     const [pageCountStage, setPageCountStage] = useState(0);
@@ -244,6 +245,7 @@ const ToCompareModal = (props) => {
     const handleCompare = () => {
       if(showReport === false) setShowReport(true);
       const valueRef = userValuesRef.current.value;
+      //setUserValues(valueRef)
       const results = compareGDCvalues(valueRef, props.items, optionsState);
       setResultReport(results);
       if(results.length !== 0){
@@ -370,13 +372,17 @@ const ToCompareModal = (props) => {
     const TableSynonyms = (props) => {
       if (props.synonyms !== undefined) {
         let regKey = new RegExp(props.match, 'ig');
-        return props.synonyms.map((item, index) =>
-          <tr key={index}>
-            <td dangerouslySetInnerHTML={{ __html: item.n.replace(regKey, '<b>$&</b>')}}></td>
-            <td>{item.src}</td>
-            <td>{item.t}</td>
-          </tr>
-        );
+        return props.synonyms.map((item, index) => {
+          let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
+          let SynName = optionsState['partial'] === true ? item.n.replace(regKey, '<b>$&</b>') : item.n.toLowerCase() === SynMatch ? `<b>${item.n}</b>` : item.n; 
+          return(
+            <tr key={index}>
+              <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
+              <td>{item.src}</td>
+              <td>{item.t}</td>
+            </tr>
+          );
+        });
       }
       return (null);
     };
@@ -391,10 +397,12 @@ const ToCompareModal = (props) => {
       };
 
       let regKey = new RegExp(props.match, 'ig');
+      let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
+      let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
       return (
         <>
           <RowRight>
-            <Col xs={10} dangerouslySetInnerHTML={{ __html: props.name.replace(regKey, '<b>$&</b>')}}></Col>
+            <Col xs={10} dangerouslySetInnerHTML={{ __html: ncitName }}></Col>
             <ColRight xs={2}>
             {((props.ncit !== undefined && props.ncit.length !== 0) || props.icdo !== undefined) &&
               <a href="/#" aria-label={isToggleOn === true ? 'collapse' : 'expand'} onClick={ToggleTableHandler}>
