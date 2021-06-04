@@ -568,7 +568,7 @@ const ToCompareModal = (props) => {
     };
 
     const downloadCompareCVS = (items) => {
-      let csv = 'User Defined Values, Matched GDC Values, ICDO3 code, NCIt code, ICDO3 Strings/Synonyms,\n';
+      let csv = 'User Defined Values, Matched GDC Values, ICDO3 code, NCIt code, NCIT Synonyms,\n';
       items.forEach((item, index) => {
         let newLine = true;
         let match = item.match;
@@ -576,16 +576,17 @@ const ToCompareModal = (props) => {
         if (item.match === undefined) match = '--';
         csv += '"' + match + '","' + item.n + '",';
         csv += item.icdo !== undefined ? '"' + item.icdo.c + '",' : '"",';
-        if (item.icdo !== undefined && item.icdo.s !== undefined && item.icdo.s.length !== 0) {
-          item.icdo.s.forEach((s, i) => {
-            csv += i === 0 ? '"","' + s.n + '",' : '"' + s.n + '",';
-          });
-        }
+        // if (item.icdo !== undefined && item.icdo.s !== undefined && item.icdo.s.length !== 0) {
+        //   item.icdo.s.forEach((s, i) => {
+        //     csv += i === 0 ? '"","' + s.n + '",' : '"' + s.n + '",';
+        //   });
+        // }
 
         if (item.ncit && item.ncit.length !== 0) {
           item.ncit.forEach((nc, tmpIndex) => {
             if (nc.s.length !== 0) {
-              csv += tmpIndex === 0 ? '\n"","","","' + nc.c + '",' : '"","","","' + nc.c + '",';
+              //csv += tmpIndex === 0 ? '\n"","","","' + nc.c + '",' : '"","","","' + nc.c + '",';
+              csv += tmpIndex === 0 ? '"' + nc.c + '",' : '"","","","' + nc.c + '",';
               nc.s.forEach(s => {
                 csv += '"' + s.n + '",';
               });
