@@ -479,23 +479,19 @@ const PCDCValuesTable = (props) => {
     };
 
     return(
-      <TableRow key={props.index}>
+      <TableRow>
         <TableCol xs={3}>
-          {props.item.node}
+          {props.item.node.n}
           <TableUl>
-            <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property}</TableLi>
+            <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property.n}</TableLi>
           </TableUl>
         </TableCol>
 
         <TableValues xs={9}>
-          <div>
-            {props.item.vs.slice(0,5).map((value, index) => {
-              return(
-                <TableRowValue data-class="TableRowValue" key={index}>
-                  <TableValue name={value.n} ic={value.i_c} icemun={value.ic_enum} nsyn={value.n_syn}/>
-                </TableRowValue>
-              )
-            })}
+          <>
+            {props.item.vs.slice(0,5).map((value, index) =>
+              <TableValue name={value.n} ic={value.i_c} icemun={value.ic_enum} nsyn={value.n_syn}/>
+            )}
             {props.item.vs.length > 5 && 
             <Collapse in={isToggleOn} mountOnEnter={true}>
               <div>
@@ -512,7 +508,7 @@ const PCDCValuesTable = (props) => {
               </div>
             </Collapse>
             }
-          </div>
+          </>
           {props.item.vs.length > 5 && 
             <TableRowValue data-class="TableRowValue">
               <TableCol data-class="TableCol" xs={12}>
@@ -554,7 +550,7 @@ const PCDCValuesTable = (props) => {
           </DivCenter>
         </TableColLeft>
         <TableColRight xs={10}>
-        {props.values.slice(0,5).map((item, index) => 
+        {props.values.slice(0,5).map((item, index) =>
           <ValueItem item={item} key={index} />
         )}
         {props.values.length > 5 && 
