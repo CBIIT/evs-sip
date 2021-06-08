@@ -127,16 +127,16 @@ export const getSearchResult = (graphType, searchData, project_filter) => {
         return;
       }
       if (dt.source === graphType) {
-        if (!(dt.node in result)) {
-          result[dt.node] = {};
-          result[dt.node].props = {};
+        if (!(dt.node.n in result)) {
+          result[dt.node.n] = {};
+          result[dt.node.n].props = {};
         }
-        result[dt.node].props[dt.prop] = {};
+        result[dt.node.n].props[dt.prop.n] = {};
         if (entry.highlight) {
-          result[dt.node].props[dt.prop].title = entry.highlight["prop.have"]
+          result[dt.node.n].props[dt.prop.n].title = entry.highlight["prop.have"]
             ? entry.highlight["prop.have"][0]
             : dt.prop;
-          result[dt.node].props[dt.prop].desc = entry.highlight["prop_desc"]
+          result[dt.node.n].props[dt.prop.n].desc = entry.highlight["prop_desc"]
             ? entry.highlight["prop_desc"][0]
             : dt.prop_desc;
           if (entry.highlight["cde.id"]) {
@@ -149,13 +149,13 @@ export const getSearchResult = (graphType, searchData, project_filter) => {
             );
           }
         } else {
-          result[dt.node].props[dt.prop].title = dt.prop;
-          result[dt.node].props[dt.prop].desc = dt.prop_desc;
+          result[dt.node.n].props[dt.prop.n].title = dt.prop.n;
+          result[dt.node.n].props[dt.prop.n].desc = dt.prop.d;
         }
 
-        result[dt.node].props[dt.prop].type = dt.type;
-        result[dt.node].props[dt.prop].enum = dt.enum ? dt.enum : [];
-        result[dt.node].props[dt.prop].hits = entry.inner_hits.enum.hits.hits;
+        result[dt.node.n].props[dt.prop.n].type = dt.type;
+        result[dt.node.n].props[dt.prop.n].enum = dt.enum ? dt.enum : [];
+        result[dt.node.n].props[dt.prop.n].hits = entry.inner_hits.enum.hits.hits;
       }
     });
   }
