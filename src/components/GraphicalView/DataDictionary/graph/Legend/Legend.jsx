@@ -22,7 +22,7 @@ class Legend extends React.Component {
   }
 
   componentDidMount() {
-    if(this.props.currentProject != ""){
+    if(this.props.currentProject !== ""){
       this.switchProject(this.props.currentProject);
     }
     
@@ -51,7 +51,7 @@ class Legend extends React.Component {
     let legend_content = "";
     if(this.props.graphType.indexOf("pcdc") === 0){
 
-      const current_project = this.props.currentProject == "" ? "AML" : this.props.currentProject;
+      const current_project = this.props.currentProject === "" ? "AML" : this.props.currentProject;
       legend_content = ["AML", "EWS", "GCT", "ALL"].map((project, i) => {
         const itemColor = getCategoryColor(project.toLowerCase());
         const IconSvg = getCategoryIconSVG(project.toLowerCase());

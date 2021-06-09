@@ -2,7 +2,7 @@ const baseUrl = "./api/search";
 //const baseUrl = "http://localhost:3000/api/search";
 
 export const apiSuggest = async (keyword) => {
-  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/\&/g, "%26");
+  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
   const response = await fetch(`${baseUrl}/suggest?keyword=${encoded_keyword}`);
   return response.json();
 };
@@ -15,7 +15,7 @@ export const apiSearchAll = async (keyword, match, options, dataSources) => {
       sources.push(key);
     }
   }
-  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/\&/g, "%26");
+  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
   const response = await fetch(`${baseUrl}/all/p?keyword=${encoded_keyword}&options=${opts}&sources=${sources.join()}`);
   return response.json();
 };

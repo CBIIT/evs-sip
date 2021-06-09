@@ -133,7 +133,7 @@ const NodesTable = (props) => {
       let nodeHits = node.hits.hits;
 
       nodeHits.forEach((hits) => {
-        if((nodes.findIndex(n => n.node.n === item._source.node.n)) !== -1) return;
+        if((nodes.findIndex(n => n.source === item._source.source && n.category === item._source.category && n.node.n.replace(/<b>/g, '').replace(/<\/b>/g, '') === item._source.node.n)) !== -1) return;
 
         let hl = hits.highlight;
 
@@ -156,8 +156,8 @@ const NodesTable = (props) => {
         nodeObj.source = item._source.source;
         nodeObj.property = item._source.prop;
         nodeObj.type = item._source.type;
-        nodeObj.property.n = highlightNodeObj[item._source.node.n] ? highlightNodeObj[item._source.node.n] : item._source.node.n;
-        nodeObj.property.d = highlightDescObj[item._source.node.d] ? highlightDescObj[item._source.node.d] : item._source.node.d;
+        nodeObj.node.n = highlightNodeObj[item._source.node.n] ? highlightNodeObj[item._source.node.n] : item._source.node.n;
+        nodeObj.node.d = highlightDescObj[item._source.node.d] ? highlightDescObj[item._source.node.d] : item._source.node.d;
         
         nodeObj.ncit = hits._source.ncit ? hits._source.ncit : undefined;
 
@@ -207,6 +207,7 @@ const NodesTable = (props) => {
     let ctdcNodes = [];
     let gdcNodes = [];
     let icdcNodes = [];
+    let pcdcNodes = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(prop => {
@@ -219,6 +220,9 @@ const NodesTable = (props) => {
         if(prop.source !== undefined && prop.source === 'icdc'){
           icdcNodes.push(prop);
         }
+        if(prop.source !== undefined && prop.source === 'pcdc'){
+          pcdcNodes.push(prop);
+        }
       });
     }
 
@@ -229,6 +233,7 @@ const NodesTable = (props) => {
         ctdc: ctdcNodes,
         gdc: gdcNodes,
         icdc: icdcNodes,
+        pcdc: pcdcNodes
       }
     })
   });
@@ -399,6 +404,20 @@ const NodesTable = (props) => {
               </TableColLeft>
               <TableColRight data-class="TableColRight" xs={10}>
                 {props.cross.nodes.icdc.map((node, index) =>
+                  <TableRowProps data-class="TableRowValues" key={index}>
+                    <PropsItems item={node}/>
+                  </TableRowProps>
+                )}
+              </TableColRight>
+            </TableRow>
+          }
+          {props.cross.nodes.pcdc.length !== 0 &&
+            <TableRow>
+              <TableColLeft data-class="TableColLeft" xs={2}>
+                <DivCenter>Pediatric Cancer Data Commons</DivCenter>
+              </TableColLeft>
+              <TableColRight data-class="TableColRight" xs={10}>
+                {props.cross.nodes.pcdc.map((node, index) =>
                   <TableRowProps data-class="TableRowValues" key={index}>
                     <PropsItems item={node}/>
                   </TableRowProps>

@@ -229,6 +229,7 @@ const ToCompareModal = (props) => {
   };
 
   const ModalContainer = (props) => {
+    //const [userValues, setUserValues] = useState('');
     const [resultReport, setResultReport] = useState([]);
     const [resultPagination, setResultPagination] = useState([]);
     const [pageCountStage, setPageCountStage] = useState(0);
@@ -244,6 +245,7 @@ const ToCompareModal = (props) => {
     const handleCompare = () => {
       if(showReport === false) setShowReport(true);
       const valueRef = userValuesRef.current.value;
+      //setUserValues(valueRef)
       const results = compareGDCvalues(valueRef, props.items, optionsState);
       setResultReport(results);
       if(results.length !== 0){
@@ -277,7 +279,6 @@ const ToCompareModal = (props) => {
       fromVArray.forEach(function (v) {
         let caseSensitiveV = v.trim().replace(/\s{2,}/g, ' ');
         v = v.trim().toLowerCase().replace(/\s{2,}/g, ' ');
-        // let reg_key = new RegExp(v, "ig");
         let tmp = v;
         if (tmp === '') {
           return;
@@ -358,25 +359,89 @@ const ToCompareModal = (props) => {
             }
           });
         }
-        if (text.length > 0) text = sortAlphabetically(text);
-        if (text.length === 0) text.push({ n: '', n_c: '', match: caseSensitiveV, s: [] });
+        if (text.length > 0) {
+          text = sortAlphabetically(text);
+          if (text.length > 1) {
+            text = text.map(t => {
+              t.rowspan = text.length;
+              return t;
+            });
+          }
+        }
+        if (text.length === 0) text.push({ n: '', n_c: '', match: caseSensitiveV, s: []});
         items = items.concat(JSON.parse(JSON.stringify(text)));
       });
     
       items = option.unmatched ? items.concat(toV.filter((v, i) => !vMatched.includes(i))) : items;
       return items;
     };
+
+    const handlePageClick = (data) => {
+      const position = data.selected * 12;
+      if (resultReport.length !== 0) {
+        setResultPagination(resultReport.slice(position, position + 11));
+      };
+    };
+
+    const downloadCompareCVS = (items) => {
+      let csv = 'User Defined Values, Matched GDC Values, ICDO3 code, NCIt code, NCIT Synonyms,\n';
+      items.forEach((item, index) => {
+        let newLine = true;
+        let match = item.match;
+        if (item.match !== undefined && index !== 0 && items[index - 1].match === items[index].match) match = '';
+        if (item.match === undefined) match = '--';
+        csv += '"' + match + '","' + item.n + '",';
+        csv += item.icdo !== undefined ? '"' + item.icdo.c + '",' : '"",';
+        // if (item.icdo !== undefined && item.icdo.s !== undefined && item.icdo.s.length !== 0) {
+        //   item.icdo.s.forEach((s, i) => {
+        //     csv += i === 0 ? '"","' + s.n + '",' : '"' + s.n + '",';
+        //   });
+        // }
+
+        if (item.ncit && item.ncit.length !== 0) {
+          item.ncit.forEach((nc, tmpIndex) => {
+            if (nc.s.length !== 0) {
+              //csv += tmpIndex === 0 ? '\n"","","","' + nc.c + '",' : '"","","","' + nc.c + '",';
+              csv += tmpIndex === 0 ? '"' + nc.c + '",' : '"","","","' + nc.c + '",';
+              nc.s.forEach(s => {
+                csv += '"' + s.n + '",';
+              });
+              csv += '\n';
+              newLine = false;
+            }
+          });
+        }
+        if (newLine === true) {
+          csv += '\n';
+        }
+      });
+
+      let csvData = new Blob([csv], { type: 'data:text/csv;charset=utf-8,' });
+      let csvUrl = URL.createObjectURL(csvData);
+      let link = document.createElement('a');
+      link.href = csvUrl;
+      link.target = '_blank';
+      link.download = 'Compare_Values_GDC.csv';
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
   
     const TableSynonyms = (props) => {
       if (props.synonyms !== undefined) {
         let regKey = new RegExp(props.match, 'ig');
-        return props.synonyms.map((item, index) =>
-          <tr key={index}>
-            <td dangerouslySetInnerHTML={{ __html: item.n.replace(regKey, '<b>$&</b>')}}></td>
-            <td>{item.src}</td>
-            <td>{item.t}</td>
-          </tr>
-        );
+        return props.synonyms.map((item, index) => {
+          let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
+          let SynName = optionsState['partial'] === true ? item.n.replace(regKey, '<b>$&</b>') : item.n.toLowerCase() === SynMatch ? `<b>${item.n}</b>` : item.n; 
+          return(
+            <tr key={index}>
+              <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
+              <td>{item.src}</td>
+              <td>{item.t}</td>
+            </tr>
+          );
+        });
       }
       return (null);
     };
@@ -391,10 +456,12 @@ const ToCompareModal = (props) => {
       };
 
       let regKey = new RegExp(props.match, 'ig');
+      let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
+      let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
       return (
         <>
           <RowRight>
-            <Col xs={10} dangerouslySetInnerHTML={{ __html: props.name.replace(regKey, '<b>$&</b>')}}></Col>
+            <Col xs={10} dangerouslySetInnerHTML={{ __html: ncitName }}></Col>
             <ColRight xs={2}>
             {((props.ncit !== undefined && props.ncit.length !== 0) || props.icdo !== undefined) &&
               <a href="/#" aria-label={isToggleOn === true ? 'collapse' : 'expand'} onClick={ToggleTableHandler}>
@@ -552,57 +619,6 @@ const ToCompareModal = (props) => {
       return (null);
     };
 
-    const handlePageClick = (data) => {
-      const position = data.selected * 12;
-      if (resultReport.length !== 0) {
-        setResultPagination(resultReport.slice(position, position + 11));
-      };
-    };
-
-    const downloadCompareCVS = (items) => {
-      let csv = 'User Defined Values, Matched GDC Values, ICDO3 code, NCIt code, ICDO3 Strings/Synonyms,\n';
-      items.forEach((item, index) => {
-        let newLine = true;
-        let match = item.match;
-        if (item.match !== undefined && index !== 0 && items[index - 1].match === items[index].match) match = '';
-        if (item.match === undefined) match = '--';
-        csv += '"' + match + '","' + item.n + '",';
-        csv += item.icdo !== undefined ? '"' + item.icdo.c + '",' : '"",';
-        if (item.icdo !== undefined && item.icdo.s !== undefined && item.icdo.s.length !== 0) {
-          item.icdo.s.forEach((s, i) => {
-            csv += i === 0 ? '"","' + s.n + '",' : '"' + s.n + '",';
-          });
-        }
-
-        if (item.ncit && item.ncit.length !== 0) {
-          item.ncit.forEach((nc, tmpIndex) => {
-            if (nc.s.length !== 0) {
-              csv += tmpIndex === 0 ? '\n"","","","' + nc.c + '",' : '"","","","' + nc.c + '",';
-              nc.s.forEach(s => {
-                csv += '"' + s.n + '",';
-              });
-              csv += '\n';
-              newLine = false;
-            }
-          });
-        }
-        if (newLine === true) {
-          csv += '\n';
-        }
-      });
-
-      let csvData = new Blob([csv], { type: 'data:text/csv;charset=utf-8,' });
-      let csvUrl = URL.createObjectURL(csvData);
-      let link = document.createElement('a');
-      link.href = csvUrl;
-      link.target = '_blank';
-      link.download = 'Compare_Values_GDC.csv';
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-
     return (
       <>
         <Modal.Header closeButton>
@@ -681,14 +697,26 @@ const ToCompareModal = (props) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {resultPagination.map((item, index) => 
+                      {resultPagination.map((item, index) => {
+                        return (
                         <tr key={index}>
-                          <td>{item.match}</td>
+                          {(item.match !== undefined && item.rowspan !== undefined && index !== 0 && item.match !== resultPagination[index - 1].match) &&
+                            <td rowSpan={item.rowspan}>{item.match}</td>
+                          } 
+                          {(item.match !== undefined && item.rowspan !== undefined && index === 0) &&
+                            <td rowSpan={item.rowspan}>{item.match}</td>
+                          }
+                          {(item.match !== undefined && item.rowspan === undefined) &&
+                            <td>{item.match}</td>
+                          }
+                          {item.match === undefined &&
+                            <td>--</td>
+                          }
                           <td>
                             <TableNCIt name={item.n} ncit={item.ncit} icdo={item.icdo} match={item.match}/>
                           </td>
-                        </tr>
-                      )}
+                        </tr>)
+                      })}
                     </tbody>
                   </TableOverFlow>
                   :

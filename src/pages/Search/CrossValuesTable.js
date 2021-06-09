@@ -358,6 +358,7 @@ const CrossValuesTable = (props) => {
     let ctdcValues = [];
     let gdcValues = [];
     let icdcValues = [];
+    let pcdcValues = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(value => {
@@ -369,6 +370,9 @@ const CrossValuesTable = (props) => {
         }
         if(value.source !== undefined && value.source === 'icdc'){
           icdcValues.push(value);
+        }
+        if(value.source !== undefined && value.source === 'pcdc'){
+          pcdcValues.push(value);
         }
       });
     }
@@ -381,6 +385,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
+        pcdcvalues: pcdcValues
       }
     })
   });
@@ -389,6 +394,7 @@ const CrossValuesTable = (props) => {
     let gdcValues = [];
     let ctdcValues = [];
     let icdcValues = [];
+    let pcdcValues = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(value => {
@@ -401,6 +407,9 @@ const CrossValuesTable = (props) => {
         if(value.source !== undefined && value.source === 'icdc'){
           icdcValues.push(value);
         }
+        if(value.source !== undefined && value.source === 'pcdc'){
+          pcdcValues.push(value);
+        }
       });
     }
 
@@ -412,6 +421,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
+        pcdcvalues: pcdcValues
       }
     })
   });
@@ -756,6 +766,20 @@ const CrossValuesTable = (props) => {
               </TableColRight>
             </TableRow>
           }
+          {props.cross.values.pcdcvalues.length !== 0 &&
+            <TableRow>
+              <TableColLeft data-class="TableColLeft" xs={2}>
+                <DivCenter>Pediatric Cancer Data Commons</DivCenter>
+              </TableColLeft>
+              <TableColRight data-class="TableColRight" xs={10}>
+                {props.cross.values.pcdcvalues.map((value, index) =>
+                  <TableRowValues data-class="TableRowValues" key={index}>
+                    <ValuesItems item={value}/>
+                  </TableRowValues>
+                )}
+              </TableColRight>
+            </TableRow>
+          }
         </TableColRight>
     </Row>
     );
@@ -791,7 +815,7 @@ const CrossValuesTable = (props) => {
           </Col>
         </TableThead>
         <TableBody>
-          {(crossValues.length < 5 || browserDetection.isEdge)
+          {(crossValues.length < 25 || browserDetection.isEdge)
           ? 
           <Col xs={12}>
             {crossValues.map((cross, index) => 
