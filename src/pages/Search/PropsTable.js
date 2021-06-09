@@ -228,6 +228,7 @@ const PropsTable = (props) => {
     let ctdcProps = [];
     let gdcProps = [];
     let icdcProps = [];
+    let pcdcProps = [];
 
     if(entry[1] !== undefined && entry[1].length !== 0){
       entry[1].forEach(prop => {
@@ -240,6 +241,9 @@ const PropsTable = (props) => {
         if(prop.source !== undefined && prop.source === 'icdc'){
           icdcProps.push(prop);
         }
+        if(prop.source !== undefined && prop.source === 'pcdc'){
+          pcdcProps.push(prop);
+        }
       });
     }
 
@@ -250,6 +254,7 @@ const PropsTable = (props) => {
         ctdc: ctdcProps,
         gdc: gdcProps,
         icdc: icdcProps,
+        pcdc: pcdcProps
       }
     })
   });
@@ -433,6 +438,20 @@ const PropsTable = (props) => {
               </TableColLeft>
               <TableColRight data-class="TableColRight" xs={10}>
                 {props.cross.props.icdc.map((prop, index) =>
+                  <TableRowProps data-class="TableRowValues" key={index}>
+                    <PropsItems item={prop}/>
+                  </TableRowProps>
+                )}
+              </TableColRight>
+            </TableRow>
+          }
+          {props.cross.props.pcdc.length !== 0 &&
+            <TableRow>
+              <TableColLeft data-class="TableColLeft" xs={2}>
+                <DivCenter>Pediatric Cancer Data Commons</DivCenter>
+              </TableColLeft>
+              <TableColRight data-class="TableColRight" xs={10}>
+                {props.cross.props.pcdc.map((prop, index) =>
                   <TableRowProps data-class="TableRowValues" key={index}>
                     <PropsItems item={prop}/>
                   </TableRowProps>
