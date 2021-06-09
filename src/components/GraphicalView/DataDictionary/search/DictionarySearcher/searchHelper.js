@@ -135,10 +135,10 @@ export const getSearchResult = (graphType, searchData, project_filter) => {
         if (entry.highlight) {
           result[dt.node.n].props[dt.prop.n].title = entry.highlight["prop.have"]
             ? entry.highlight["prop.have"][0]
-            : dt.prop;
+            : dt.prop.n;
           result[dt.node.n].props[dt.prop.n].desc = entry.highlight["prop_desc"]
             ? entry.highlight["prop_desc"][0]
-            : dt.prop_desc;
+            : dt.prop.d;
           if (entry.highlight["cde.id"]) {
             let icdo = entry.highlight["cde.id"][0];
             result[dt.node].props[dt.prop].desc = result[dt.node].props[
