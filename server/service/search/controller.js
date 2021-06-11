@@ -789,7 +789,7 @@ const updateGDCDataMappings = async (req, res) => {
     "..",
     "data_files",
     "GDC",
-    "New Mapping.xlsx"
+    "New_Mapping.xlsx"
   );
   let output_file_path = path.join(
     __dirname,
@@ -1530,6 +1530,170 @@ const updateGDCPropertyMappings = async function(req, res) {
     */ 
 }
 
+const addGDCDataMappings = async (req, res) => {
+  /*
+  let file_path = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "GDC_Value.xlsx"
+  );
+  let output_file_path = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "gdc_values_updated.js"
+  );
+  let current_mappings = shared.readGDCValues();
+  const workbook = new Excel.Workbook();
+  await workbook.xlsx.readFile(file_path.replace(/\\/g, "/"));
+  let worksheet = workbook.worksheets[0];
+
+  let prop_mapping = {};
+  let value_mapping = {};
+
+  worksheet.eachRow(function (row, rowNumber) {
+    let item = row.values;
+    if (rowNumber > 1) {
+      let category = "";
+      let node = "";
+      let property = item[4] == undefined || item[4] == null ? "" : item[4].trim();
+      let property_ncit = item[3] == undefined || item[3] == null ? "" : item[3].trim();
+      let value = item[2] == undefined || item[2] == null ? "" : item[2].trim();
+      let ncit = item[1] == undefined || item[1] == null ? "" : item[1].trim();
+
+      if (property.indexOf("||") > -1) {
+        let ps = property.split("||");
+        let p_ncits = property_ncit.split("||");
+        ps.forEach((p, idx) => {
+          prop_mapping[p.trim()] = p_ncits[idx].trim();
+        });
+      }
+      else{
+        prop_mapping[property.trim()] = property_ncit.trim();
+      }
+
+      if(value.indexOf("||") > -1){
+        let values = value.split("||");
+        values.forEach((v, idx) => {
+          let entry = v.split("|");
+          let v_id = entry[1].trim() + "." + entry[0].trim();
+          if(!(v_id in value_mapping)){
+            value_mapping[v_id] = [];
+          }
+          if(value_mapping[v_id].indexOf(ncit) == -1){
+            value_mapping[v_id].push(ncit);
+          }
+        });
+      }
+      else{
+        let entry = value.split("|");
+        let v_id = entry[1].trim() + "." + entry[0].trim();
+        if(!(v_id in value_mapping)){
+          value_mapping[v_id] = [];
+        }
+        if(value_mapping[v_id].indexOf(ncit) == -1){
+          value_mapping[v_id].push(ncit);
+        }
+      }
+
+    }
+  });
+
+  let prop2Node = {};
+
+  const dataset = {};
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+  let cache = [];
+  let mappings_to_validate = [];
+  let count = 0;
+  
+	for(let node in GDCDict){
+		let entry = GDCDict[node];
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+        tmp.desc = prop_dict[prop].description;
+
+        tmp.enum = prop_dict[prop].enum;
+
+        if(prop in prop_mapping){
+          
+          if(tmp.enum && tmp.enum.length > 0){
+            tmp.enum.forEach((em) => {
+              let value_id = prop + "." + em;
+              if(value_id in value_mapping){
+                if(cache.indexOf(value_id) > -1){
+                  count ++;
+                }
+                else{
+                  cache.push(value_id);
+                }
+                mappings_to_validate.push({
+                  p_id: tmp.category + "." + tmp.node + "." + tmp.property,
+                  v: em,
+                  ncit: value_mapping[value_id]
+                });
+              }
+            });
+          }
+          
+        }
+			}
+		} 
+	}
+
+  mappings_to_validate.forEach((mtv, idx) => {
+      let value = mtv.v;
+      let ncit = mtv.ncit;
+      let p_id = mtv.p_id;
+      let found = false;
+          
+      if (!(p_id in current_mappings)) {
+        current_mappings[p_id] = [];
+      }
+      current_mappings[p_id].forEach((value_entry) => {
+        if (value_entry.nm == value.trim()) {
+          found = true;
+          if (ncit != "") {
+            value_entry.n_c = ncit;
+          }
+          
+        }
+      });
+
+      if(!found){
+        let entry = {};
+        entry.nm = value;
+        entry.n_c = ncit;
+        entry.i_c = "";
+        entry.i_c_s = "";
+        entry.term_type = "";
+        current_mappings[p_id].push(entry);
+      }
+  });
+
+  fs.writeFileSync(
+    output_file_path,
+    JSON.stringify(current_mappings),
+    (err) => {
+      if (err) return logger.error(err);
+    }
+  );
+  */
+  //handle value mappings
+
+  res.json({ result: "success" });
+};
+
 
 
 module.exports = {
@@ -1551,5 +1715,6 @@ module.exports = {
 	exportCompareResult,
 	exportAllCompareResult,
 	generateProperties,
-  updateGDCPropertyMappings
+  updateGDCPropertyMappings,
+  addGDCDataMappings
 };
