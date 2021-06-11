@@ -399,7 +399,7 @@ const PropsTable = (props) => {
       <Row key={props.index}>
         <TableColLeft data-class="TableColLeft" xs={2}>
           <DivCenter>
-            <CodeSpan>{props.cross.code}<br/>({props.cross.ref})</CodeSpan>
+            <CodeSpan dangerouslySetInnerHTML={{ __html: `${props.cross.code}<br/>${props.cross.ref}`}}></CodeSpan>
           </DivCenter>
         </TableColLeft>
         <TableColRight data-class="TableColRight" xs={10}>
