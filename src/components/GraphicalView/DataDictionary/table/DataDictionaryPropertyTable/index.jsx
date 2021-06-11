@@ -34,6 +34,7 @@ class DataDictionaryPropertyTable extends React.Component {
   }
 
   openOrCloseValuesTable = (e, prop, hasValues) => {
+    e.preventDefault();
     if(!hasValues){
       return;
     }

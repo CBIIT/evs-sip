@@ -1,5 +1,4 @@
-const baseUrl = "./api/search";
-//const baseUrl = "http://localhost:3000/api/search";
+const baseUrl = process.env.REACT_APP_DEV_API_URL || "./api/search";
 
 export const apiSuggest = async (keyword) => {
   let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
