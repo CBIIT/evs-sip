@@ -274,15 +274,9 @@ const SearchBox = (props) => {
 
   let [optionsState, setOptionsState] = useState({
     desc: false,
-    syns: false
+    syns: false,
+    p_syns: false
   });
-
-  // let [selectDataSource, setSelectDataSource] = useState({
-  //   ctdc: false,
-  //   gdc: false,
-  //   icdc: false,
-  //   pcdc: false
-  // });
 
   let [isToggleOnOptions, setIsToggleOnOptions] = useState(false);
   let [isToggleOnSource, setIsToggleOnSource] = useState(false);
@@ -357,12 +351,14 @@ const SearchBox = (props) => {
     if(isToggleOnOptions === false){
       setOptionsState({
         desc: true,
-        syns: true
+        syns: true,
+        p_syns: true
       });
     } else {
       setOptionsState({
         desc: false,
-        syns: false
+        syns: false,
+        p_syns: false
       });
     }
     setIsToggleOnOptions(!isToggleOnOptions);
@@ -455,7 +451,7 @@ const SearchBox = (props) => {
                   Search Synonyms of Values
                 </CheckboxLabel>
                 <CheckboxLabel>
-                  <CheckboxInput name="p_syns" type="checkbox"/>
+                  <CheckboxInput name="p_syns" type="checkbox" checked={optionsState['p_syns']} onClick={checkedToggleHandler}/>
                   <CheckboxSpan>
                     <CheckboxIcon icon={faCheck}/>
                   </CheckboxSpan>
