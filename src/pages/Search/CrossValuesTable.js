@@ -330,7 +330,7 @@ const CrossValuesTable = (props) => {
           }
 
           entry[1].vs = idValueObj[`${match}-${entry[1].id}`];
-          ncitObjs[match].push(entry[1]);
+          ncitObjs[match].push({ ...entry[1] });
         }
       });
     }
@@ -340,7 +340,7 @@ const CrossValuesTable = (props) => {
         icdo3Objs[entry[1].ic_match] = [];
       }
       entry[1].vs = idValueObj[`${entry[1].ic_match}-${entry[1].id}`];
-      icdo3Objs[entry[1].ic_match].push(entry[1]);
+      icdo3Objs[entry[1].ic_match].push({ ...entry[1] });
     };
 
     if ((entry[1].n_match === undefined || entry[1].n_match.length === 0) && entry[1].ic_match === undefined && entry[0] === `no-mapping-${entry[1].id}`){
@@ -348,7 +348,7 @@ const CrossValuesTable = (props) => {
         ncitObjs['no-mapping'] = [];
       }
       entry[1].vs = idValueObj[`no-mapping-${entry[1].id}`];
-      ncitObjs['no-mapping'].push(entry[1]);
+      ncitObjs['no-mapping'].push({ ...entry[1] });
     };
   });
 
