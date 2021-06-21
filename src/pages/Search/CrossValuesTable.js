@@ -138,6 +138,7 @@ const PreferredTerm = styled.div`
   color: #475162;
   font-size: 1rem;
   font-weight: bold;
+  word-break: break-word;
 `;
 
 const TableStyled = styled(Table)`
@@ -664,7 +665,6 @@ const CrossValuesTable = (props) => {
                 </TableUl>
               </TableLi>
             </TableUl>
-            {/* <GDCTerms idterm={item.id}/> */}
           </TableCol>
           <TableColRight data-class="TableColRight" xs={9}>
               <div>
@@ -721,7 +721,7 @@ const CrossValuesTable = (props) => {
             <CodeSpan>{props.cross.code}<br/>({props.cross.ref})</CodeSpan><br/>
             {props.cross.ncitPreferredTerm !== undefined && <PreferredTerm dangerouslySetInnerHTML={{ __html: `${props.cross.ncitPreferredTerm.termName} (${props.cross.ncitPreferredTerm.termGroup})` }}></PreferredTerm>}
             {(props.cross.icdo3PreferredTerm !== undefined) && <PreferredTerm>{props.cross.icdo3PreferredTerm.n} ({props.cross.icdo3PreferredTerm.t})</PreferredTerm>}
-        </DivCenter>
+          </DivCenter>
         </TableColLeft>
         <TableColRight data-class="TableColRight" xs={10}>
           {props.cross.values.gdcvalues.length !== 0 &&
