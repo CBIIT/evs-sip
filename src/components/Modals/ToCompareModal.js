@@ -430,7 +430,7 @@ const ToCompareModal = (props) => {
   
     const TableSynonyms = (props) => {
       if (props.synonyms !== undefined) {
-        let regKey = new RegExp(props.match, 'ig');
+        let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
           let SynName = optionsState['partial'] === true ? item.n.replace(regKey, '<b>$&</b>') : item.n.toLowerCase() === SynMatch ? `<b>${item.n}</b>` : item.n; 
@@ -455,7 +455,7 @@ const ToCompareModal = (props) => {
         setIsToggleOn(!isToggleOn);
       };
 
-      let regKey = new RegExp(props.match, 'ig');
+      let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
       let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
       let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
       return (
