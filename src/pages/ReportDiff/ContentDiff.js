@@ -185,7 +185,15 @@ const ContentDiff = () => {
   return <ContentBox>
     <ContentBoxTitle>Report Differences</ContentBoxTitle>
     <ContentBoxText>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ut sapien tellus. Duis sed dapibus diam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+      <p>The Report Differences is a tool to compare the mapped NCIt codes of selected Compare Type (Node/Property/Value) between the official GDC Dictionary and Data Commons. Current only preset options are supported.</p>
+      <p>The results have four tabs, "All", "Unmapped", "Mapped", and "Conflict".</p>
+      <ul>
+        <li>"All" tab includes all values from specified GDC Dictionary and data (GDC and NCItCode) provided by EVS team. </li>
+        <li>"Mapped" tab includes all values with NCIt mappings from data provided by EVS team.</li>
+        <li>"Unmapped" tab includes all values without NCIt mappings from data provided by EVS team.</li>
+        <li>"Conflict" tab includes all values with different NCIt mappings from specified GDC Dictionary and data (GDC and NCItCode) provided by EVS team.</li>
+      </ul>
+      <p>The results could be downloaded in xls format to for all tabs, or from each tab.</p>
       <FormDiff reportTrigger={reportTrigger}/>
       {loadedDataStage &&
         <>
