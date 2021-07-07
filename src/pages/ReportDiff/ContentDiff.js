@@ -59,7 +59,6 @@ const ContentDiff = () => {
   let [loadedDataStage, setLoadedDataStage] = useState(false);
   let [resultState, setResultState] = useState([]);
   let [typeState, setTypeState] = useState('all');
-  let [pageState, setPageState] = useState(1);
   let [pageSizeState, setPageSizeState] = useState(25);
   let [totalState, setTotalState] = useState(0);
   let [pageCountState, setPageCountState] = useState(0);
@@ -69,6 +68,12 @@ const ContentDiff = () => {
     mapped: '',
     conflict: ''
   });
+  let [pageState, setPageState] = useState({
+    all: 1,
+    unmapped: 1,
+    mapped: 1,
+    conflict: 1
+  });
 
   const reportTrigger = () => {
     setLoadingState(true);
@@ -77,7 +82,6 @@ const ContentDiff = () => {
       setLoadingState(false);
       setLoadedDataStage(true);
       setResultState(result.data);
-      setPageState(result.pageInfo.page);
       setPageSizeState(result.pageInfo.pageSize);
       setTotalState(result.pageInfo.total);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
@@ -88,15 +92,22 @@ const ContentDiff = () => {
         mapped: '',
         conflict: ''
       });
+      setPageState({
+        all: result.pageInfo.page,
+        unmapped: 1,
+        mapped: 1,
+        conflict: 1
+      });
     });
   };
 
   const handleSelectTab = (type) => {
-    compareAllWithGDCDictionary(type, pageState, pageSizeState, searchState[type])
+    compareAllWithGDCDictionary(type, pageState[type], pageSizeState, searchState[type])
     .then(result => {
       setResultState(result.data);
       setTypeState(type);
-      setPageState(result.pageInfo.page);
+      pageState[type] = result.pageInfo.page 
+      setPageState(pageState);
       setPageSizeState(result.pageInfo.pageSize);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
@@ -138,18 +149,22 @@ const ContentDiff = () => {
     compareAllWithGDCDictionary(typeState, page, pageSizeState, searchState[typeState])
     .then(result => {
       setResultState(result.data);
-      setPageState(result.pageInfo.page);
-      // setPageSizeState(result.pageInfo.pageSize);
-      // setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
+      pageState[typeState] = result.pageInfo.page 
+      setPageState(pageState);
     });
   }
 
   const handlepageSizeChange = (event) => {
     const pageSize = event.target.value;
-    compareAllWithGDCDictionary(typeState, pageState, pageSize, searchState[typeState])
+    compareAllWithGDCDictionary(typeState, 1, pageSize, searchState[typeState])
     .then(result => {
       setResultState(result.data);
-      // setPageState(result.pageInfo.page);
+      setPageState({
+        all: 1,
+        unmapped: 1,
+        mapped: 1,
+        conflict: 1
+      });
       setPageSizeState(result.pageInfo.pageSize);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
@@ -158,12 +173,11 @@ const ContentDiff = () => {
   const handleSearchSubmit = event => {
     event.preventDefault();
     const keyword = searchState[typeState].trim().replace(/\s{2,}/g, ' ').toLowerCase();
-    compareAllWithGDCDictionary(typeState, pageState, pageSizeState, keyword)
+    compareAllWithGDCDictionary(typeState, 1, pageSizeState, keyword)
     .then(result => {
       setResultState(result.data);
-      //setSearchState(keyword);
-      // setPageState(result.pageInfo.page);
-      //setPageSizeState(result.pageInfo.pageSize);
+      pageState[typeState] = 1
+      setPageState(pageState);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
   }
@@ -185,7 +199,7 @@ const ContentDiff = () => {
             result={resultState}
             pageClick={handlePageClick} 
             pageSizeChange={handlepageSizeChange} 
-            currentPage={pageState} 
+            currentPage={pageState}
             pageSize={pageSizeState} 
             pageCount={pageCountState} 
             total={totalState}

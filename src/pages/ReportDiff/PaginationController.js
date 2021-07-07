@@ -35,6 +35,7 @@ const PaginationController = (props) => {
       pageLinkClassName={'page-link'}
       subContainerClassName={'pages pagination'}
       activeClassName={'active'}
+      forcePage={props.currentPage[props.type] - 1}
     />
     <PageInfo>
       <Form.Label style={{padding: '.375rem .75rem'}}>Page Size:</Form.Label>
