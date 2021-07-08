@@ -59,7 +59,6 @@ const ContentDiff = () => {
   let [loadedDataStage, setLoadedDataStage] = useState(false);
   let [resultState, setResultState] = useState([]);
   let [typeState, setTypeState] = useState('all');
-  let [pageState, setPageState] = useState(1);
   let [pageSizeState, setPageSizeState] = useState(25);
   let [totalState, setTotalState] = useState(0);
   let [pageCountState, setPageCountState] = useState(0);
@@ -69,6 +68,12 @@ const ContentDiff = () => {
     mapped: '',
     conflict: ''
   });
+  let [pageState, setPageState] = useState({
+    all: 1,
+    unmapped: 1,
+    mapped: 1,
+    conflict: 1
+  });
 
   const reportTrigger = () => {
     setLoadingState(true);
@@ -77,7 +82,6 @@ const ContentDiff = () => {
       setLoadingState(false);
       setLoadedDataStage(true);
       setResultState(result.data);
-      setPageState(result.pageInfo.page);
       setPageSizeState(result.pageInfo.pageSize);
       setTotalState(result.pageInfo.total);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
@@ -88,15 +92,22 @@ const ContentDiff = () => {
         mapped: '',
         conflict: ''
       });
+      setPageState({
+        all: result.pageInfo.page,
+        unmapped: 1,
+        mapped: 1,
+        conflict: 1
+      });
     });
   };
 
   const handleSelectTab = (type) => {
-    compareAllWithGDCDictionary(type, pageState, pageSizeState, searchState[type])
+    compareAllWithGDCDictionary(type, pageState[type], pageSizeState, searchState[type])
     .then(result => {
       setResultState(result.data);
       setTypeState(type);
-      setPageState(result.pageInfo.page);
+      pageState[type] = result.pageInfo.page 
+      setPageState(pageState);
       setPageSizeState(result.pageInfo.pageSize);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
@@ -138,18 +149,22 @@ const ContentDiff = () => {
     compareAllWithGDCDictionary(typeState, page, pageSizeState, searchState[typeState])
     .then(result => {
       setResultState(result.data);
-      setPageState(result.pageInfo.page);
-      // setPageSizeState(result.pageInfo.pageSize);
-      // setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
+      pageState[typeState] = result.pageInfo.page 
+      setPageState(pageState);
     });
   }
 
   const handlepageSizeChange = (event) => {
     const pageSize = event.target.value;
-    compareAllWithGDCDictionary(typeState, pageState, pageSize, searchState[typeState])
+    compareAllWithGDCDictionary(typeState, 1, pageSize, searchState[typeState])
     .then(result => {
       setResultState(result.data);
-      // setPageState(result.pageInfo.page);
+      setPageState({
+        all: 1,
+        unmapped: 1,
+        mapped: 1,
+        conflict: 1
+      });
       setPageSizeState(result.pageInfo.pageSize);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
@@ -158,12 +173,11 @@ const ContentDiff = () => {
   const handleSearchSubmit = event => {
     event.preventDefault();
     const keyword = searchState[typeState].trim().replace(/\s{2,}/g, ' ').toLowerCase();
-    compareAllWithGDCDictionary(typeState, pageState, pageSizeState, keyword)
+    compareAllWithGDCDictionary(typeState, 1, pageSizeState, keyword)
     .then(result => {
       setResultState(result.data);
-      //setSearchState(keyword);
-      // setPageState(result.pageInfo.page);
-      //setPageSizeState(result.pageInfo.pageSize);
+      pageState[typeState] = 1
+      setPageState(pageState);
       setPageCountState(result.pageInfo.total / result.pageInfo.pageSize);
     });
   }
@@ -171,7 +185,15 @@ const ContentDiff = () => {
   return <ContentBox>
     <ContentBoxTitle>Report Differences</ContentBoxTitle>
     <ContentBoxText>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ut sapien tellus. Duis sed dapibus diam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+      <p>The Report Differences is a tool to compare the mapped NCIt codes of selected Compare Type (Node/Property/Value) between the official GDC Dictionary and Data Commons. Current only preset options are supported.</p>
+      <p>The results have four tabs, "All", "Unmapped", "Mapped", and "Conflict".</p>
+      <ul>
+        <li>"All" tab includes all values from specified GDC Dictionary and data (GDC and NCItCode) provided by EVS team. </li>
+        <li>"Mapped" tab includes all values with NCIt mappings from data provided by EVS team.</li>
+        <li>"Unmapped" tab includes all values without NCIt mappings from data provided by EVS team.</li>
+        <li>"Conflict" tab includes all values with different NCIt mappings from specified GDC Dictionary and data (GDC and NCItCode) provided by EVS team.</li>
+      </ul>
+      <p>The results could be downloaded in xls format to for all tabs, or from each tab.</p>
       <FormDiff reportTrigger={reportTrigger}/>
       {loadedDataStage &&
         <>
@@ -185,7 +207,7 @@ const ContentDiff = () => {
             result={resultState}
             pageClick={handlePageClick} 
             pageSizeChange={handlepageSizeChange} 
-            currentPage={pageState} 
+            currentPage={pageState}
             pageSize={pageSizeState} 
             pageCount={pageCountState} 
             total={totalState}
