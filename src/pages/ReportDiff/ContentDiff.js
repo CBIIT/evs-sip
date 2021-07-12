@@ -185,7 +185,7 @@ const ContentDiff = () => {
   return <ContentBox>
     <ContentBoxTitle>Report Differences</ContentBoxTitle>
     <ContentBoxText>
-      <p>The Report Differences is a tool to compare the mapped NCIt codes of selected Compare Type (Node/Property/Value) between the official GDC Dictionary and Data Commons. Current only preset options are supported.</p>
+      <p>The Report Differences is a tool to compare the mapped NCIt codes of selected Compare Type (Node/Property/Value) between the official GDC Dictionary and Data Commons. Currently, only preset options are supported.</p>
       <p>The results have four tabs, "All", "Unmapped", "Mapped", and "Conflict".</p>
       <ul>
         <li>"All" tab includes all values from specified GDC Dictionary and data source. </li>
