@@ -151,7 +151,8 @@ const indexing = (req, res) => {
         analyzer: {
           case_insensitive: {
             tokenizer: "keyword",
-            filter: ["lowercase", "whitespace_remove"],
+            //filter: ["lowercase", "whitespace_remove"],
+            filter: ["lowercase"],
           },
           my_standard: {
             tokenizer: "standard",
@@ -160,8 +161,9 @@ const indexing = (req, res) => {
           },
           my_whitespace: {
             tokenizer: "whitespace",
-            char_filter: ["my_filter"],
-            filter: ["lowercase", "whitespace_remove"],
+            //char_filter: ["my_filter"],
+            //filter: ["lowercase", "whitespace_remove"],
+            filter: ["lowercase"],
           },
         },
         char_filter: {
