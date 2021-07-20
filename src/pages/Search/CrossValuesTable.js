@@ -12,8 +12,7 @@ const ContainerStyled = styled(Container)`
   padding-right: 15px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
-  // height: 45rem;
-  min-height: 45rem;
+  height: 45rem;
   border: 2px solid #535F74;
   overflow: hidden;
 `;
@@ -36,8 +35,7 @@ const TableTh = styled.div`
 
 const TableBody = styled(Row)`
   overflow-y: auto;
-  // max-height: 42rem;
-  max-height: 55rem;
+  max-height: 42rem;
 `;
 
 const TableCol = styled(Col)`
@@ -140,9 +138,7 @@ const PreferredTerm = styled.div`
   color: #475162;
   font-size: 1rem;
   font-weight: bold;
-  width: 10.5rem;
-  margin: auto;
-  word-wrap: break-word;
+  word-break: break-word;
 `;
 
 const TableStyled = styled(Table)`
@@ -390,7 +386,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
-        pcdcvalues: pcdcValues,
+        pcdcvalues: pcdcValues
       }
     })
   });
@@ -426,7 +422,7 @@ const CrossValuesTable = (props) => {
         ctdcvalues: ctdcValues,
         gdcvalues: gdcValues,
         icdcvalues: icdcValues,
-        pcdcvalues: pcdcValues,
+        pcdcvalues: pcdcValues
       }
     })
   });
@@ -663,13 +659,12 @@ const CrossValuesTable = (props) => {
           <TableCol data-class="TableCol" xs={3}>
             {props.item.category}
             <TableUl>
-              <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.node}
+              <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.node.n}
                 <TableUl>
-                  <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property}</TableLi>
+                  <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property.n}</TableLi>
                 </TableUl>
               </TableLi>
             </TableUl>
-            {/* <GDCTerms idterm={item.id}/> */}
           </TableCol>
           <TableColRight data-class="TableColRight" xs={9}>
               <div>
@@ -720,7 +715,7 @@ const CrossValuesTable = (props) => {
 
   const ValuesItemsContainer = (props) => {
     return (
-      <Row key={props.index}>
+      <Row>
         <TableColLeft data-class="TableColLeft" xs={2}>
           <DivCenter>
             <CodeSpan>{props.cross.code}<br/>({props.cross.ref})</CodeSpan><br/>
@@ -792,7 +787,7 @@ const CrossValuesTable = (props) => {
 
   const LazyLoadContainer = (props) => {
     return (
-      <LazyLoad height={250} once overflow={true} offset={500} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-cross">
+      <LazyLoad height={250} once overflow={true} offset={270} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-cross">
         {props.children}
       </LazyLoad>
     );
@@ -820,7 +815,7 @@ const CrossValuesTable = (props) => {
           </Col>
         </TableThead>
         <TableBody>
-          {(crossValues.length < 5 || browserDetection.isEdge)
+          {(crossValues.length < 25 || browserDetection.isEdge)
           ? 
           <Col xs={12}>
             {crossValues.map((cross, index) => 

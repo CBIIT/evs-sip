@@ -12,8 +12,7 @@ const ContainerStyled = styled(Container)`
   padding-right: 15px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
-  // height: 45rem;
-  min-height: 45rem;
+  height: 45rem;
   border: 2px solid #535F74;
   overflow: hidden;
 `;
@@ -36,8 +35,7 @@ const TableTh = styled.div`
 
 const TableBody = styled(Row)`
   overflow-y: auto;
-  // max-height: 42rem;
-  max-height: 55rem;
+  max-height: 42rem;
 `;
 
 const TableRow = styled(Row)`
@@ -443,9 +441,9 @@ const GDCValuesTable = (props) => {
         <TableCol xs={3}>
           {props.item.category}
           <TableUl>
-            <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.node}
+            <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.node.n}
               <TableUl>
-                <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property}</TableLi>
+                <TableLi><SpanIcon><FontAwesomeIcon icon={faAngleDown}/></SpanIcon>{props.item.property.n}</TableLi>
               </TableUl>
             </TableLi>
           </TableUl>
@@ -499,7 +497,7 @@ const GDCValuesTable = (props) => {
 
   const LazyLoadContainer = (props) => {
     return (
-      <LazyLoad height={100} once overflow={true} offset={300} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-gdc">
+      <LazyLoad height={180} once overflow={true} offset={200} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-gdc">
         {props.children}
       </LazyLoad>
     );

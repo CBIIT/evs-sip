@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Tab, Row, Col, Nav, Container } from 'react-bootstrap';
 import CrossValuesTable from './CrossValuesTable';
 import PropsTable from './PropsTable';
+import NodesTable from './NodesTable';
 
 const TabNavsCol = styled(Col)`
   display: flex;
@@ -56,7 +57,10 @@ const TabsController = (props) => {
                   <NavLinkStyled eventKey="values">Values</NavLinkStyled>
                 </Nav.Item>
                 <Nav.Item>
-                  <NavLinkStyled eventKey="properties">Node/Properties</NavLinkStyled>
+                  <NavLinkStyled eventKey="properties">Properties</NavLinkStyled>
+                </Nav.Item>
+                <Nav.Item>
+                  <NavLinkStyled eventKey="nodes">Nodes</NavLinkStyled>
                 </Nav.Item>
               </NavStyled>
             </TabNavsCol>
@@ -67,6 +71,9 @@ const TabsController = (props) => {
                 </Tab.Pane>
                 <Tab.Pane unmountOnExit={true} eventKey="properties">
                   <PropsTable properties={props.source}/>
+                </Tab.Pane>
+                <Tab.Pane unmountOnExit={true} eventKey="nodes">
+                  <NodesTable nodes={props.source}/>
                 </Tab.Pane>
               </Tab.Content>
             </Col>

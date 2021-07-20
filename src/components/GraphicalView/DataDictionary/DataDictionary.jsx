@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DataDictionaryGraph from './graph/DataDictionaryGraph/.';
-import ReduxDataDictionaryTable from './table/DataDictionaryTable';
-import ReduxDictionarySearcher from './search/DictionarySearcher/.';
-import ReduxDictionarySearchHistory from './search/DictionarySearchHistory/.';
 import { apiGetGDCDictionary, apiGetICDCDictionary, apiGetCTDCDictionary, apiGetPCDCDictionary  } from '../../../api';
 import { getSearchResult, getSearchSummary} from './search/DictionarySearcher/searchHelper'; 
 import './DataDictionary.css';

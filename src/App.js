@@ -16,6 +16,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Search from './pages/Search';
 import DataModel from './pages/DataModel';
+import ReportDiff from './pages/ReportDiff';
 import NotFound from './pages/NotFound';
 
 
@@ -36,6 +37,7 @@ function App() {
               <Route path="/search" component={Search} />
               <Route path="/datamodel" component={DataModel} />
               <Route path="/about" component={About} />
+              <Route path="/reportdiff" component={ReportDiff} />
               <Route component={NotFound} />
             </Switch>
           </Layout>

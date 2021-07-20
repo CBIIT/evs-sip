@@ -8,8 +8,8 @@ if (process.env.NODE_ENV !== "prod") {
     process.env = {
       ...process.env,
       NODE_ENV: tmp.NODE_ENV,
-      PORT: tmp.PORT,
-      LOGDIR: tmp.LOGDIR,
+      PORT: tmp.SERVICE_PORT,
+      LOGDIR: tmp.LOGDIR
     };
     //process.env.NODE_ENV = tmp.NODE_ENV;
   } else {

@@ -1,8 +1,11 @@
 const cache = require("../../components/cache");
+const elastic = require('../../components/elasticsearch');
 const config = require("../../config");
 const fs = require("fs");
 const path = require("path");
 const yaml = require("yamljs");
+const Datastore = require('nedb-promises');
+let db = Datastore.create();
 const _ = require("lodash");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 
@@ -35,6 +38,41 @@ const generateHighlightInnerHits = () => {
   return highlight;
 };
 
+const generateHighlightInnerHits_node = () => {
+  let highlight = {
+    "pre_tags": ["<b>"],
+    "post_tags": ["</b>"],
+    "fields": {
+      "node.n.have": {"number_of_fragments": 0},
+      "node.n": {"number_of_fragments": 0},
+      "node.d": {"number_of_fragments": 0},
+      "node.ncit.c.have": {"number_of_fragments": 0},
+      "node.ncit.c": {"number_of_fragments": 0},
+      "node.ncit.s.n.have": {"number_of_fragments": 0},
+      "node.ncit.s.n": {"number_of_fragments": 0}
+    }
+  };
+  return highlight;
+}
+
+const generateHighlightInnerHits_prop = () => {
+  let highlight = {
+    "pre_tags": ["<b>"],
+    "post_tags": ["</b>"],
+    "fields": {
+      "prop.n.have": {"number_of_fragments": 0},
+      "prop.n": {"number_of_fragments": 0},
+      "prop.d": {"number_of_fragments": 0},
+      "prop.ncit.c.have": {"number_of_fragments": 0},
+      "prop.ncit.c": {"number_of_fragments": 0},
+      "prop.ncit.s.n.have": {"number_of_fragments": 0},
+      "prop.ncit.s.n": {"number_of_fragments": 0},
+      "prop.cde.c": {"number_of_fragments": 0},
+    }
+  };
+  return highlight;
+}
+
 const generateHighlight = () => {
   let highlight = {
     pre_tags: ["<b>"],
@@ -55,11 +93,11 @@ const generateQuery = (keyword, option) => {
   query.bool = {};
   query.bool.must = [];
   //check if need to filter out sources
-  if (option.sources.length > 0) {
+  if(option.sources.length > 0){
     let m = {};
     m.bool = {};
     m.bool.should = [];
-    option.sources.forEach((source) => {
+    option.sources.forEach(source => {
       let tmp = {};
       tmp.term = {};
       tmp.term.source = source;
@@ -71,71 +109,177 @@ const generateQuery = (keyword, option) => {
   clause.bool = {};
   clause.bool.should = [];
   //adding double escaping
-  if (option.match === "exact") {
-    // Perform exact search
+  if(option.match === "exact"){ // Perform exact search
     //The reserved characters in elasticsearch are: + - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /
-    let exact_keyword = keyword
-      .replace(/\//g, "\\/")
-      .replace(/\+/g, "\\+")
-      .replace(/-/g, "\\-")
-      .replace(/\(/g, "\\(")
-      .replace(/\)/g, "\\)");
+    let exact_keyword = keyword.replace(/\//g, '\\/').replace(/\+/g, "\\+").replace(/-/g, "\\-").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
     let m = {};
-    m.query_string = {};
-    m.query_string.query = exact_keyword;
-    m.query_string.fields = [];
-    m.query_string.fields.push("cde.id");
-    m.query_string.fields.push("prop");
-    clause.bool.should.push(m);
-
-    if (option.desc) {
-      m = {};
-      m.match_phrase_prefix = {};
-      m.match_phrase_prefix["prop_desc"] = {};
-      m.match_phrase_prefix["prop_desc"].query = keyword;
-      m.match_phrase_prefix["prop_desc"].analyzer = "my_whitespace";
-      clause.bool.should.push(m);
-    }
-
-    m = {};
     m.nested = {};
-    m.nested.path = "enum";
+    m.nested.path = "node";
     m.nested.query = {};
     m.nested.query.query_string = {};
     m.nested.query.query_string.fields = [];
-
-    if (option.syn) {
-      m.nested.query.query_string.fields.push("enum.ncit.s.n");
+    
+    m.nested.query.query_string.fields.push("node.n");
+    m.nested.query.query_string.fields.push("node.ncit.c");
+    if (option.n_syn) {
+      m.nested.query.query_string.fields.push("node.ncit.s.n");
     }
-    m.nested.query.query_string.fields.push("enum.ncit.c");
-    m.nested.query.query_string.fields.push("enum.n");
-    m.nested.query.query_string.fields.push("enum.icdo.c");
     m.nested.query.query_string.query = exact_keyword;
+    
+    m.nested.inner_hits = {};
+    m.nested.inner_hits.from = 0;
+    m.nested.inner_hits.size = 10000;
+    m.nested.inner_hits.name = "node";
+    m.nested.inner_hits.highlight = generateHighlightInnerHits_node();
+    clause.bool.should.push(m);
+
+    m = {};
+    m.nested = {};
+    m.nested.path = "prop"
+    m.nested.query = {};
+    m.nested.query.bool = {};
+    m.nested.query.bool.should = [];
+
+    let n = {};
+    
+    if (option.desc) {
+      n = {};
+      n.match_phrase_prefix = {};
+      n.match_phrase_prefix["prop.d"] = {};
+      n.match_phrase_prefix["prop.d"].query = keyword;
+      n.match_phrase_prefix["prop.d"].analyzer = "my_whitespace";
+      m.nested.query.bool.should.push(n);
+    }
+
+    n = {};
+    n.query_string = {};
+    n.query_string.fields = [];
+    n.query_string.fields.push("prop.n");
+    n.query_string.fields.push("prop.ncit.c");
+    if (option.p_syn) {
+      n.query_string.fields.push("prop.ncit.s.n");
+    }
+    n.query_string.fields.push("prop.cde.c");
+    n.query_string.query = exact_keyword;
+    m.nested.query.bool.should.push(n);
 
     m.nested.inner_hits = {};
     m.nested.inner_hits.from = 0;
     m.nested.inner_hits.size = 10000;
-    m.nested.inner_hits.highlight = generateHighlightInnerHits();
-    clause.bool.should.push(m);
-  } else {
-    /*
-  else{
-    let m = {};
-    m.match_phrase_prefix = {};
-    m.match_phrase_prefix["prop.have"] = keyword;
+    m.nested.inner_hits.name = "prop";
+    m.nested.inner_hits.highlight = generateHighlightInnerHits_prop();
     clause.bool.should.push(m);
 
     m = {};
-    m.match_phrase_prefix = {};
-    m.match_phrase_prefix["cde.id"] = keyword;
+    m.nested = {};
+    m.nested.path = "enum"
+    m.nested.query = {};
+    m.nested.query.query_string = {};
+    m.nested.query.query_string.fields = [];
+    
+    m.nested.query.query_string.fields.push("enum.n");
+    m.nested.query.query_string.fields.push("enum.ncit.c");
+    if (option.syn) {
+      m.nested.query.query_string.fields.push("enum.ncit.s.n");
+    }
+    m.nested.query.query_string.fields.push("enum.icdo.c");
+    m.nested.query.query_string.query = exact_keyword;
+    
+    m.nested.inner_hits = {};
+    m.nested.inner_hits.from = 0;
+    m.nested.inner_hits.size = 10000;
+    m.nested.inner_hits.name = "enum";
+    m.nested.inner_hits.highlight = generateHighlightInnerHits();
+    clause.bool.should.push(m);
+  }
+  else{
+    let m = {};
+    m.nested = {};
+    m.nested.path = "node";
+    m.nested.query = {};
+    m.nested.query.bool = {};
+    m.nested.query.bool.should = [];
+
+    let n = {};
+    n.match_phrase_prefix = {};
+    n.match_phrase_prefix["node.n.have"] = {};
+    n.match_phrase_prefix["node.n.have"].query = keyword;
+    n.match_phrase_prefix["node.n.have"].analyzer = "my_whitespace";
+    m.nested.query.bool.should.push(n);
+
+    n = {};
+    n.match_phrase_prefix = {};
+    n.match_phrase_prefix["node.ncit.c.have"] = {};
+    n.match_phrase_prefix["node.ncit.c.have"].query = keyword;
+    n.match_phrase_prefix["node.ncit.c.have"].analyzer = "my_whitespace";
+    m.nested.query.bool.should.push(n);
+
+    if (option.n_syn) {
+      n = {};
+      n.match_phrase_prefix = {};
+      n.match_phrase_prefix["node.ncit.s.n.have"] = {};
+      n.match_phrase_prefix["node.ncit.s.n.have"].query = keyword;
+      n.match_phrase_prefix["node.ncit.s.n.have"].analyzer = "my_whitespace";
+      m.nested.query.bool.should.push(n);
+    }
+
+    m.nested.inner_hits = {};
+    m.nested.inner_hits.from = 0;
+    m.nested.inner_hits.size = 10000;
+    m.nested.inner_hits.name = "node";
+    m.nested.inner_hits.highlight = generateHighlightInnerHits_node();
     clause.bool.should.push(m);
 
+    m = {};
+    m.nested = {};
+    m.nested.path = "prop";
+    m.nested.query = {};
+    m.nested.query.bool = {};
+    m.nested.query.bool.should = [];
+
     if (option.desc) {
-      m = {};
-      m.match_phrase_prefix = {};
-      m.match_phrase_prefix["prop_desc"] = keyword;
-      clause.bool.should.push(m);
+      n = {};
+      n.match_phrase_prefix = {};
+      n.match_phrase_prefix["prop.d"] = {};
+      n.match_phrase_prefix["prop.d"].query = keyword;
+      n.match_phrase_prefix["prop.d"].analyzer = "my_whitespace";
+      m.nested.query.bool.should.push(n);
     }
+
+    n = {};
+    n.match_phrase_prefix = {};
+    n.match_phrase_prefix["prop.n.have"] = {};
+    n.match_phrase_prefix["prop.n.have"].query = keyword;
+    n.match_phrase_prefix["prop.n.have"].analyzer = "my_whitespace";
+    m.nested.query.bool.should.push(n);
+
+    n = {};
+    n.match_phrase_prefix = {};
+    n.match_phrase_prefix["prop.ncit.c.have"] = {};
+    n.match_phrase_prefix["prop.ncit.c.have"].query = keyword;
+    n.match_phrase_prefix["prop.ncit.c.have"].analyzer = "my_whitespace";
+    m.nested.query.bool.should.push(n);
+
+    if (option.p_syn) {
+      n = {};
+      n.match_phrase_prefix = {};
+      n.match_phrase_prefix["prop.ncit.s.n.have"] = {};
+      n.match_phrase_prefix["prop.ncit.s.n.have"].query = keyword;
+      n.match_phrase_prefix["prop.ncit.s.n.have"].analyzer = "my_whitespace";
+      m.nested.query.bool.should.push(n);
+    }
+
+    n = {};
+    n.match_phrase_prefix = {};
+    n.match_phrase_prefix["prop.cde.c"] = keyword;
+    m.nested.query.bool.should.push(n);
+
+    m.nested.inner_hits = {};
+    m.nested.inner_hits.from = 0;
+    m.nested.inner_hits.size = 10000;
+    m.nested.inner_hits.name = "prop";
+    m.nested.inner_hits.highlight = generateHighlightInnerHits_prop();
+    clause.bool.should.push(m);
 
     m = {};
     m.nested = {};
@@ -144,66 +288,6 @@ const generateQuery = (keyword, option) => {
     m.nested.query.bool = {};
     m.nested.query.bool.should = [];
 
-    let n = {};
-    if (option.syn) {
-      n = {};
-      n.match_phrase_prefix = {};
-      n.match_phrase_prefix["enum.ncit.s.n.have"] = keyword;
-      m.nested.query.bool.should.push(n);
-    }
-    n = {};
-    n.match_phrase_prefix = {};
-    n.match_phrase_prefix["enum.ncit.c.have"] = keyword;
-    m.nested.query.bool.should.push(n);
-    
-    n = {};
-    n.match_phrase_prefix = {};
-    n.match_phrase_prefix["enum.n.have"] = keyword;
-    m.nested.query.bool.should.push(n);
-
-    n = {};
-    n.match_phrase_prefix = {};
-    n.match_phrase_prefix["enum.icdo.have"] = {};
-    n.match_phrase_prefix["enum.icdo.have"].query = keyword;
-    n.match_phrase_prefix["enum.icdo.have"].analyzer = "my_standard";
-    m.nested.query.bool.should.push(n);
-
-    m.nested.inner_hits = {};
-    m.nested.inner_hits.from = 0;
-    m.nested.inner_hits.size = 10000;
-    m.nested.inner_hits.highlight = generateHighlightInnerHits();
-    clause.bool.should.push(m);
-  }
-  */
-    let m = {};
-    m.match_phrase_prefix = {};
-    m.match_phrase_prefix["prop.have"] = {};
-    m.match_phrase_prefix["prop.have"].query = keyword;
-    m.match_phrase_prefix["prop.have"].analyzer = "my_whitespace";
-    clause.bool.should.push(m);
-
-    m = {};
-    m.match_phrase_prefix = {};
-    m.match_phrase_prefix["cde.id"] = keyword;
-    clause.bool.should.push(m);
-
-    if (option.desc) {
-      m = {};
-      m.match_phrase_prefix = {};
-      m.match_phrase_prefix["prop_desc"] = {};
-      m.match_phrase_prefix["prop_desc"].query = keyword;
-      m.match_phrase_prefix["prop_desc"].analyzer = "my_whitespace";
-      clause.bool.should.push(m);
-    }
-
-    m = {};
-    m.nested = {};
-    m.nested.path = "enum";
-    m.nested.query = {};
-    m.nested.query.bool = {};
-    m.nested.query.bool.should = [];
-
-    let n = {};
     if (option.syn) {
       n = {};
       n.match_phrase_prefix = {};
@@ -218,10 +302,10 @@ const generateQuery = (keyword, option) => {
     n.match_phrase_prefix["enum.ncit.c.have"].query = keyword;
     n.match_phrase_prefix["enum.ncit.c.have"].analyzer = "my_whitespace";
     m.nested.query.bool.should.push(n);
-
+    
     n = {};
     n.match_phrase_prefix = {};
-
+    
     n.match_phrase_prefix["enum.n.have"] = {};
     n.match_phrase_prefix["enum.n.have"].query = keyword;
     n.match_phrase_prefix["enum.n.have"].analyzer = "my_whitespace";
@@ -237,11 +321,12 @@ const generateQuery = (keyword, option) => {
     m.nested.inner_hits = {};
     m.nested.inner_hits.from = 0;
     m.nested.inner_hits.size = 10000;
+    m.nested.inner_hits.name = "enum";
     m.nested.inner_hits.highlight = generateHighlightInnerHits();
     clause.bool.should.push(m);
   }
   query.bool.must.push(clause);
-
+  
   return query;
 };
 
@@ -343,6 +428,16 @@ const readGDCValues = () => {
   let content = fs.readFileSync(dataFilesDir + "/gdc_values.js").toString();
   return JSON.parse(content);
 };
+
+const readGDCProps = () => {
+  let content = fs.readFileSync(dataFilesDir + "/gdc_props.js").toString();
+  return JSON.parse(content);
+};
+
+const readGDCNodes = () => {
+  let content = fs.readFileSync(dataFilesDir + "/gdc_nodes.js").toString();
+return JSON.parse(content);
+}
 
 const readCDEData = () => {
   let content = fs.readFileSync(dataFilesDir + "/cdeData.js").toString();
@@ -854,6 +949,42 @@ const getGraphicalGDCDictionary = async function () {
   return result;
 };
 
+const getGDCDictionaryByVersion = async function(version) {
+  let result = cache.getValue("gdc_dict_"+version);
+  const DictionaryPath = path.join(__dirname, '..', '..', 'data_files','GDC', 'model-'+version);
+  if(result == undefined){
+      console.log("Start to generate GDC Dictionary "+version+" Data and load to local cache.");
+      let jsonData = {};
+      var termsJson = yaml.load(DictionaryPath + '/_terms.yaml');
+      jsonData["_terms.yaml"] = termsJson;
+      var defJson = yaml.load(DictionaryPath + '/_definitions.yaml');
+      jsonData["_definitions.yaml"] = defJson;
+      // let bulkBody = [];
+      fs.readdirSync(DictionaryPath).forEach(file => {
+          let fileJson = yaml.load(DictionaryPath + '/' + file);
+          // Do not include annotation.yaml, metaschema.yaml
+          // Only include node in the gdc_searchable_nodes
+          // Do not include node in category "TBD" and "data" 
+          /*
+          if (file.indexOf('_') !== 0 && file !== 'annotation.yaml' && file !== 'metaschema.yaml'  
+            && gdc_searchable_nodes.indexOf(fileJson.id) !== -1 && fileJson.category !== 'TBD' && fileJson.category !== 'data') {
+            jsonData[file] = fileJson;
+          }
+          */
+          if (file.indexOf('_') !== 0 && file !== 'annotation.yaml' && file !== 'metaschema.yaml'  
+            && fileJson.category !== 'TBD' && fileJson.category !== 'data') {
+            jsonData[file] = fileJson;
+          }
+      });
+      result = await generateGDCData(jsonData);
+      console.log("Cached:");
+      console.log(Object.keys(result).length);
+      cache.setValue("gdc_dict_"+version, result, config.item_ttl);
+  }
+
+  return result;
+}
+
 const getGraphicalICDCDictionary = () => {
   let result = cache.getValue("icdc_dict");
   if (result == undefined) {
@@ -887,7 +1018,270 @@ const getGraphicalCTDCDictionary = () => {
     cache.setValue("ctdc_dict", result, config.item_ttl);
   }
   return result;
+}
+
+const processGDCDictionaryEnumData = (prop) => {
+	const enums = prop.enum;
+	const enumsDef = prop.enumDef;
+	let result = enums ? enums.map((value) => {
+		let tmp = {};
+		tmp.n = value.replace(/(?:\r\n|\r|\n)/g, ' ');
+		if(enumsDef && enumsDef[tmp.n] && enumsDef[tmp.n].termDef){
+			let term = enumsDef[tmp.n].termDef;
+			if(term.source == "NCIt" && term.term_id && term.term_id !== ""){
+				tmp.gdc_ncit = term.term_id;
+			}
+			else{
+				tmp.gdc_ncit = "";
+			}
+		}
+		else{
+			tmp.gdc_ncit = "";
+		}
+		tmp.n = tmp.n.replace(/\s+/g,' ');
+		return tmp;
+	}) : [];
+	return result;
 };
+
+const processEVSSIPEnumData = (enums) => {
+	let result = {};
+	if(enums) {
+		enums.map((entry) => {
+			let value = entry.n.replace(/\s+/g,' ');
+			result[value] = [];
+			let ncits = entry.ncit;
+			ncits.map((ncit) => {
+				result[value].push(ncit.c);
+			});
+		});
+	}
+	return result;
+};
+
+function compareValues(v_gdc, v_evssip, prop, node, category){
+	let dict_data = processGDCDictionaryEnumData(v_gdc);
+	let evssip_data = processEVSSIPEnumData(v_evssip);
+	let i = 0 ,j = 0, k = 0, m = 0, n = 0, conflict = 0, ok = 0;
+	let groupedContent = {};
+	groupedContent.i = [];
+	groupedContent.j = [];
+	groupedContent.k = [];
+	groupedContent.m = [];
+	groupedContent.n = [];
+	groupedContent.conflict = [];
+	groupedContent.ok = [];
+	let result = [];
+	dict_data.map((entry) => {
+		let tmp = {};
+		tmp.p = prop;
+		tmp.n = node;
+		tmp.c = category;
+		tmp.v_1 = entry.n;
+		tmp.n_1 = entry.gdc_ncit;
+		tmp.v_2 = "";
+		tmp.n_2 = "";
+		let value = tmp.v_1;
+		if(evssip_data[value] && evssip_data[value].length > 0){
+			tmp.v_2 = value;
+			tmp.n_2 = evssip_data[value].join();
+			//entry.evssip_ncit = evssip_data[value].join();
+		}
+		else if(evssip_data[value]){
+			tmp.v_2 = value;
+			tmp.n_2 = "";
+			//entry.evssip_ncit = "";
+		}
+		else{
+			tmp.v_2 = "";
+			tmp.n_2 = "";
+		}
+
+    //generate category
+    if(tmp.n_2 == ""){
+      //unmapped
+      tmp.t = 1;
+    }
+    else if((tmp.n_1 == "" && tmp.n_2 != "" ) || 
+            (tmp.n_1 != "" && tmp.n_2 != "" &&  tmp.n_2.split(',').indexOf(tmp.n_1.trim()) > -1)){
+      //mapped
+      tmp.t = 0;
+    }
+    else if(tmp.n_1 != "" && tmp.n_2 != "" &&  tmp.n_2.split(',').indexOf(tmp.n_1.trim()) == -1){
+      //conflict
+      tmp.t = 2;
+    }
+    else{
+      tmp.t = -1;
+    }
+    db.insert(tmp);
+		result.push(tmp);
+	});
+	return result;
+}
+
+const genearteCompareResult = async function(){
+    let delCount = await db.remove({}, {multi: true});
+    console.log(delCount);
+    let query = {};
+		query.terms = {};
+		query.terms.source = [];
+		query.terms.source.push("gdc");
+		let GDCDict = await getGDCDictionaryByVersion("2.3.0");
+		let data = await elastic.query_all(config.index_p, query, "", null);
+		if (data.hits === undefined) {
+			return handleError.error(res, data);
+		}
+		let rs = data.hits.hits;
+		let local_data = {};
+		rs.map((entry) => {
+			let dt = entry._source;
+			local_data[dt.id] = dt.enum ? dt.enum : [];
+		});
+		let mappings = [];
+		for(let node in GDCDict){
+			let props = GDCDict[node].properties;
+			let category = GDCDict[node].category;
+			if(props == undefined) continue;
+			//compare
+			for(let prop in props){
+				let uid = prop + '/' + node + '/' + category + "/gdc";
+				let v_gdc = props[prop];
+				let v_evssip = local_data[uid];
+				compareValues(v_gdc, v_evssip, prop, node, category);
+			}
+		}
+		cache.setValue("compareWith_2.3.0", true, config.item_ttl/3);
+}
+
+const getCompareResult = async function(searchText, from , limit){
+	let compared = cache.getValue("compareWith_2.3.0");
+  if(compared == undefined){
+    await genearteCompareResult();
+  }
+  let result = {};
+  if(limit < 0){
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]});
+      result.data = await db.find({$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+    else{
+      result.total = await db.count({});
+      result.data = await db.find({}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+  }
+  else{
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]});
+      result.data = await db.find({$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+    else{
+      result.total = await db.count({});
+      result.data = await db.find({}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+  }
+  return result;
+};
+
+const getCompareResult_unmapped = async function(searchText, from , limit) {
+  let compared = cache.getValue("compareWith_2.3.0");
+  if(compared == undefined){
+    await genearteCompareResult();
+	}
+  let result = {};
+  if(limit < 0){
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 1},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 1},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]})
+                        .sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+    else{
+      result.total = await db.count({t: 1});
+      result.data = await db.find({t: 1}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+  }
+  else{
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 1},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 1},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]})
+                        .sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+    else{
+      result.total = await db.count({t: 1});
+      result.data = await db.find({t: 1}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+  }
+  
+  
+  return result;
+}
+
+const getCompareResult_mapped = async function(searchText, from , limit) {
+  let compared = cache.getValue("compareWith_2.3.0");
+  if(compared == undefined){
+    await genearteCompareResult();
+	}
+  let result = {};
+  if(limit < 0){
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 0},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 0},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+    else{
+      result.total = await db.count({t: 0});
+      result.data = await db.find({t: 0}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+  }
+  else{
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 0},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 0},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+    else{
+      result.total = await db.count({t: 0});
+      result.data = await db.find({t: 0}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+  }
+  
+  return result;
+}
+
+const getCompareResult_conflict = async function(searchText, from , limit) {
+  let compared = cache.getValue("compareWith_2.3.0");
+  if(compared == undefined){
+    await genearteCompareResult();
+	}
+  let result = {};
+  if(limit < 0){
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 2},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 2},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+    else{
+      result.total = await db.count({t: 2});
+      result.data = await db.find({t: 2}).sort({c: 1, n: 1, p: 1}).skip(from);
+    }
+  }
+  else{
+    if(searchText.trim() != ""){
+      const reg = new RegExp(searchText, 'i');
+      result.total = await db.count({$and: [{t: 2},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]});
+      result.data = await db.find({$and: [{t: 2},{$or: [{p: reg}, {n: reg}, {v_1: reg}, {n_1: reg}, {n_2: reg}]}]}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+    else{
+      result.total = await db.count({t: 2});
+      result.data = await db.find({t: 2}).sort({c: 1, n: 1, p: 1}).skip(from).limit(limit);
+    }
+  }
+  return result;
+}
 
 const getGraphicalPCDCDictionary = (project) => {
   let project_result = cache.getValue("pcdc_dict_" + project);
@@ -937,6 +1331,8 @@ module.exports = {
   readNCItDetails,
   preProcess,
   readGDCValues,
+  readGDCProps,
+  readGDCNodes,
   readCDEData,
   readCTDCMapping,
   readICDCMapping,
@@ -950,4 +1346,9 @@ module.exports = {
   getGraphicalPCDCDictionary,
   convert2Key,
   getPCDCProjectsFullName,
+  getCompareResult,
+  getCompareResult_unmapped,
+  getCompareResult_mapped,
+  getCompareResult_conflict,
+  getGDCDictionaryByVersion
 };

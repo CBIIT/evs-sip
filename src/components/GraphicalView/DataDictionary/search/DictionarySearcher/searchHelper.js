@@ -4,6 +4,7 @@ import {
   getPropertyDescription,
   getType,
 } from "../../utils";
+import { getHighlightObj } from "../../../../../shared"
 
 export const ZERO_RESULT_FOUND_MSG =
   "0 results found. Please try another keyword.";
@@ -122,40 +123,41 @@ export const getSearchResult = (graphType, searchData, project_filter) => {
   if (searchData.length > 0) {
     searchData.forEach((entry) => {
       let dt = entry._source;
+      let ih = entry.inner_hits;
 
       if (project_filter && dt.category !== project_filter) {
         return;
       }
       if (dt.source === graphType) {
-        if (!(dt.node in result)) {
-          result[dt.node] = {};
-          result[dt.node].props = {};
+        if (!(dt.node.n in result)) {
+          result[dt.node.n] = {};
+          result[dt.node.n].props = {};
         }
-        result[dt.node].props[dt.prop] = {};
-        if (entry.highlight) {
-          result[dt.node].props[dt.prop].title = entry.highlight["prop.have"]
-            ? entry.highlight["prop.have"][0]
-            : dt.prop;
-          result[dt.node].props[dt.prop].desc = entry.highlight["prop_desc"]
-            ? entry.highlight["prop_desc"][0]
-            : dt.prop_desc;
-          if (entry.highlight["cde.id"]) {
-            let icdo = entry.highlight["cde.id"][0];
-            result[dt.node].props[dt.prop].desc = result[dt.node].props[
-              dt.prop
-            ].desc.replace(
-              icdo.replace(/<b>/g, "").replace(/<\/b>/g, ""),
-              icdo
-            );
-          }
+        result[dt.node.n].props[dt.prop.n] = {};
+
+        if (ih.prop.hits.hits.length !== 0) {
+          let propHits = ih.prop.hits.hits;
+    
+          propHits.forEach((hits) => {
+            let hl = hits.highlight;
+    
+            let highlightProp = ('prop.n' in hl) || ('prop.n.have' in hl) ? hl['prop.n'] || hl['prop.n.have'] : undefined;
+            let highlightPropObj = getHighlightObj(highlightProp);
+
+            let highlightDesc = ('prop.d' in hl) || ('prop.d.have' in hl) ? hl['prop.d'] || hl['prop.d.have'] : undefined;
+            let highlightDescObj = getHighlightObj(highlightDesc);
+
+            result[dt.node.n].props[dt.prop.n].title = highlightPropObj[dt.prop.n] ? highlightPropObj[dt.prop.n] : dt.prop.n;
+            result[dt.node.n].props[dt.prop.n].desc = highlightDescObj[dt.prop.d] ? highlightDescObj[dt.prop.d] : dt.prop.d;
+          });
         } else {
-          result[dt.node].props[dt.prop].title = dt.prop;
-          result[dt.node].props[dt.prop].desc = dt.prop_desc;
+          result[dt.node.n].props[dt.prop.n].title = dt.prop.n;
+          result[dt.node.n].props[dt.prop.n].desc = dt.prop.d;
         }
 
-        result[dt.node].props[dt.prop].type = dt.type;
-        result[dt.node].props[dt.prop].enum = dt.enum ? dt.enum : [];
-        result[dt.node].props[dt.prop].hits = entry.inner_hits.enum.hits.hits;
+        result[dt.node.n].props[dt.prop.n].type = dt.type;
+        result[dt.node.n].props[dt.prop.n].enum = dt.enum ? dt.enum : [];
+        result[dt.node.n].props[dt.prop.n].hits = entry.inner_hits.enum.hits.hits;
       }
     });
   }

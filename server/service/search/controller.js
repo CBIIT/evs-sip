@@ -9,6 +9,7 @@ const path = require("path");
 const shared = require("./shared");
 // const git = require('nodegit');
 //const Excel = require("exceljs");
+const export_excel = require('node-excel-export');
 const dataFilesPath = path.join(__dirname, "..", "..", "data_files");
 var syns = {};
 
@@ -150,7 +151,8 @@ const indexing = (req, res) => {
         analyzer: {
           case_insensitive: {
             tokenizer: "keyword",
-            filter: ["lowercase", "whitespace_remove"],
+            //filter: ["lowercase", "whitespace_remove"],
+            filter: ["lowercase"],
           },
           my_standard: {
             tokenizer: "standard",
@@ -159,8 +161,9 @@ const indexing = (req, res) => {
           },
           my_whitespace: {
             tokenizer: "whitespace",
-            char_filter: ["my_filter"],
-            filter: ["lowercase", "whitespace_remove"],
+            //char_filter: ["my_filter"],
+            //filter: ["lowercase", "whitespace_remove"],
+            filter: ["lowercase"],
           },
         },
         char_filter: {
@@ -180,86 +183,151 @@ const indexing = (req, res) => {
     },
     mappings: {
       properties: {
-        id: {
-          type: "keyword",
-        },
-        source: {
-          type: "keyword",
-        },
-        category: {
-          type: "keyword",
-        },
-        node: {
-          type: "keyword",
-        },
-        prop_desc: {
-          type: "text",
-          analyzer: "my_whitespace",
-        },
-        prop: {
-          type: "text",
-          fields: {
-            have: {
-              type: "text",
-              analyzer: "my_whitespace",
-            },
-          },
-          analyzer: "case_insensitive",
-        },
-        enum: {
-          type: "nested",
-          properties: {
-            n: {
-              type: "text",
-              fields: {
-                have: {
-                  type: "text",
-                  analyzer: "my_whitespace",
-                },
-              },
-              analyzer: "case_insensitive",
-            },
-            "ncit.s.n": {
-              type: "text",
-              fields: {
-                have: {
-                  type: "text",
-                  analyzer: "my_whitespace",
-                },
-              },
-              analyzer: "case_insensitive",
-            },
-            "ncit.c": {
-              type: "text",
-              fields: {
-                have: {
-                  type: "text",
-                  analyzer: "my_whitespace",
-                },
-              },
-              analyzer: "case_insensitive",
-            },
-            icdo: {
-              properties: {
-                c: {
-                  type: "text",
-                  analyzer: "case_insensitive",
-                },
-                have: {
-                  type: "text",
-                  analyzer: "my_whitespace",
-                },
-              },
-            },
-          },
-        },
-        "cde.id": {
-          type: "text",
-          analyzer: "case_insensitive",
-        },
-      },
-    },
-  };
+        "id": {
+					"type": "keyword"
+				},
+				"source":{
+					"type": "keyword"
+				},
+				"category": {
+					"type": "keyword"
+				},
+				"node":{
+					"type": "nested",
+					"properties": {
+						"n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"d": {
+							"type": "text",
+							"analyzer": "my_whitespace"
+						},
+						"ncit.c": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"ncit.s.n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						}
+					}
+				},
+				"prop":{
+					"type": "nested",
+					"properties": {
+						"n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"d": {
+							"type": "text",
+							"analyzer": "my_whitespace"
+						},
+						"ncit.c": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"ncit.s.n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"cde":{
+							"properties": {
+								"c": {
+									"type": "text",
+									"analyzer": "case_insensitive"
+								}
+							}
+						}
+					}
+				},
+				"enum":{
+					"type": "nested",
+					"properties": {
+						"n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"ncit.s.n": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"ncit.c": {
+							"type": "text",
+							"fields": {
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							},
+							"analyzer": "case_insensitive"
+						},
+						"icdo":{
+							"properties": {
+								"c": {
+									"type": "text",
+									"analyzer": "case_insensitive"
+								},
+								"have": {
+									"type": "text",
+									"analyzer": "my_whitespace"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	};
   configs.push(config_property);
   //config suggestion index
   let config_suggestion = {};
@@ -320,17 +388,21 @@ const searchP = (req, res) => {
   let keyword = req.query.keyword.trim();
 
   let option = {};
-  if (req.query.options) {
-    option.match =
-      req.query.options.indexOf("exact") !== -1 ? "exact" : "partial";
-    option.syn = req.query.options.indexOf("syn") !== -1 ? true : false;
-    option.desc = req.query.options.indexOf("desc") !== -1 ? true : false;
-    option.sources = req.query.sources ? req.query.sources.split(",") : [];
-  } else {
+  if(req.query.options){
+    option.match = req.query.options.indexOf("exact") !== -1 ? "exact" : "partial";
+    option.syn = req.query.options.indexOf('syn') !== -1 ? true : false;
+    option.n_syn = req.query.options.indexOf('n_syn') !== -1 ? true : false;
+    option.p_syn = req.query.options.indexOf('p_syn') !== -1 ? true : false;
+    option.desc = req.query.options.indexOf('desc') !== -1 ? true : false;
+    option.sources = req.query.sources? req.query.sources.split(',') : [];
+  }
+  else{
     option = {
       match: "partial",
       syn: false,
-      desc: false,
+      n_syn: false,
+      p_syn: false,
+      desc: false
     };
     option.sources = [];
   }
@@ -719,7 +791,7 @@ const updateGDCDataMappings = async (req, res) => {
     "..",
     "data_files",
     "GDC",
-    "New Mapping.xlsx"
+    "New_Mapping.xlsx"
   );
   let output_file_path = path.join(
     __dirname,
@@ -923,19 +995,728 @@ const preloadPCDCDataMappings = async (req, res) => {
   res.json({ result: "success" });
 };
 
+const compareAllWithGDCDictionary = async function(req, res){
+	const params = req.query;
+	const searchText = params.searchText ? params.searchText : "";
+	const type = params.type ? params.type : "all";
+	const page = parseInt(params.page ? params.page : 1);
+	const pageSize = parseInt(params.pageSize ? params.pageSize : 25);
+	const from = page > 1 ? (page - 1) * pageSize : 0;
+	const limit = pageSize;
+	
+	let result = {};
+	result.pageInfo = {};
+	result.pageInfo.page = page;
+	result.pageInfo.pageSize = pageSize;
+	if(type == "all"){
+		let mappings = await shared.getCompareResult(searchText, from , limit);
+		result.data = mappings.data;
+		result.pageInfo.total = mappings.total;
+		res.json(result);
+	}
+	else if(type == "unmapped"){
+		let mappings = await shared.getCompareResult_unmapped(searchText, from , limit);
+		result.data = mappings.data;
+		result.pageInfo.total = mappings.total;
+		res.json(result);
+	}
+	else if(type == "mapped"){
+		let mappings = await shared.getCompareResult_mapped(searchText, from , limit);
+		result.data = mappings.data;
+		result.pageInfo.total = mappings.total;
+		res.json(result);
+	}
+	else if(type == "conflict"){
+		//conflict
+		let mappings = await shared.getCompareResult_conflict(searchText, from , limit);
+		result.data = mappings.data;
+		result.pageInfo.total = mappings.total;
+		res.json(result);
+	}
+	else{
+		let mappings = await shared.getCompareResult(searchText, from , limit);
+		result.data = mappings.data;
+		result.pageInfo.total = mappings.total;
+		res.json(result); 
+	}
+}
+
+const exportCompareResult = async function(req, res){
+	const params = req.query;
+	const searchText = params.searchText ? params.searchText : "";
+	const type = params.type ? params.type : "all";
+
+
+	let result = {};
+	if(type == "all"){
+		let mappings = await shared.getCompareResult(searchText, 0 , -1);
+		result.data = mappings.data;
+	}
+	else if(type == "unmapped"){
+		let mappings = await shared.getCompareResult_unmapped(searchText, 0 , -1);
+		result.data = mappings.data;
+	}
+	else if(type == "mapped"){
+		let mappings = await shared.getCompareResult_mapped(searchText, 0 , -1);
+		result.data = mappings.data;
+	}
+	else if(type == "conflict"){
+		//conflict
+		let mappings = await shared.getCompareResult_conflict(searchText, 0 , -1);
+		result.data = mappings.data;
+	}
+	else{
+		let mappings = await shared.getCompareResult(searchText, 0 , -1);
+		result.data = mappings.data;
+	}
+
+	// You can define styles as json object
+	const styles = {
+		cellBlue_header: {
+			fill: {
+				fgColor: {
+					rgb: '00008bff'
+				}
+			},
+			font:{
+				sz: 14,
+				bold: true
+			}
+		},
+		cellBlue: {
+			fill: {
+				fgColor: {
+					rgb: '00008bff'
+				}
+			}
+		}
+	};
+	
+	//Array of objects representing heading rows (very top)
+	const heading = [
+		[{value: '', style: styles.cellBlue_header},{value: '', style: styles.cellBlue_header},{value: '', style: styles.cellBlue_header},{value: 'GDC Dictionary', style: styles.cellBlue_header},{value: 'GDC Dictionary', style: styles.cellBlue_header}, {value: 'Mapped GDC Values', style: styles.cellBlue_header}, {value: 'Mapped GDC Values', style: styles.cellBlue_header}]
+	];
+	
+	//Here you specify the export structure
+	const specification = {
+		c: { // <- the key should match the actual data key
+			displayName: 'Category', // <- Here you specify the column header
+			headerStyle: styles.cellBlue, // <- Header style
+			width: 220 // <- width in pixels
+		},
+		n: {
+			displayName: 'Node',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in chars (when the number is passed as string)
+		},
+		p: {
+			displayName: 'Property',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		v_1: {
+			displayName: 'Value',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		n_1: {
+			displayName: 'NCIt Code',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		v_2: {
+			displayName: 'Value',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		n_2: {
+			displayName: 'NCIt Code',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		}
+	}
+	
+	// Define an array of merges. 1-1 = A:1
+	// The merges are independent of the data.
+	// A merge will overwrite all data _not_ in the top-left cell.
+	const merges = [
+		{ start: { row: 1, column: 4 }, end: { row: 1, column: 5 } },
+		{ start: { row: 1, column: 6 }, end: { row: 1, column: 7 } }
+	];
+	
+	// Create the excel report.
+	// This function will return Buffer
+	const report = export_excel.buildExport(
+	[ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+		{
+		name: 'Report', // <- Specify sheet name (optional)
+		heading: heading, // <- Raw heading array (optional)
+		merges: merges, // <- Merge cell ranges
+		specification: specification, // <- Report specification
+		data: result.data // <-- Report data
+		}
+	]
+	);
+	
+	// You can then return this straight
+	res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+	res.send(report);
+}
+
+const exportAllCompareResult = async function(req, res){
+	const searchText = "";
+
+	let result = {};
+	let all_mappings = await shared.getCompareResult(searchText, 0 , -1);
+	result.all_data = all_mappings.data;
+	let unmapped_mappings = await shared.getCompareResult_unmapped(searchText, 0 , -1);
+	result.unmapped_data = unmapped_mappings.data;
+	let mapped_mappings = await shared.getCompareResult_mapped(searchText, 0 , -1);
+	result.mapped_data = mapped_mappings.data;
+	let conflict_mappings = await shared.getCompareResult_conflict(searchText, 0 , -1);
+	result.conflict_data = conflict_mappings.data;
+
+	// You can define styles as json object
+	const styles = {
+		cellBlue_header: {
+			fill: {
+				fgColor: {
+					rgb: '00008bff'
+				}
+			},
+			font:{
+				sz: 14,
+				bold: true
+			}
+		},
+		cellBlue: {
+			fill: {
+				fgColor: {
+					rgb: '00008bff'
+				}
+			}
+		}
+	};
+	
+	//Array of objects representing heading rows (very top)
+	const heading = [
+		[{value: '', style: styles.cellBlue_header},{value: '', style: styles.cellBlue_header},{value: '', style: styles.cellBlue_header},{value: 'GDC Dictionary', style: styles.cellBlue_header},{value: 'GDC Dictionary', style: styles.cellBlue_header}, {value: 'Mapped GDC Values', style: styles.cellBlue_header}, {value: 'Mapped GDC Values', style: styles.cellBlue_header}]
+	];
+	
+	//Here you specify the export structure
+	const specification = {
+		c: { // <- the key should match the actual data key
+			displayName: 'Category', // <- Here you specify the column header
+			headerStyle: styles.cellBlue, // <- Header style
+			width: 220 // <- width in pixels
+		},
+		n: {
+			displayName: 'Node',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in chars (when the number is passed as string)
+		},
+		p: {
+			displayName: 'Property',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		v_1: {
+			displayName: 'Value',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		n_1: {
+			displayName: 'NCIt Code',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		v_2: {
+			displayName: 'Value',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		},
+		n_2: {
+			displayName: 'NCIt Code',
+			headerStyle: styles.cellBlue,
+			width: 220 // <- width in pixels
+		}
+	}
+	
+	// Define an array of merges. 1-1 = A:1
+	// The merges are independent of the data.
+	// A merge will overwrite all data _not_ in the top-left cell.
+	const merges = [
+		{ start: { row: 1, column: 4 }, end: { row: 1, column: 5 } },
+		{ start: { row: 1, column: 6 }, end: { row: 1, column: 7 } }
+	];
+	
+	// Create the excel report.
+	// This function will return Buffer
+	const report = export_excel.buildExport(
+	[ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+		{
+		name: 'All', // <- Specify sheet name (optional)
+		heading: heading, // <- Raw heading array (optional)
+		merges: merges, // <- Merge cell ranges
+		specification: specification, // <- Report specification
+		data: result.all_data // <-- Report data
+		},
+		{
+		name: 'Unmapped', // <- Specify sheet name (optional)
+		heading: heading, // <- Raw heading array (optional)
+		merges: merges, // <- Merge cell ranges
+		specification: specification, // <- Report specification
+		data: result.unmapped_data // <-- Report data
+		},
+		{
+		name: 'Mapped', // <- Specify sheet name (optional)
+		heading: heading, // <- Raw heading array (optional)
+		merges: merges, // <- Merge cell ranges
+		specification: specification, // <- Report specification
+		data: result.mapped_data // <-- Report data
+		},
+		{
+		name: 'Conflict', // <- Specify sheet name (optional)
+		heading: heading, // <- Raw heading array (optional)
+		merges: merges, // <- Merge cell ranges
+		specification: specification, // <- Report specification
+		data: result.conflict_data // <-- Report data
+		}
+	]
+	);
+	
+	// You can then return this straight
+	res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+	res.send(report);
+}
+
+const generateProperties = async function(req, res) {
+	const dataset = [];
+	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+	let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+	
+	for(let node in GDCDict){
+		let entry = GDCDict[node];
+		let uid = node + "/" + entry.category + "/gdc";
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+				let dict = prop_dict[prop];
+				tmp.ncit = dict.termDef && dict.termDef.source  && dict.termDef.source == "NCIt" ? (dict.termDef.term_id || dict.termDef.cde_id ) : "";
+				dataset.push(tmp);
+			}
+		} 
+	}
+
+  // You can define styles as json object
+	const styles = {
+    cellPink: {
+      fill: {
+      fgColor: {
+        rgb: 'FF00FF00'
+      }
+      }
+    }
+    };
+    
+    //Array of objects representing heading rows (very top)
+    const heading = [
+    ];
+    
+    //Here you specify the export structure
+    const specification = {
+      category: { // <- the key should match the actual data key
+        displayName: 'Category', // <- Here you specify the column header
+        headerStyle: styles.cellPink, // <- Header style
+        width: 220 // <- width in pixels
+      },
+      node: {
+        displayName: 'Node',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in chars (when the number is passed as string)
+      },
+      property: {
+        displayName: 'Property',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      },
+      ncit: {
+        displayName: 'NCIt Code',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      }
+    }
+    
+    // Define an array of merges. 1-1 = A:1
+    // The merges are independent of the data.
+    // A merge will overwrite all data _not_ in the top-left cell.
+    const merges = [];
+    
+    // Create the excel report.
+    // This function will return Buffer
+    const report = export_excel.buildExport(
+    [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+      {
+      name: 'Report', // <- Specify sheet name (optional)
+      heading: heading, // <- Raw heading array (optional)
+      merges: merges, // <- Merge cell ranges
+      specification: specification, // <- Report specification
+      data: dataset // <-- Report data
+      }
+    ]
+    );
+    
+    // You can then return this straight
+    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.send(report);
+}
+
+const updateGDCPropertyMappings = async function(req, res) {
+  /*
+  let file_path = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "GDC_Property.xlsx"
+  );
+
+  let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_props.js');
+  
+  const workbook = new Excel.Workbook();
+  await workbook.xlsx.readFile(file_path.replace(/\\/g, "/"));
+  let worksheet = workbook.worksheets[0];
+
+  let prop_mapping = {};
+
+  let prop_mapping_count = 0;
+  let prop_mapped_count = 0;
+  let prop_unmapped_count = 0;
+
+  worksheet.eachRow(function (row, rowNumber) {
+    let item = row.values;
+    if (rowNumber > 1) {
+      let property = item[6] == undefined || item[6] == null ? "" : item[6];
+      let ncit = item[3] == undefined || item[3] == null ? "" : item[3];
+      if(property != ""){
+        if(property.indexOf(" || ") > -1){
+          property.split(" || ").forEach((p) => {
+            prop_mapping[p.trim()] = ncit;
+            prop_mapping_count++;
+          })
+        }
+        else{
+          prop_mapping[property] = ncit;
+          prop_mapping_count ++;
+        }
+      }
+      
+    }
+  });
+  
+  const mapped_props = [];
+	const dataset = {};
+  const dataoutput = [];
+	let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+	
+	for(let node in GDCDict){
+		let entry = GDCDict[node];
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+        tmp.desc = prop_dict[prop].description;
+        
+        if(prop in prop_mapping){
+          //console.log("Found mapping: <", prop, node, category, ">");
+          let p_id = tmp.category + "."+ tmp.node + "." + prop;
+          if(mapped_props.indexOf(prop) == -1){
+            mapped_props.push(prop);
+          }
+          dataset[p_id] = prop_mapping[prop];
+          tmp.ncit = prop_mapping[prop];
+          prop_mapped_count++;
+        }
+        else{
+          //console.log("don't have mapping for <", prop, node, category, ">");
+          tmp.ncit = "";
+          prop_unmapped_count++;
+        }
+
+        dataoutput.push(tmp);
+
+			}
+		} 
+	}
+
+  console.log(prop_mapping_count, prop_mapped_count, prop_unmapped_count);
+
+  fs.writeFileSync(output_file_path, JSON.stringify(dataset), (err) => {
+    if (err) return logger.error(err);
+  });
+
+  // You can define styles as json object
+	const styles = {
+    cellPink: {
+      fill: {
+      fgColor: {
+        rgb: 'FF00FF00'
+      }
+      }
+    }
+    };
+    
+    //Array of objects representing heading rows (very top)
+    const heading = [
+    ];
+    
+    //Here you specify the export structure
+    const specification = {
+      category: { // <- the key should match the actual data key
+        displayName: 'Category', // <- Here you specify the column header
+        headerStyle: styles.cellPink, // <- Header style
+        width: 220 // <- width in pixels
+      },
+      node: {
+        displayName: 'Node',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in chars (when the number is passed as string)
+      },
+      property: {
+        displayName: 'Property',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      },
+      desc: {
+        displayName: 'Property Description',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      },
+      ncit: {
+        displayName: 'NCIt Code',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      }
+    }
+    
+    // Define an array of merges. 1-1 = A:1
+    // The merges are independent of the data.
+    // A merge will overwrite all data _not_ in the top-left cell.
+    const merges = [];
+    
+    // Create the excel report.
+    // This function will return Buffer
+    const report = export_excel.buildExport(
+    [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+      {
+      name: 'Report', // <- Specify sheet name (optional)
+      heading: heading, // <- Raw heading array (optional)
+      merges: merges, // <- Merge cell ranges
+      specification: specification, // <- Report specification
+      data: dataoutput // <-- Report data
+      }
+    ]
+    );
+    
+    // You can then return this straight
+    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.send(report);
+    */ 
+}
+
+const addGDCDataMappings = async (req, res) => {
+  /*
+  let file_path = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "GDC_Value.xlsx"
+  );
+  let output_file_path = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "gdc_values_updated.js"
+  );
+  let current_mappings = shared.readGDCValues();
+  const workbook = new Excel.Workbook();
+  await workbook.xlsx.readFile(file_path.replace(/\\/g, "/"));
+  let worksheet = workbook.worksheets[0];
+
+  let prop_mapping = {};
+  let value_mapping = {};
+
+  worksheet.eachRow(function (row, rowNumber) {
+    let item = row.values;
+    if (rowNumber > 1) {
+      let category = "";
+      let node = "";
+      let property = item[4] == undefined || item[4] == null ? "" : item[4].trim();
+      let property_ncit = item[3] == undefined || item[3] == null ? "" : item[3].trim();
+      let value = item[2] == undefined || item[2] == null ? "" : item[2].trim();
+      let ncit = item[1] == undefined || item[1] == null ? "" : item[1].trim();
+
+      if (property.indexOf("||") > -1) {
+        let ps = property.split("||");
+        let p_ncits = property_ncit.split("||");
+        ps.forEach((p, idx) => {
+          prop_mapping[p.trim()] = p_ncits[idx].trim();
+        });
+      }
+      else{
+        prop_mapping[property.trim()] = property_ncit.trim();
+      }
+
+      if(value.indexOf("||") > -1){
+        let values = value.split("||");
+        values.forEach((v, idx) => {
+          let entry = v.split("|");
+          let v_id = entry[1].trim() + "." + entry[0].trim();
+          if(!(v_id in value_mapping)){
+            value_mapping[v_id] = [];
+          }
+          if(value_mapping[v_id].indexOf(ncit) == -1){
+            value_mapping[v_id].push(ncit);
+          }
+        });
+      }
+      else{
+        let entry = value.split("|");
+        let v_id = entry[1].trim() + "." + entry[0].trim();
+        if(!(v_id in value_mapping)){
+          value_mapping[v_id] = [];
+        }
+        if(value_mapping[v_id].indexOf(ncit) == -1){
+          value_mapping[v_id].push(ncit);
+        }
+      }
+
+    }
+  });
+
+  let prop2Node = {};
+
+  const dataset = {};
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+  let cache = [];
+  let mappings_to_validate = [];
+  let count = 0;
+  
+	for(let node in GDCDict){
+		let entry = GDCDict[node];
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+        tmp.desc = prop_dict[prop].description;
+
+        tmp.enum = prop_dict[prop].enum;
+
+        if(prop in prop_mapping){
+          
+          if(tmp.enum && tmp.enum.length > 0){
+            tmp.enum.forEach((em) => {
+              let value_id = prop + "." + em;
+              if(value_id in value_mapping){
+                if(cache.indexOf(value_id) > -1){
+                  count ++;
+                }
+                else{
+                  cache.push(value_id);
+                }
+                mappings_to_validate.push({
+                  p_id: tmp.category + "." + tmp.node + "." + tmp.property,
+                  v: em,
+                  ncit: value_mapping[value_id]
+                });
+              }
+            });
+          }
+          
+        }
+			}
+		} 
+	}
+
+  mappings_to_validate.forEach((mtv, idx) => {
+      let value = mtv.v;
+      let ncit = mtv.ncit;
+      let p_id = mtv.p_id;
+      let found = false;
+          
+      if (!(p_id in current_mappings)) {
+        current_mappings[p_id] = [];
+      }
+      current_mappings[p_id].forEach((value_entry) => {
+        if (value_entry.nm == value.trim()) {
+          found = true;
+          if (ncit != "") {
+            value_entry.n_c = ncit;
+          }
+          
+        }
+      });
+
+      if(!found){
+        let entry = {};
+        entry.nm = value;
+        entry.n_c = ncit;
+        entry.i_c = "";
+        entry.i_c_s = "";
+        entry.term_type = "";
+        current_mappings[p_id].push(entry);
+      }
+  });
+
+  fs.writeFileSync(
+    output_file_path,
+    JSON.stringify(current_mappings),
+    (err) => {
+      if (err) return logger.error(err);
+    }
+  );
+  */
+  //handle value mappings
+
+  res.json({ result: "success" });
+};
+
+
+
 module.exports = {
-  indexing,
-  suggestion,
-  searchP,
-  getGDCData,
-  getGraphicalGDCDictionary,
-  getGraphicalICDCDictionary,
-  getGraphicalCTDCDictionary,
+	indexing,
+	suggestion,
+	searchP,
+	getGDCData,
+	getGraphicalGDCDictionary,
+	getGraphicalICDCDictionary,
+	getGraphicalCTDCDictionary,
   getGraphicalPCDCDictionary,
-  getValuesForGraphicalView,
-  preloadNCItSynonyms_old,
+	getValuesForGraphicalView,
+	preloadNCItSynonyms_old,
   preloadNCItSynonyms,
-  preloadGDCDataMappings,
+	preloadGDCDataMappings,
   updateGDCDataMappings,
   preloadPCDCDataMappings,
+	compareAllWithGDCDictionary,
+	exportCompareResult,
+	exportAllCompareResult,
+	generateProperties,
+  updateGDCPropertyMappings,
+  addGDCDataMappings
 };
