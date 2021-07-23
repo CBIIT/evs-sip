@@ -429,25 +429,15 @@ const ToCompareModal = (props) => {
     };
   
     const TableSynonyms = (props) => {
-      if (props.synonyms !== undefined && props.match !== undefined) {
-        let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
+      if (props.synonyms !== undefined) {
+        let match = props.match !== undefined ? props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)') : '\\(?!.*\\)';
+        let regKey = new RegExp(match, 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
           let SynName = optionsState['partial'] === true && optionsState['syns'] === true ? item.n.replace(regKey, '<b>$&</b>') : optionsState['partial'] === false && item.n.toLowerCase() === SynMatch  ? `<b>${item.n}</b>` : item.n; 
           return(
             <tr key={index}>
               <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
-              <td>{item.src}</td>
-              <td>{item.t}</td>
-            </tr>
-          );
-        });
-      }
-      if (props.synonyms !== undefined && props.match === undefined) {
-        return props.synonyms.map((item, index) => {
-          return(
-            <tr key={index}>
-              <td dangerouslySetInnerHTML={{ __html: item.n }}></td>
               <td>{item.src}</td>
               <td>{item.t}</td>
             </tr>
@@ -465,8 +455,8 @@ const ToCompareModal = (props) => {
         event.preventDefault();
         setIsToggleOn(!isToggleOn);
       };
-
-      let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
+      let match = props.match !== undefined ? props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)') : '\\(?!.*\\)';
+      let regKey = new RegExp(match, 'ig');
       let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
       let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
       return (
