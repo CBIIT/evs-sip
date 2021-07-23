@@ -433,7 +433,7 @@ const ToCompareModal = (props) => {
         let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
-          let SynName = optionsState['partial'] === true ? item.n.replace(regKey, '<b>$&</b>') : item.n.toLowerCase() === SynMatch ? `<b>${item.n}</b>` : item.n; 
+          let SynName = optionsState['partial'] === true && optionsState['syns'] === true ? item.n.replace(regKey, '<b>$&</b>') : optionsState['partial'] === false && item.n.toLowerCase() === SynMatch  ? `<b>${item.n}</b>` : item.n; 
           return(
             <tr key={index}>
               <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
@@ -492,7 +492,7 @@ const ToCompareModal = (props) => {
                           </tr>
                         </thead>
                         <tbody>
-                          <TableSynonyms synonyms={props.icdo.s}  match={optionsState['syns'] === true ? props.match : undefined}/>
+                          <TableSynonyms synonyms={props.icdo.s}  match={props.match}/>
                         </tbody>
                       </TableStyled>
                     </TableContainer>
@@ -517,7 +517,7 @@ const ToCompareModal = (props) => {
                               </tr>
                             </thead>
                             <tbody>
-                              <TableSynonyms synonyms={ncit.s} match={optionsState['syns'] === true ? props.match : undefined}/>
+                              <TableSynonyms synonyms={ncit.s} match={props.match}/>
                             </tbody>
                           </TableStyled>
                         </TableContainer>
