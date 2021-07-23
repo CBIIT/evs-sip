@@ -429,7 +429,7 @@ const ToCompareModal = (props) => {
     };
   
     const TableSynonyms = (props) => {
-      if (props.synonyms !== undefined) {
+      if (props.synonyms !== undefined && props.match !== undefined) {
         let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
@@ -437,6 +437,17 @@ const ToCompareModal = (props) => {
           return(
             <tr key={index}>
               <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
+              <td>{item.src}</td>
+              <td>{item.t}</td>
+            </tr>
+          );
+        });
+      }
+      if (props.synonyms !== undefined && props.match === undefined) {
+        return props.synonyms.map((item, index) => {
+          return(
+            <tr key={index}>
+              <td dangerouslySetInnerHTML={{ __html: item.n }}></td>
               <td>{item.src}</td>
               <td>{item.t}</td>
             </tr>
