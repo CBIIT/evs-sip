@@ -119,8 +119,27 @@
 			{"p_name": "histology_cytopathology", "p_n_code": "C166230", "p_PT": "", "values": []}, 
 			{"p_name": "pathology_report", "p_n_code": "C28277", "p_PT": "", "values": []}, 
 			{"p_name": "primary_disease_site", "p_n_code": "C158874", "p_PT": "", "values": []}, 
-			{"p_name": "stage_of_disease", "p_n_code": "C28108", "p_PT": "", "values": []}, 
-			{"p_name": "treatment_data", "p_n_code": "C164335", "p_PT": "", "values": []}, 
+			{"p_name": "stage_of_disease", "p_n_code": "C28108", "p_PT": "", "values": [
+				{ "v_name": "I", "v_n_code": "C27966", "v_PT": "Stage I" },
+				{ "v_name": "II", "v_n_code": "C28054", "v_PT": "Stage II" },
+				{ "v_name": "III", "v_n_code": "C27970", "v_PT": "Stage III" },
+				{ "v_name": "IIIa", "v_n_code": "C27977", "v_PT": "Stage IIIA" },
+				{ "v_name": "IIIb", "v_n_code": "C27978", "v_PT": "Stage IIIB" },
+				{ "v_name": "IIa", "v_n_code": "C27967", "v_PT": "Stage IIA" },
+				{ "v_name": "IIb", "v_n_code": "C27968", "v_PT": "Stage IIB" },
+				{ "v_name": "IV", "v_n_code": "C27971", "v_PT": "Stage IV" },
+				{ "v_name": "IVa", "v_n_code": "C27979", "v_PT": "Stage IVA" },
+				{ "v_name": "IVb", "v_n_code": "C27980", "v_PT": "Stage IVB" },
+				{ "v_name": "Ia", "v_n_code": "C27975", "v_PT": "Stage IA" },
+				{ "v_name": "Ib", "v_n_code": "C27976", "v_PT": "Stage IB" },
+				{ "v_name": "Not Applicable", "v_n_code": "C48660", "v_PT": "Not Applicable" },
+				{ "v_name": "Unknown", "v_n_code": "C17998", "v_PT": "Unknown" },
+				{ "v_name": "V", "v_n_code": "C27973", "v_PT": "Stage V" }
+			]}, 
+			{"p_name": "treatment_data", "p_n_code": "C164335", "p_PT": "", "values": [
+				{ "v_name": "N", "v_n_code": "C49487", "v_PT": "No" },
+				{ "v_name": "Y", "v_n_code": "C49488", "v_PT": "Yes" }
+			]}, 
 			{"p_name": "crf_id", "p_n_code": "C164327", "p_PT": "", "values": []}
 		]
 	},
@@ -228,7 +247,20 @@
 		"n_n_code": "", 
 		"n_PT": "physical_exam", 
 		"properties": [
-			{"p_name": "body_system", "p_n_code": "C12919", "p_PT": "", "values": []}, 
+			{"p_name": "body_system", "p_n_code": "C12919", "p_PT": "", "values": [
+				{ "v_name": "Attitude", "v_n_code": "C16326", "v_PT": "Behavior" },
+				{ "v_name": "Cardiovascular", "v_n_code": "C12686", "v_PT": "Cardiovascular System" },
+				{ "v_name": "Endocrine", "v_n_code": "C12705", "v_PT": "Endocrine System" },
+				{ "v_name": "Eyes/Ears/Nose/Throat", "v_n_code": "C42300", "v_PT": "Head, Ears, Eyes, Nose and Throat" },
+				{ "v_name": "Gastrointestinal", "v_n_code": "C12378", "v_PT": "Digestive System" },
+				{ "v_name": "Genitourinary", "v_n_code": "C12810", "v_PT": "Genitourinary System" },
+				{ "v_name": "Integumentary", "v_n_code": "C12907", "v_PT": "Integumentary System" },
+				{ "v_name": "Lymphatic", "v_n_code": "C12746", "v_PT": "Lymphatic System" },
+				{ "v_name": "Musculoskeletal", "v_n_code": "C12754", "v_PT": "Musculoskeletal System" },
+				{ "v_name": "Neurologic", "v_n_code": "C12755", "v_PT": "Nervous System" },
+				{ "v_name": "Other", "v_n_code": "C17649", "v_PT": "Other" },
+				{ "v_name": "Respiratory", "v_n_code": "C12779", "v_PT": "Respiratory System" }
+			]}, 
 			{"p_name": "date_of_examination", "p_n_code": "C83030", "p_PT": "", "values": []}, 
 			{"p_name": "pe_comment", "p_n_code": "C166247", "p_PT": "", "values": []}, 
 			{"p_name": "pe_finding", "p_n_code": "C83119", "p_PT": "", "values": []}, 
@@ -319,23 +351,45 @@
 			{"p_name": "analysis_area_percentage_stroma", "p_n_code": "C166203", "p_PT": "", "values": []}, 
 			{"p_name": "analysis_area_percentage_tumor", "p_n_code": "C166204", "p_PT": "", "values": []}, 
 			{"p_name": "date_of_sample_collection", "p_n_code": "C81286", "p_PT": "", "values": []}, 
-			{"p_name": "general_sample_pathology", "p_n_code": "C166229", "p_PT": "", "values": []}, 
+			{"p_name": "general_sample_pathology", "p_n_code": "C166229", "p_PT": "", "values": [
+				{ "v_name": "Benign", "v_n_code": "C14172", "v_PT": "Benign" },
+				{ "v_name": "Malignant", "v_n_code": "C14143", "v_PT": "Malignant" },
+				{ "v_name": "Not Applicable", "v_n_code": "C48660", "v_PT": "Not Applicable" }
+			]}, 
 			{"p_name": "length_of_tumor", "p_n_code": "C25334", "p_PT": "", "values": []}, 
 			{"p_name": "molecular_subtype", "p_n_code": "", "p_PT": "", "values": []}, 
-			{"p_name": "necropsy_sample", "p_n_code": "C166270", "p_PT": "", "values": []}, 
+			{"p_name": "necropsy_sample", "p_n_code": "C166270", "p_PT": "", "values": [
+				{ "v_name": "N", "v_n_code": "C49487", "v_PT": "No" },
+				{ "v_name": "U", "v_n_code": "C17998", "v_PT": "Unknown" },
+				{ "v_name": "Y", "v_n_code": "C49488", "v_PT": "Yes" }
+			]}, 
 			{"p_name": "non_tumor_tissue_area", "p_n_code": "C166238", "p_PT": "", "values": []}, 
 			{"p_name": "percentage_stroma", "p_n_code": "C166245", "p_PT": "", "values": []}, 
 			{"p_name": "percentage_tumor", "p_n_code": "C166246", "p_PT": "", "values": []}, 
-			{"p_name": "sample_chronology", "p_n_code": "", "p_PT": "", "values": []}, 
+			{"p_name": "sample_chronology", "p_n_code": "", "p_PT": "", "values": [
+				{ "v_name": "Not Applicable", "v_n_code": "C48660", "v_PT": "Not Applicable" },
+				{ "v_name": "Unknown", "v_n_code": "C17998", "v_PT": "Unknown" }
+			]}, 
 			{"p_name": "sample_id", "p_n_code": "C164332", "p_PT": "", "values": []}, 
-			{"p_name": "sample_preservation", "p_n_code": "C64262", "p_PT": "", "values": []}, 
+			{"p_name": "sample_preservation", "p_n_code": "C64262", "p_PT": "", "values": [
+				{ "v_name": "FFPE", "v_n_code": "C143028", "v_PT": "Formalin-Fixed Paraffin-Embedded" },
+				{ "v_name": "Snap Frozen", "v_n_code": "C63521", "v_PT": "Quick Freeze" }
+			]}, 
 			{"p_name": "sample_site", "p_n_code": "C171435", "p_PT": "", "values": []}, 
-			{"p_name": "sample_type", "p_n_code": "C70713", "p_PT": "", "values": []}, 
+			{"p_name": "sample_type", "p_n_code": "C70713", "p_PT": "", "values": [
+				{ "v_name": "Blood", "v_n_code": "C17610", "v_PT": "Blood Sample" },
+				{ "v_name": "Tissue", "v_n_code": "C19697", "v_PT": "Tissue Sample" }
+			]}, 
 			{"p_name": "specific_sample_pathology", "p_n_code": "C171436", "p_PT": "", "values": []}, 
 			{"p_name": "summarized_sample_type", "p_n_code": "C171437", "p_PT": "", "values": []}, 
 			{"p_name": "total_tissue_area", "p_n_code": "C166239", "p_PT": "", "values": []}, 
 			{"p_name": "tumor_grade", "p_n_code": "C18000", "p_PT": "", "values": []}, 
-			{"p_name": "tumor_sample_origin", "p_n_code": "C171438", "p_PT": "", "values": []}, 
+			{"p_name": "tumor_sample_origin", "p_n_code": "C171438", "p_PT": "", "values": [
+				{ "v_name": "Metastatic", "v_n_code": "C156440", "v_PT": "Metastatic Tumor Sample" },
+				{ "v_name": "Not Applicable", "v_n_code": "C48660", "v_PT": "Not Applicable" },
+				{ "v_name": "Primary", "v_n_code": "C8509", "v_PT": "Primary Neoplasm" },
+				{ "v_name": "Unknown", "v_n_code": "C17998", "v_PT": "Unknown" }
+			]}, 
 			{"p_name": "tumor_tissue_area", "p_n_code": "C166240", "p_PT": "", "values": []}, 
 			{"p_name": "volume_of_tumor", "p_n_code": "C94515", "p_PT": "", "values": []}, 
 			{"p_name": "width_of_tumor", "p_n_code": "C158774", "p_PT": "", "values": []}, 
