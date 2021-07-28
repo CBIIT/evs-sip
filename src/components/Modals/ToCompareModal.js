@@ -430,7 +430,7 @@ const ToCompareModal = (props) => {
   
     const TableSynonyms = (props) => {
       if (props.synonyms !== undefined) {
-        let match = props.match !== undefined ? props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)') : '\\(?!.*\\)';
+        let match = props.match !== undefined ? props.match.replace(/[^0-9a-zA-Z-&:,. \\)\\(\\*\\/=<+]+/g, '').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/\*/g, '\\*').replace(/\//g, '\\/').replace(/\+/g, '\\+') : '\\(?!.*\\)';
         let regKey = new RegExp(match, 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
@@ -455,7 +455,7 @@ const ToCompareModal = (props) => {
         event.preventDefault();
         setIsToggleOn(!isToggleOn);
       };
-      let match = props.match !== undefined ? props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)') : '\\(?!.*\\)';
+      let match = props.match !== undefined ? props.match.replace(/[^0-9a-zA-Z-&:,. \\)\\(\\*\\/=<+]+/g, '').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/\*/g, '\\*').replace(/\//g, '\\/').replace(/\+/g, '\\+') : '\\(?!.*\\)';
       let regKey = new RegExp(match, 'ig');
       let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
       let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
