@@ -430,10 +430,11 @@ const ToCompareModal = (props) => {
   
     const TableSynonyms = (props) => {
       if (props.synonyms !== undefined) {
-        let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
+        let match = props.match !== undefined ? props.match.replace(/[^0-9a-zA-Z-&:,. \\)\\(\\*\\/=<+]+/g, '').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/\*/g, '\\*').replace(/\//g, '\\/').replace(/\+/g, '\\+') : '\\(?!.*\\)';
+        let regKey = new RegExp(match, 'ig');
         return props.synonyms.map((item, index) => {
           let SynMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
-          let SynName = optionsState['partial'] === true ? item.n.replace(regKey, '<b>$&</b>') : item.n.toLowerCase() === SynMatch ? `<b>${item.n}</b>` : item.n; 
+          let SynName = optionsState['partial'] === true && optionsState['syns'] === true ? item.n.replace(regKey, '<b>$&</b>') : optionsState['partial'] === false && item.n.toLowerCase() === SynMatch  ? `<b>${item.n}</b>` : item.n; 
           return(
             <tr key={index}>
               <td dangerouslySetInnerHTML={{ __html: SynName }}></td>
@@ -454,8 +455,8 @@ const ToCompareModal = (props) => {
         event.preventDefault();
         setIsToggleOn(!isToggleOn);
       };
-
-      let regKey = new RegExp(props.match.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'ig');
+      let match = props.match !== undefined ? props.match.replace(/[^0-9a-zA-Z-&:,. \\)\\(\\*\\/=<+]+/g, '').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/\*/g, '\\*').replace(/\//g, '\\/').replace(/\+/g, '\\+') : '\\(?!.*\\)';
+      let regKey = new RegExp(match, 'ig');
       let ncitMatch = props.match !== undefined ? props.match.toLowerCase() : props.match;
       let ncitName = optionsState['partial'] === true ? props.name.replace(regKey, '<b>$&</b>') : props.name.toLowerCase() === ncitMatch ? `<b>${props.name}</b>` : props.name;
       return (
@@ -492,7 +493,7 @@ const ToCompareModal = (props) => {
                           </tr>
                         </thead>
                         <tbody>
-                          <TableSynonyms synonyms={props.icdo.s}  match={optionsState['syns'] === true ? props.match : undefined}/>
+                          <TableSynonyms synonyms={props.icdo.s}  match={props.match}/>
                         </tbody>
                       </TableStyled>
                     </TableContainer>
@@ -517,7 +518,7 @@ const ToCompareModal = (props) => {
                               </tr>
                             </thead>
                             <tbody>
-                              <TableSynonyms synonyms={ncit.s} match={optionsState['syns'] === true ? props.match : undefined}/>
+                              <TableSynonyms synonyms={ncit.s} match={props.match}/>
                             </tbody>
                           </TableStyled>
                         </TableContainer>
