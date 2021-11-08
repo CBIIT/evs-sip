@@ -32,6 +32,7 @@ const FormDiff = (props) => {
     <Form.Group>
       <FormLabelStyled>Source Branch from GDC Dictionary</FormLabelStyled>
       <Form.Control as="select" disabled>
+        <option value="2.4.1">Curie 2.4.1</option>
         <option value="2.3.0">Yertle the Turtle 2.3.0</option>
         <option value="2.2.0">Very Bad Fish 2.2.0</option>
         <option value="2.1.0">Thidwick 2.1.0</option>
