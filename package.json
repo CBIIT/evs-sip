@@ -2,7 +2,7 @@
   "name": "evs-sip",
   "version": "v2.0.3",
   "private": true,
-  "homepage": "/",
+  "homepage": "/evssip/",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
