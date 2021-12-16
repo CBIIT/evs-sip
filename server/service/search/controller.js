@@ -1293,7 +1293,7 @@ const exportAllCompareResult = async function(req, res){
 const generateProperties = async function(req, res) {
 	const dataset = [];
 	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
-	let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
 	
 	for(let node in GDCDict){
 		let entry = GDCDict[node];
@@ -1374,6 +1374,242 @@ const generateProperties = async function(req, res) {
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
 }
+
+
+const generateCompareProperties = async function(req, res) {
+	const datasetnew = {};
+  const datasetold = {};
+  const dataset = [];
+	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+	
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.3.0");
+  let prop_mapping = shared.readGDCProps();
+	
+	for(let node in GDCDict){
+		let entry = GDCDict[node];
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+				let dict = prop_dict[prop];
+        let uid = entry.category + "." + node + "." + prop;
+        tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
+        datasetnew[uid] = tmp;
+			}
+		} 
+	}
+
+  for(let node in GDCDictOld){
+		let entry = GDCDictOld[node];
+		if(entry.properties){
+			let prop_dict = entry.properties;
+			for(let prop in prop_dict){
+				let tmp = {};
+				tmp.category = entry.category;
+				tmp.node = node;
+				tmp.property = prop;
+				let dict = prop_dict[prop];
+        let uid = entry.category + "." + node + "." + prop;
+        tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
+        datasetold[uid] = tmp;
+			}
+		} 
+	}
+
+  for(let key in datasetnew){
+    if (!datasetold[key]) {
+      datasetnew[key].newprop = datasetnew[key].property;
+      datasetnew[key].oldprop = 'no match';
+      dataset.push(datasetnew[key])
+    }else if (datasetnew[key] && datasetold[key]) {
+      datasetnew[key].newprop = datasetnew[key].property;
+      datasetnew[key].oldprop = datasetold[key].property;
+      dataset.push(datasetnew[key])
+    }
+  }
+  for(let key in datasetold){
+    if (!datasetnew[key]) {
+      datasetold[key].newprop = 'no match';
+      datasetold[key].oldprop = datasetnew[key].property;
+      dataset.push(datasetold[key])
+    }
+  }
+
+  // You can define styles as json object
+	const styles = {
+    cellPink: {
+      fill: {
+      fgColor: {
+        rgb: 'FF00FF00'
+      }
+      }
+    }
+    };
+    
+    //Array of objects representing heading rows (very top)
+    const heading = [
+    ];
+    
+    //Here you specify the export structure
+    const specification = {
+      category: { // <- the key should match the actual data key
+        displayName: 'Category', // <- Here you specify the column header
+        headerStyle: styles.cellPink, // <- Header style
+        width: 220 // <- width in pixels
+      },
+      node: {
+        displayName: 'Node',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in chars (when the number is passed as string)
+      },
+      oldprop: {
+        displayName: 'Old GDC Property',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels  
+      },
+      newprop: {
+        displayName: 'New GDC Property',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      },
+      ncit: {
+        displayName: 'NCIt Code',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      }
+    }
+    
+    // Define an array of merges. 1-1 = A:1
+    // The merges are independent of the data.
+    // A merge will overwrite all data _not_ in the top-left cell.
+    const merges = [];
+    
+    // Create the excel report.
+    // This function will return Buffer
+    const report = export_excel.buildExport(
+    [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+      {
+      name: 'Report', // <- Specify sheet name (optional)
+      heading: heading, // <- Raw heading array (optional)
+      merges: merges, // <- Merge cell ranges
+      specification: specification, // <- Report specification
+      data: dataset // <-- Report data
+      }
+    ]
+    );
+    
+    // You can then return this straight
+    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.send(report);
+}
+
+const generateCompareNodes = async function(req, res) {
+  const dataset = [];
+	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+	
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.3.0");
+  let node_mapping = shared.readGDCNodes();
+	
+	for(let node in GDCDict){
+    if (!GDCDictOld[node]) {
+      let tmp = {};
+      tmp.category = GDCDict[node].category;
+      tmp.node = node;
+      tmp.oldnode = 'no match';
+      let uid = GDCDict[node].category + "." + node;
+      tmp.ncit = node_mapping[uid] !== undefined ? node_mapping[uid] : '';
+      dataset.push(tmp);
+    } else if (GDCDict[node] && GDCDictOld[node]) {
+      let tmp = {};
+      tmp.category = GDCDict[node].category;
+      tmp.node = node;
+      tmp.oldnode = node;
+      let uid = GDCDict[node].category + "." + node;
+      tmp.ncit = node_mapping[uid] !== undefined ? node_mapping[uid] : '';
+      dataset.push(tmp);
+    }
+	}
+
+  for(let node in GDCDictOld){
+    if (!GDCDict[node]) {
+      let tmp = {};
+      tmp.category = GDCDictOld[node].category;
+      tmp.node = 'no match';
+      tmp.oldnode = node;
+      let uid = GDCDictOld[node].category + "." + node;
+      tmp.ncit = node_mapping[uid] !== undefined ? node_mapping[uid] : '';
+      dataset.push(tmp);
+    }
+	}
+
+  // You can define styles as json object
+	const styles = {
+    cellPink: {
+      fill: {
+      fgColor: {
+        rgb: 'FF00FF00'
+      }
+      }
+    }
+    };
+    
+    //Array of objects representing heading rows (very top)
+    const heading = [
+    ];
+    
+    //Here you specify the export structure
+    const specification = {
+      category: { // <- the key should match the actual data key
+        displayName: 'Category', // <- Here you specify the column header
+        headerStyle: styles.cellPink, // <- Header style
+        width: 220 // <- width in pixels
+      },
+      oldnode: {
+        displayName: 'Old GDC Node',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in chars (when the number is passed as string)
+      },
+      node: {
+        displayName: 'New GDC Node',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels  
+      },
+      ncit: {
+        displayName: 'NCIt Code',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      }
+    }
+    
+    // Define an array of merges. 1-1 = A:1
+    // The merges are independent of the data.
+    // A merge will overwrite all data _not_ in the top-left cell.
+    const merges = [];
+    
+    // Create the excel report.
+    // This function will return Buffer
+    const report = export_excel.buildExport(
+    [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+      {
+      name: 'Report', // <- Specify sheet name (optional)
+      heading: heading, // <- Raw heading array (optional)
+      merges: merges, // <- Merge cell ranges
+      specification: specification, // <- Report specification
+      data: dataset // <-- Report data
+      }
+    ]
+    );
+    
+    // You can then return this straight
+    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.send(report);
+}
+
 
 const updateGDCPropertyMappings = async function(req, res) {
   /*
@@ -1717,6 +1953,8 @@ module.exports = {
 	exportCompareResult,
 	exportAllCompareResult,
 	generateProperties,
+  generateCompareProperties,
+  generateCompareNodes,
   updateGDCPropertyMappings,
   addGDCDataMappings
 };
