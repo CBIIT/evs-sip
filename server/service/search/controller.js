@@ -1508,6 +1508,7 @@ const generateCompareProperties = async function(req, res) {
 }
 
 const generateCompareNodes = async function(req, res) {
+  /*
   const dataset = [];
 	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
@@ -1608,6 +1609,7 @@ const generateCompareNodes = async function(req, res) {
     // You can then return this straight
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
+    */
 }
 
 
