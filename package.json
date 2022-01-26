@@ -40,7 +40,7 @@
     "nedb-promises": "^5.0.2",
     "node-cache": "^4.1.1",
     "node-excel-export": "^1.4.4",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "prop-types": "^15.6.0",
     "react": "^16.13.1",
     "react-app-polyfill": "^2.0.0",
