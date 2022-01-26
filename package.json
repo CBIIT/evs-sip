@@ -1,6 +1,6 @@
 {
   "name": "evs-sip",
-  "version": "v2.0.3",
+  "version": "v2.0.4",
   "private": true,
   "homepage": "/evssip/",
   "dependencies": {
