@@ -225,7 +225,7 @@ const helper_gdc = (fileJson, syns) => {
           if(values_icdo_mapping[v_lowcase] != ""){
             tmp.icdo = {};
             tmp.icdo.c = values_icdo_mapping[v_lowcase];
-            tmp.icdo.have = shared.generateICDOHaveWords(tmp.icdo.c),
+            tmp.icdo.have = shared.generateICDOHaveWords(tmp.icdo.c);
             tmp.icdo.s = [];
             for(let key in icdo_mapping[tmp.icdo.c].syn){
               let entry = {n: key, t: icdo_mapping[tmp.icdo.c].syn[key]};
@@ -405,7 +405,6 @@ const helper_gdc = (fileJson, syns) => {
 const helper_icdc = (dict, icdc_mapping, syns) => {
   for(let node_name in dict){
     let properties = dict[node_name].properties;
-
     let mapping_dict = {};
     if(icdc_mapping[node_name] && icdc_mapping[node_name].properties){
       icdc_mapping[node_name].properties.forEach(prop => {
@@ -413,6 +412,31 @@ const helper_icdc = (dict, icdc_mapping, syns) => {
       });
     }
     
+    // add for ICDC node ncit values
+    let n_ncit = [];
+    if(icdc_mapping[node_name] && icdc_mapping[node_name].n_n_code){
+      let n_tmp = {};
+      n_tmp.c = icdc_mapping[node_name].n_n_code.toUpperCase();
+      n_tmp.l = (n_tmp.c !== '' && syns[n_tmp.c] ? syns[n_tmp.c].label : "");
+      let synonyms = (n_tmp.c !== '' && syns[n_tmp.c] ? syns[n_tmp.c].synonyms : []);
+      if(syns[n_tmp.c] == undefined){
+        console.log("Don't have the ncit data for:" + n_tmp.c);
+        if(unloaded_ncits.indexOf(n_tmp.c) == -1){
+          unloaded_ncits.push(n_tmp.c);
+        }
+      }
+      if(synonyms.length > 0){
+        n_tmp.s = [];
+        synonyms.forEach(s => {
+          n_tmp.s.push({
+            n: s.termName,
+            t: s.termGroup,
+            src: s.termSource
+          });
+        });
+      }
+      n_ncit.push(n_tmp);
+    }
 
     for (var prop in properties) {
       let entry = {};
@@ -427,6 +451,9 @@ const helper_icdc = (dict, icdc_mapping, syns) => {
       p.node = {};
       p.node.n = dict[node_name].id;
       p.node.d = dict[node_name].description || "";
+      if(n_ncit.length > 0){
+        p.node.ncit = n_ncit;
+      }
       p.prop = {};
       p.prop.n = prop;
       p.prop.d = entryRaw.description;
