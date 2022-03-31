@@ -386,7 +386,7 @@ const build_icdc_prop = (dict) => {
                 mapping_dict[prop.p_name] = prop;
             });
         }
-
+        
         // loop through each node-prop
         for (var prop_name in properties) {
             let p = {};
