@@ -770,7 +770,11 @@ const generateICDCorCTDCData = (dc) => {
     item["title"] = convert2Title(key);
     if ("Category" in value) {
       item["category"] = value.Category;
-    } else {
+    }
+    else if ("Tags" in value) {
+      item["category"] = value.Tags.Category;
+    } 
+    else {
       item["category"] = "Undefined";
     }
 
