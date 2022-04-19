@@ -100,7 +100,7 @@ const Footer = () => {
                   <MenuUl>
                     <MenuLi><MenuLink to="/about" aria-label="About EVS-SIP">About EVS-SIP</MenuLink></MenuLi>
                     <MenuLi><MenuLink to="/datamodel" aria-label="Data Models">Data Models</MenuLink></MenuLi>
-                    <MenuLi><MenuLink to="/api/docs/" aria-label="EVSSIP API">API</MenuLink></MenuLi>
+                    <MenuLi><a href="/evssip/api/docs/" target="_blank" rel="noopener noreferrer">API EVS-SIP</a></MenuLi>
                   </MenuUl>
                 </Col>
                 <Col xs={4}>
