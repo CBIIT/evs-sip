@@ -10,7 +10,7 @@ const FooterStyled = styled.footer`
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 18rem;
+  height: 19rem;
 `;
 
 const FooterContainer = styled(Container)`
@@ -100,6 +100,7 @@ const Footer = () => {
                   <MenuUl>
                     <MenuLi><MenuLink to="/about" aria-label="About EVS-SIP">About EVS-SIP</MenuLink></MenuLi>
                     <MenuLi><MenuLink to="/datamodel" aria-label="Data Models">Data Models</MenuLink></MenuLi>
+                    <MenuLi><MenuLink to="/api/docs" aria-label="EVSSIP API">API</MenuLink></MenuLi>
                   </MenuUl>
                 </Col>
                 <Col xs={4}>

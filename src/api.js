@@ -1,4 +1,4 @@
-const baseUrl = process.env.EVSSIP_SERV_API_URL || "http://localhost:3000/service/search";
+const baseUrl = process.env.EVSSIP_SERV_API_URL || "./service/search";
 
 export const apiSuggest = async (keyword) => {
   let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
