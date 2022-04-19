@@ -47,9 +47,6 @@ var options = {
 
 // initialize swagger-jsdoc
 var swaggerSpec = swaggerJsdoc(options);
-
-app.use("/api/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
   
   app.use(function (req, res, next) {
 		res.header('Access-Control-Allow-Origin', '*');
@@ -62,8 +59,8 @@ app.use("/api/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 	});
 
   //Routers
-  app.use('/api', require('./apiroutes'));
   app.use('/service/search', require('../service/search'));
+  app.use('/api', require('./apiroutes'));
 
   app.get('*', (req, res) => {
     res.sendFile('build/index.html', { root: config.root });

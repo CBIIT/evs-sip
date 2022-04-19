@@ -110,7 +110,7 @@ const NavigationBar = () => (
               }
             }}>PCDC</NavDropdownItem>
           </NavDropdownStyled>
-          <Nav.Link as={Link} to="/api/docs">API</Nav.Link>
+          <Nav.Link as={Link} to="/api/docs/">API</Nav.Link>
           <Nav.Link as={Link} to="/about">About</Nav.Link>
         </Nav>
       </Navbar.Collapse>
