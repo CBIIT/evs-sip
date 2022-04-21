@@ -10,7 +10,7 @@ const FooterStyled = styled.footer`
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 18rem;
+  height: 19rem;
 `;
 
 const FooterContainer = styled(Container)`
@@ -108,6 +108,7 @@ const Footer = () => {
                     <MenuLi><a href="https://www.cancer.gov/policies/disclaimer" target="_blank" rel="noopener noreferrer">Disclaimer</a></MenuLi>
                     <MenuLi><a href="https://www.cancer.gov/policies/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a></MenuLi>
                     <MenuLi><a href="https://www.cancer.gov/policies/foia" target="_blank" rel="noopener noreferrer">FOIA</a></MenuLi>
+                    <MenuLi><a href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html" target="_blank" rel="noopener noreferrer">HHS Vulnerability Disclosure</a></MenuLi>
                   </MenuUl>
                 </Col>
               </Row>
