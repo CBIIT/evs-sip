@@ -110,7 +110,7 @@ const NavigationBar = () => (
               }
             }}>PCDC</NavDropdownItem>
           </NavDropdownStyled>
-          <a className='nav-link' href="/evssip/api/docs/" target="_blank" rel="noopener noreferrer">API</a>
+          <Nav.Link as={Link} to="/apidocs">API</Nav.Link>
           <Nav.Link as={Link} to="/about">About</Nav.Link>
         </Nav>
       </Navbar.Collapse>

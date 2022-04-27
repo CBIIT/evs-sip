@@ -1,4 +1,4 @@
-const baseUrl = process.env.EVSSIP_SERV_API_URL || "./service/search";
+const baseUrl = process.env.REACT_APP_DEV_API_URL || "./service/search";
 
 export const apiSuggest = async (keyword) => {
   let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
@@ -64,6 +64,13 @@ export const exportCompareResult = async(type ='all', search='') => {
 };
 
 export const exportAllCompareResult = async() => {
+  const response = await fetch(`${baseUrl}/exportAllCompareResult`);
+  //return response.json();
+
+  return response.blob();
+};
+
+export const swaggerDocs = async() => {
   const response = await fetch(`${baseUrl}/exportAllCompareResult`);
   //return response.json();
 
