@@ -951,7 +951,7 @@ const helper_pcdc = (pcdc_data, syns) => {
         p.source = "pcdc";
         p.category = project;
         p.node = {};
-        p.node.n = pcdc_mapping[node_name].n_PT;
+        p.node.n = node_name;
         if(n_n_code.trim() != ""){
           p.node.ncit = [];
           let dict = {};
