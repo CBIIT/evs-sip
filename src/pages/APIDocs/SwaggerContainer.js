@@ -15,8 +15,9 @@ const ContentBox =  styled.div`
 `;
 
 const SwaggerContainer = () => {
+  let home_url = process.env.REACT_APP_HOME_URL || process.env.PUBLIC_URL;
   return <ContentBox>
-      <SwaggerUI url={process.env.PUBLIC_URL + '/api/swaggerjson/'}/>
+      <SwaggerUI url={home_url + 'api/swaggerjson/'}/>
   </ContentBox>
 }
 
