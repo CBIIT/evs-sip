@@ -2,5 +2,7 @@
   "AML": "Acute Myelogenous Leukemia",
   "EWS": "Ewing Sarcoma",
   "GCT": "Germ Cell Tumors",
-  "ALL": "Acute Lymphocytic Leukemia"
+  "ALL": "Acute Lymphocytic Leukemia",
+  "HL": "H Leukemia",
+  "OS": "O Sarcoma"
 }

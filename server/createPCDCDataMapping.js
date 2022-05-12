@@ -27,9 +27,10 @@ const readExcelFile = async () => {
       let node = item[3];
       let node_nc = item[2];
       let pt = item[7];
-      let p_desc = item[9];
+      let p_desc = item[10];
       let ncit = item[4];
-      let p_type = item[14];
+      let p_type = item[15];
+      console.log(item);
       if(p_type === 'code' || p_type === 'string' || p_type === 'number'){
         id = project + "/" + lowerNode + "/" + pt;
         data[id] = {
@@ -46,7 +47,6 @@ const readExcelFile = async () => {
         data[id].v.push({n: pt, nt: ncit});
       }
   });
-  //console.log(data);
 
   return (data);
 }
@@ -57,7 +57,6 @@ const build_pcdc = (data) => {
   for(let key in data){
     let project = data[key].pj;
     let lowerNode = data[key].n.replace(" Table", "").replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
-    console.log(lowerNode);
     if(result[project] === undefined){
       result[project] = {};
       if(result[project][lowerNode] === undefined){
@@ -81,7 +80,7 @@ const build_pcdc = (data) => {
 
   for (let key in data) {
     let project = data[key].pj;
-    let lowerNode = data[key].n.replace(" Table", "").replace(/ /g, "_").replace(/ /g, "_").toLowerCase();
+    let lowerNode = data[key].n.replace(" Table", "").replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
     let values = [];
     data[key].v.forEach((v) => {
       values.push({
