@@ -294,7 +294,7 @@ const excludeSystemProperties = function (node) {
 };
 
 const getGraphicalICDCDictionary = function (node, prop ) {
-
+  
   let result = cache.getValue("icdc_dict_api");
   if (result == undefined || node !== '') {
     let jsonData = {};
@@ -401,7 +401,6 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
 
   for (let [key, value] of Object.entries(dcMData.Nodes)) {
     if (prop && prop !== '' && node && node !== '' && key.toLowerCase() === (node.toLowerCase())) {
-      
       if (dcMData.Nodes[key].Props != null) {
         //if(dcMData.Nodes[key].Props.some(item => item.toLowerCase() === prop.toLowerCase())){
         // console.log ("find match prop ", prop );
@@ -415,6 +414,8 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
                 propertiesItem["model"] = model;
                 if ("Category" in value) {
                   propertiesItem["category"] = value.Category;
+                } else if ("Tags" in value) {
+                    propertiesItem["category"] = value.Tags.Category;
                 } else {
                   propertiesItem["category"] = "Undefined";
                 }
@@ -427,7 +428,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
                   dcMPData.PropDefinitions[propertyName].Type.sort() : dcMPData.PropDefinitions[propertyName].Type;
                 propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
 
-            dataList.push(propertiesItem)
+                dataList.push(propertiesItem)
 
               }
             }
@@ -443,6 +444,8 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
       item["model"] = model;
       if ("Category" in value) {
         item["category"] = value.Category;
+      } else if ("Tags" in value) {
+        item["category"] = value.Tags.Category;
       } else {
         item["category"] = "Undefined";
       }

@@ -1363,6 +1363,7 @@ module.exports = {
   getGraphicalCTDCDictionary,
   getGraphicalPCDCDictionary,
   convert2Key,
+  convert2Title,
   getPCDCProjectsFullName,
   getCompareResult,
   getCompareResult_unmapped,

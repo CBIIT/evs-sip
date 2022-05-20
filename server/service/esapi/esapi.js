@@ -46,7 +46,6 @@ const getEsModelData = async function (req, res) {
     const model = req.params['model'] || 'ICDC';
     const node = req.params['node'] || '';
     const prop = req.params['prop'] || '';
-    console.log(" node name ", node)
     
     let result ={};
     if (['icdc', 'ctdc', 'gdc', 'pcdc'].includes(model.toLowerCase())) {
