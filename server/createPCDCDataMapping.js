@@ -30,7 +30,6 @@ const readExcelFile = async () => {
       let p_desc = item[10];
       let ncit = item[4];
       let p_type = item[15];
-      console.log(item);
       if(p_type === 'code' || p_type === 'string' || p_type === 'number'){
         id = project + "/" + lowerNode + "/" + pt;
         data[id] = {
@@ -43,7 +42,7 @@ const readExcelFile = async () => {
           pt: p_type === 'code' ? 'enum': p_type,
           v: []};
       }
-      if(p_type === ''){
+      if(p_type === '' || p_type === undefined){
         data[id].v.push({n: pt, nt: ncit});
       }
   });

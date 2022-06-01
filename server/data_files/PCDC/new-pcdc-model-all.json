@@ -6796,57 +6796,57 @@
           "p_type": "enum",
           "values": [
             {
-              "v_name": "100",
+              "v_name": 100,
               "v_n_code": "C69426",
               "v_PT": ""
             },
             {
-              "v_name": "90",
+              "v_name": 90,
               "v_n_code": "C69425",
               "v_PT": ""
             },
             {
-              "v_name": "80",
+              "v_name": 80,
               "v_n_code": "C69424",
               "v_PT": ""
             },
             {
-              "v_name": "70",
+              "v_name": 70,
               "v_n_code": "C69423",
               "v_PT": ""
             },
             {
-              "v_name": "60",
+              "v_name": 60,
               "v_n_code": "C69422",
               "v_PT": ""
             },
             {
-              "v_name": "50",
+              "v_name": 50,
               "v_n_code": "C69421",
               "v_PT": ""
             },
             {
-              "v_name": "40",
+              "v_name": 40,
               "v_n_code": "C70542",
               "v_PT": ""
             },
             {
-              "v_name": "30",
+              "v_name": 30,
               "v_n_code": "C70541",
               "v_PT": ""
             },
             {
-              "v_name": "20",
+              "v_name": 20,
               "v_n_code": "C70540",
               "v_PT": ""
             },
             {
-              "v_name": "10",
+              "v_name": 10,
               "v_n_code": "C70539",
               "v_PT": ""
             },
             {
-              "v_name": "0",
+              "v_name": 0,
               "v_n_code": "C70538",
               "v_PT": ""
             },
@@ -6869,57 +6869,57 @@
           "p_type": "enum",
           "values": [
             {
-              "v_name": "100",
+              "v_name": 100,
               "v_n_code": "C105707",
               "v_PT": ""
             },
             {
-              "v_name": "90",
+              "v_name": 90,
               "v_n_code": "C105709",
               "v_PT": ""
             },
             {
-              "v_name": "80",
+              "v_name": 80,
               "v_n_code": "C105710",
               "v_PT": ""
             },
             {
-              "v_name": "70",
+              "v_name": 70,
               "v_n_code": "C105711",
               "v_PT": ""
             },
             {
-              "v_name": "60",
+              "v_name": 60,
               "v_n_code": "C105712",
               "v_PT": ""
             },
             {
-              "v_name": "50",
+              "v_name": 50,
               "v_n_code": "C105713",
               "v_PT": ""
             },
             {
-              "v_name": "40",
+              "v_name": 40,
               "v_n_code": "C105714",
               "v_PT": ""
             },
             {
-              "v_name": "30",
+              "v_name": 30,
               "v_n_code": "C105715",
               "v_PT": ""
             },
             {
-              "v_name": "20",
+              "v_name": 20,
               "v_n_code": "C105716",
               "v_PT": ""
             },
             {
-              "v_name": "10",
+              "v_name": 10,
               "v_n_code": "C105718",
               "v_PT": ""
             },
             {
-              "v_name": "0",
+              "v_name": 0,
               "v_n_code": "C105720",
               "v_PT": ""
             },
@@ -11813,7 +11813,7 @@
             },
             {
               "v_name": "TCGM2004",
-              "v_n_code": "",
+              "v_n_code": "C187201",
               "v_PT": ""
             }
           ]
@@ -19919,57 +19919,57 @@
           "p_type": "enum",
           "values": [
             {
-              "v_name": "100",
+              "v_name": 100,
               "v_n_code": "C105707",
               "v_PT": ""
             },
             {
-              "v_name": "90",
+              "v_name": 90,
               "v_n_code": "C105709",
               "v_PT": ""
             },
             {
-              "v_name": "80",
+              "v_name": 80,
               "v_n_code": "C105710",
               "v_PT": ""
             },
             {
-              "v_name": "70",
+              "v_name": 70,
               "v_n_code": "C105711",
               "v_PT": ""
             },
             {
-              "v_name": "60",
+              "v_name": 60,
               "v_n_code": "C105712",
               "v_PT": ""
             },
             {
-              "v_name": "50",
+              "v_name": 50,
               "v_n_code": "C105713",
               "v_PT": ""
             },
             {
-              "v_name": "40",
+              "v_name": 40,
               "v_n_code": "C105714",
               "v_PT": ""
             },
             {
-              "v_name": "30",
+              "v_name": 30,
               "v_n_code": "C105715",
               "v_PT": ""
             },
             {
-              "v_name": "20",
+              "v_name": 20,
               "v_n_code": "C105716",
               "v_PT": ""
             },
             {
-              "v_name": "10",
+              "v_name": 10,
               "v_n_code": "C105718",
               "v_PT": ""
             },
             {
-              "v_name": "0",
+              "v_name": 0,
               "v_n_code": "C105720",
               "v_PT": ""
             }
@@ -19982,57 +19982,57 @@
           "p_type": "enum",
           "values": [
             {
-              "v_name": "100",
+              "v_name": 100,
               "v_n_code": "C69426",
               "v_PT": ""
             },
             {
-              "v_name": "90",
+              "v_name": 90,
               "v_n_code": "C69425",
               "v_PT": ""
             },
             {
-              "v_name": "80",
+              "v_name": 80,
               "v_n_code": "C69424",
               "v_PT": ""
             },
             {
-              "v_name": "70",
+              "v_name": 70,
               "v_n_code": "C69423",
               "v_PT": ""
             },
             {
-              "v_name": "60",
+              "v_name": 60,
               "v_n_code": "C69422",
               "v_PT": ""
             },
             {
-              "v_name": "50",
+              "v_name": 50,
               "v_n_code": "C69421",
               "v_PT": ""
             },
             {
-              "v_name": "40",
+              "v_name": 40,
               "v_n_code": "C70542",
               "v_PT": ""
             },
             {
-              "v_name": "30",
+              "v_name": 30,
               "v_n_code": "C70541",
               "v_PT": ""
             },
             {
-              "v_name": "20",
+              "v_name": 20,
               "v_n_code": "C70540",
               "v_PT": ""
             },
             {
-              "v_name": "10",
+              "v_name": 10,
               "v_n_code": "C70539",
               "v_PT": ""
             },
             {
-              "v_name": "0",
+              "v_name": 0,
               "v_n_code": "C70538",
               "v_PT": ""
             }
@@ -26227,7 +26227,7 @@
         },
         {
           "p_name": "COURSE",
-          "p_n_code": "C168807",
+          "p_n_code": "C187095",
           "p_desc": "The type of protocol treatment course administered with respect to Course Timing.",
           "p_type": "enum",
           "values": [
