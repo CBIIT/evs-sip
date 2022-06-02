@@ -156,6 +156,7 @@ module.exports = function (protocol, host, basePath) {
               {
                 'name': 'node',
                 'in': 'path',
+                'required': true,
                 'description': 'The node name to be searched. Must be a correct name..',
                 'type': 'string'
               }
@@ -195,13 +196,21 @@ module.exports = function (protocol, host, basePath) {
               {
                 'name': 'node',
                 'in': 'path',
+                'required': true,
                 'description': 'The node name to be searched. Must be a correct name..',
                 'type': 'string'
               },
               {
                 'name': 'prop',
                 'in': 'path',
+                'required': true,
                 'description': 'The property name to be searched. Must be a correct name..',
+                'type': 'string'
+              },
+              {
+                'name': 'project',
+                'in': 'query',
+                'description': 'The project name to be searched. Must be a correct name..',
                 'type': 'string'
               }
             ],
