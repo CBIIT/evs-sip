@@ -393,13 +393,6 @@ module.exports = function (protocol, host, basePath) {
         'properties': {
           'model': {
             'type': 'string',
-            'description': 'data model',
-            'enum': [
-              'GDC',
-              'CTDC',
-              'ICDC',
-              'PCDC'
-            ]
           },
           'category': {
             'type': 'string'
@@ -439,7 +432,7 @@ module.exports = function (protocol, host, basePath) {
           'description':{
             'type': 'string'
           },
-          'value_Type': {
+          'value_type': {
             'type': 'string'
           },
           'values': {
