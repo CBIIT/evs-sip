@@ -244,14 +244,7 @@ module.exports = function (protocol, host, basePath) {
         'type': 'object',
         'properties': {
           'model': {
-            'type': 'string',
-            'description': 'data model',
-            'enum': [
-              'GDC',
-              'CTDC',
-              'ICDC',
-              'PCDC'
-            ]
+            'type': 'string'
           },
           'category': {
             'type': 'string'
@@ -299,7 +292,7 @@ module.exports = function (protocol, host, basePath) {
           'ncit_code': {
             'type': 'string'
           },
-          'value_Type': {
+          'value_type': {
             'type': 'string'
           },
           'values': {

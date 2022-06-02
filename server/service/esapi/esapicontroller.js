@@ -95,7 +95,7 @@ const searchP = (req, res, formatFlag) => {
 const getGraphicalGDCDictionary = async function (node, prop) {
 
   let result = cache.getValue("gdc_dict_api");
-  if (result == undefined || node !== '') {
+  if (result === undefined || node !== '') {
     console.log(
       "Start to generate GDC Dictionary Data and load to local cache."
     );
@@ -218,7 +218,7 @@ const generateGDCData = async function (schema) {
   const result = Object.keys(newDict).reduce(function (filtered, key) {
     let obj = newDict[key];
     let deprecated_properties = obj.deprecated ? obj.deprecated : [];
-    let deprecated_enum = [];
+    //let deprecated_enum = [];
 
     if (obj.properties) {
       deprecated_properties.forEach((d_p) => {
@@ -361,9 +361,9 @@ const processGDCDictionaryEnumData = (prop) => {
 
 const getGraphicalPCDCDictionary = (project, node, prop) => {
   let project_result = cache.getValue("pcdc_dict_" + project);
-  if (project_result == undefined) {
+  if (project_result === undefined) {
     let result = cache.getValue("pcdc_dict");
-    if (result == undefined) {
+    if (result === undefined) {
       let jsonData = shared.readPCDCMapping();
       result = generatePCDCData(jsonData, {});
       //result = generatePCDCData(jsonData, {Relationships: {}});
@@ -424,9 +424,11 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
 
                 propertiesItem["description"] = dcMPData.PropDefinitions[propertyName].Desc;
 
-                propertiesItem["value_type"] = (!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ?
-                  dcMPData.PropDefinitions[propertyName].Type.sort() : dcMPData.PropDefinitions[propertyName].Type;
-                propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
+                propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
+                
+                if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
+                  propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
+                }
 
                 dataList.push(propertiesItem)
 
@@ -456,20 +458,23 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
       const pRequired = [];
 
       if (dcMData.Nodes[key].Props != null) {
-        for (var i = 0; i < dcMData.Nodes[key].Props.length; i++) {
+        for (let i = 0; i < dcMData.Nodes[key].Props.length; i++) {
           //console.log(icdcMData.Nodes[key].Props[i]);
           const nodeP = dcMData.Nodes[key].Props[i];
           const propertiesItem = {};
-          for (var propertyName in dcMPData.PropDefinitions) {
+          for (let propertyName in dcMPData.PropDefinitions) {
             if (propertyName === nodeP) {
               propertiesItem["description"] =
                 dcMPData.PropDefinitions[propertyName].Desc;
 
-              propertiesItem["value_type"] = (!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ?
-                dcMPData.PropDefinitions[propertyName].Type.sort() : dcMPData.PropDefinitions[propertyName].Type;
-              propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
+                propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
+                
+                if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
+                  propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
+                }
+              //propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
 
-              if (dcMPData.PropDefinitions[propertyName].Req == true) {
+              if (dcMPData.PropDefinitions[propertyName].Req === true) {
                 pRequired.push(nodeP);
               }
             }
@@ -500,7 +505,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
           if (dcMData.Relationships[propertyName].Ends[i].Src == key) {
             const backref = dcMData.Relationships[propertyName].Ends[i].Src;
             const name = dcMData.Relationships[propertyName].Ends[i].Dst;
-            const target = dcMData.Relationships[propertyName].Ends[i].Dst;
+            //const target = dcMData.Relationships[propertyName].Ends[i].Dst;
 
             nodeList.push({ source: backref, destination: name })
 
@@ -581,8 +586,8 @@ const generatePCDCData = (pcdc_data, filter) => {
 const processGDCResult = function (result, node, prop ) {
   const dataList = [];
   if(result.length > 0){
-    result.map((r) =>{
-      if(!node ||  r.id.toLowerCase() === node.toLowerCase()){
+    result.forEach((r) => {
+      if(!node || r.id.toLowerCase() === node.toLowerCase()){
         let item = {};
         item["model"] = "GDC";
         item["category"] = r.category;
@@ -597,23 +602,25 @@ const processGDCResult = function (result, node, prop ) {
                 //console.log("GDC prop found")
                 item["property_name"] = propertyName;
                 item["property_description"] = r.properties[propertyName].description;
+                item["value_type"] = r.properties[propertyName].type;
                 item["values"] = r.properties[propertyName].enum;
-                item["term_def"] = r.properties[propertyName].termDef;
+                //item["term_def"] = r.properties[propertyName].termDef;
                 dataList.push(item);
               }
             }
 
           }
 
-        }else{
+        } else {
           let propList =[];
           if(r.properties){
             for (let propertyName in r.properties) {
               let p ={};
                 p["property_name"] = propertyName;
                 p["property_description"] = r.properties[propertyName].description;
+                p["value_type"] = r.properties[propertyName].type;
                 p["values"] = r.properties[propertyName].enum;
-                p["term_def"] = r.properties[propertyName].termDef;
+                //p["term_def"] = r.properties[propertyName].termDef;
                 propList.push(p);             
             }
 
