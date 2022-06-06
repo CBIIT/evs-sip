@@ -20,9 +20,9 @@ code {
     monospace;
 }
 
-.container {
+/* .container {
   max-width: 80rem !important;
-}
+} */
 
 #returnToNCIframe {
   display: none !important;

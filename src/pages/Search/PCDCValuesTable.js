@@ -1,7 +1,7 @@
 import React, { useState , useContext} from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { Container, Row, Col, Table, Tab, Nav, Collapse, Accordion, Card, Button, useAccordionToggle, AccordionContext} from 'react-bootstrap';
+import { Container, Row, Col, Table, Tab, Nav, Collapse, Accordion, Card, Button, useAccordionButton, AccordionContext} from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { getHighlightObj, sortAlphabetically, sortAlphabeticallyObject, sortSynonyms } from '../../shared';
@@ -590,7 +590,7 @@ const PCDCValuesTable = (props) => {
   const AccordionToggle = ({ children, eventKey, callback }) => {
     const currentEventKey = useContext(AccordionContext);
   
-    const decoratedOnClick = useAccordionToggle(
+    const decoratedOnClick = useAccordionButton(
       eventKey,
       () => callback && callback(eventKey),
     );
