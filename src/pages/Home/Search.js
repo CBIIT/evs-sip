@@ -163,6 +163,7 @@ const CheckboxLabel = styled.label`
   inline-size: 8rem;
   line-height: 1rem;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 `;
 
 const CheckboxBtn = styled.span`
@@ -280,7 +281,7 @@ const Search = () => {
   const selectDataToggleHandler = event => {
     setSelectDataSource({
       ...selectDataSource,
-      [event.target.name]: !event.target.checked
+      [event.target.name]: event.target.checked
     });
   };
 
