@@ -37,7 +37,7 @@ const TableTh = styled.div`
 
 const TableBody = styled(Row)`
   overflow-y: auto;
-  max-height: 39rem;
+  max-height: 42rem;
 `;
 
 const TableRow = styled(Row)`
