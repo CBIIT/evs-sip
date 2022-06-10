@@ -359,35 +359,65 @@ const processGDCDictionaryEnumData = (prop) => {
   return result;
 };
 
-const getGraphicalPCDCDictionary = (project, node, prop) => {
-  let project_result = cache.getValue("pcdc_dict_" + project);
-  if (project_result === undefined) {
-    let result = cache.getValue("pcdc_dict");
-    if (result === undefined) {
-      let jsonData = shared.readPCDCMapping();
-      result = generatePCDCData(jsonData, {});
-      //result = generatePCDCData(jsonData, {Relationships: {}});
-      cache.setValue("pcdc_dict", result, config.item_ttl);
+/**
+ * Retrieves data specified by project, node, and property
+ *
+ * @param {string} project The PCDC project to filter by
+ * @param {string} node The node to filter by
+ * @param {string} prop The property to filter by
+ * @returns {object} A map of values
+ */
+const getGraphicalPCDCDictionary = (project = null, node, prop) => {
+  // Initialize results
+  const project_result = {
+    results: [],
+  };
+  let result;
+
+  if (project) {
+    result = cache.getValue("pcdc_dict_" + project);
+  } else {
+    result = cache.getValue("pcdc_dict");
+  }
+
+  if (result === undefined) {
+    let jsonData = shared.readPCDCMapping();
+    result = generatePCDCData(jsonData, {});
+    //result = generatePCDCData(jsonData, {Relationships: {}});
+    cache.setValue("pcdc_dict", result, config.item_ttl);
+  }
+
+  // Obtain nodes from specified project
+  for (const proj in result) {
+    const isCorrectProject = proj.toLowerCase() === project?.toLowerCase();
+    const projData = result[proj];
+
+    if (project !== null && !isCorrectProject) {
+      continue;
     }
 
-    project_result = result[project];
-    let nodes = Object.keys(project_result);
-    //create fake relationship for graphical display purpose
-
-    nodes.forEach((n, i) => {
-      if (i - 4 >= 0) {
-        let linkItem = {};
-        linkItem["name"] = nodes[i - 4];
-        linkItem["backref"] = n;
-        linkItem["label"] = "of_pcdc";
-        linkItem["target_type"] = nodes[i - 4];
-        linkItem["required"] = false;
-
-        project_result[n].links.push(linkItem);
-      }
-    });
-    cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
+    for (const nodeName in projData) {
+      const node = projData[nodeName];
+      project_result.results.push(node);
+    }
   }
+  let nodes = Object.keys(project_result);
+  
+  //create fake relationship for graphical display purpose
+
+  nodes.forEach((n, i) => {
+    if (i - 4 >= 0) {
+      let linkItem = {};
+      linkItem["name"] = nodes[i - 4];
+      linkItem["backref"] = n;
+      linkItem["label"] = "of_pcdc";
+      linkItem["target_type"] = nodes[i - 4];
+      linkItem["required"] = false;
+
+      project_result[n].links.push(linkItem);
+    }
+  });
+  cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
 
   project_result.status = 200;
   return project_result;
