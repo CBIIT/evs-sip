@@ -391,15 +391,13 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   for (const proj in result) {
     const isCorrectProject = proj.toLowerCase() === project?.toLowerCase();
     const projData = result[proj];
+    const desiredNodes = getPcdcNodes(projData, node, prop);
 
     if (project !== null && !isCorrectProject) {
       continue;
     }
 
-    for (const nodeName in projData) {
-      const node = projData[nodeName];
-      project_result.results.push(node);
-    }
+    project_result.results = project_result.results.concat(desiredNodes);
   }
   let nodes = Object.keys(project_result);
   
@@ -422,6 +420,31 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   project_result.status = 200;
   return project_result;
 };
+
+/**
+ * Retrieves specified nodes
+ *
+ * @param {object} nodes A mapping of nodes to consider
+ * @param {string} desiredNode The name of the node to retrieve
+ * @param {string} desiredProp The name of the property to retrieve
+ * @returns {object[]} The target nodes
+ */
+const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
+  const desiredNodes = [];
+
+  // Gather desired nodes into an array
+  for(const nodeName in nodes) {
+    const node = nodes[nodeName];
+    const isCorrectNode = node.id?.toLowerCase() === desiredNode?.toLowerCase();
+
+    // Include the node if specified, or include it if no node is specified
+    if (!desiredNode || isCorrectNode) {
+      desiredNodes.push(node);
+    }
+  }
+
+  return desiredNodes;
+}
 
 const generateICDCorCTDCData = (dc, model, node, prop) => {
   const dcMData = dc.mData;
