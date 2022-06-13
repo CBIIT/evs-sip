@@ -69,37 +69,25 @@ const getEsModelData = async function (req, res) {
         if (+result.status === 200) {
             res.json(result);
         } else {
-            //res.json( {status: 404 ,message: 'Data not found'  });
             return writeError(res, { detail: 'Data not found' }, 404);
         }
     } else {
-        //res.json( {status: 400 ,message: 'Not valid data model :'+model  });
         return writeError(res, { message: 'Not valid data model' }, 400);
     }
 
 };
 
 
-const getGraphicalGDCDictionary = async function ( node, prop ) {
-    return await esapicontroller.getGraphicalGDCDictionary( node, prop );
-    // let jsonData = await shared.getGraphicalGDCDictionary();
-    // //res.json(jsonData);
-    // let formatFlag = req.query.format || '';
-    // if (formatFlag === 'xml') {
-    //     res.setHeader('Content-Type', 'application/xml');
-    //     // xmlBuilder.buildResponse(formatFlag, res, 200, JSON.parse(JSON.stringify(jsonData)), 'data');
-    //     xmlBuilder.buildResponse(formatFlag, res, 200, { message: "Invalid data for xml format, Please select json format. " });
-    // } else {
-    //     res.json(jsonData);
-    // }
+const getGraphicalGDCDictionary = async (node, prop) => {
+    return await esapicontroller.getGraphicalGDCDictionary(node, prop);
 };
 
-const getGraphicalICDCDictionary = async  ( node, prop )=> 
-    await esapicontroller.getGraphicalICDCDictionary( node, prop )
-;
+const getGraphicalICDCDictionary = async  (node, prop) => {
+    return await esapicontroller.getGraphicalICDCDictionary( node, prop )
+};
 
-const getGraphicalCTDCDictionary = async function ( node, prop ) {
-    return  await esapicontroller.getGraphicalCTDCDictionary( node, prop );
+const getGraphicalCTDCDictionary = async function (node, prop) {
+    return await esapicontroller.getGraphicalCTDCDictionary( node, prop );
 };
 
 const getGraphicalPCDCDictionary = async (project, node, prop) => {

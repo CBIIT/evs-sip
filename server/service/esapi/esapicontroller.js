@@ -699,15 +699,11 @@ const processGDCResult = function (result, node, prop ) {
         if(prop && prop !== ''){
           if(r.properties){
             for (let propertyName in r.properties) {
-              //console.log(propertyName)
-             // console.log(r.properties[propertyName]);
               if (propertyName.toLowerCase() === prop.toLowerCase()) {
-                //console.log("GDC prop found")
                 item["property_name"] = propertyName;
                 item["property_description"] = r.properties[propertyName].description;
-                item["value_type"] = r.properties[propertyName].type;
+                item["value_type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
                 item["values"] = r.properties[propertyName].enum;
-                //item["term_def"] = r.properties[propertyName].termDef;
                 dataList.push(item);
               }
             }
@@ -721,9 +717,8 @@ const processGDCResult = function (result, node, prop ) {
               let p ={};
                 p["property_name"] = propertyName;
                 p["property_description"] = r.properties[propertyName].description;
-                p["value_type"] = r.properties[propertyName].type;
+                p["value_type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
                 p["values"] = r.properties[propertyName].enum;
-                //p["term_def"] = r.properties[propertyName].termDef;
                 propList.push(p);             
             }
 
