@@ -374,13 +374,14 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   };
   let result;
 
-  if (project) {
-    result = cache.getValue("pcdc_dict_" + project);
-  } else {
-    result = cache.getValue("pcdc_dict");
-  }
+  // TODO - fix result being empty after making same request for 2nd time
+  // if (project) {
+  //   result = cache.getValue(`pcdc_dict_${project}`);
+  // } else {
+  //   result = cache.getValue("pcdc_dict");
+  // }
 
-  if (result === undefined) {
+  if (true || result === undefined) {
     let jsonData = shared.readPCDCMapping();
     result = generatePCDCData(jsonData, {});
     //result = generatePCDCData(jsonData, {Relationships: {}});
@@ -439,11 +440,60 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
 
     // Include the node if specified, or include it if no node is specified
     if (!desiredNode || isCorrectNode) {
-      desiredNodes.push(node);
+      const formattedNode = collapsePcdcNode(node, desiredProp);
+      desiredNodes.push(formattedNode);
     }
   }
 
   return desiredNodes;
+}
+
+/**
+ * Replaces a node's list of properties with a single property
+ * 
+ * @param {object} node The node to collapse
+ * @param {string} desiredProp The name of the only prop the node should have
+ * @returns {object} The collapsed node
+ */
+const collapsePcdcNode = (node, desiredProp) => {
+  const formattedNode = node;
+
+  // Don't do anything if no property is specified
+  if (!desiredProp) {
+    return node;
+  }
+
+  // Find the property in the node
+  for (const propName in node.properties) {
+    const doesPropMatch = propName.toLowerCase() === desiredProp.toLowerCase();
+    const propFields = {
+      description: 'description',
+      type: 'value_type',
+      values: 'values',
+    };
+    let prop;
+
+    // Skip if no match
+    if (!doesPropMatch) {
+      continue;
+    }
+
+    prop = node.properties[propName];
+
+    // Save property fields to the node
+    formattedNode.property_name = propName;
+
+    for (const fieldName in propFields) {
+      const destName = propFields[fieldName];
+      if (prop.hasOwnProperty(fieldName)) {
+        formattedNode[destName] = prop[fieldName];
+      }
+    }
+
+    delete formattedNode.properties;
+  }
+
+  return formattedNode;
 }
 
 const generateICDCorCTDCData = (dc, model, node, prop) => {
