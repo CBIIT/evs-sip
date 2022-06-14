@@ -527,7 +527,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
                 propertiesItem["node_name"] = key;
                 propertiesItem["property_name"] = nodeP;
 
-                propertiesItem["description"] = dcMPData.PropDefinitions[propertyName].Desc;
+                propertiesItem["property_description"] = dcMPData.PropDefinitions[propertyName].Desc;
 
                 propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
                 
@@ -569,7 +569,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
           const propertiesItem = {};
           for (let propertyName in dcMPData.PropDefinitions) {
             if (propertyName === nodeP) {
-              propertiesItem["description"] =
+              propertiesItem["property_description"] =
                 dcMPData.PropDefinitions[propertyName].Desc;
 
                 propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
@@ -668,7 +668,7 @@ const generatePCDCData = (pcdc_data, filter) => {
           const nodeP = value.properties[i];
           const propertiesItem = {};
           propertiesItem['property_name'] = nodeP.p_name;
-          propertiesItem['description'] = nodeP.p_desc;
+          propertiesItem['property_description'] = nodeP.p_desc;
           propertiesItem['value_type'] = nodeP.p_type;
           // propertiesItem['src'] = value.n_PT;
 
