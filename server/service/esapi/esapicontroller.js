@@ -669,6 +669,9 @@ const generatePCDCData = (pcdc_data, filter) => {
           propertiesItem["src"] = value.n_PT;
 
           properties[nodeP.p_name] = propertiesItem;
+
+          // Store permissible values as an array of value names
+          propertiesItem["values"] = nodeP.values.map(v => v.v_name);
         }
 
         item["properties"] = properties;
