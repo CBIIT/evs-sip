@@ -218,7 +218,7 @@ module.exports = function (protocol, host, basePath) {
               '200': {
                 'description': 'Success.',
                 'schema': {
-                  '$ref': '#/definitions/ESDictResults'
+                  '$ref': '#/definitions/ESDictPropertiesResults'
                 }
               },
               '404': {
@@ -229,341 +229,366 @@ module.exports = function (protocol, host, basePath) {
         }
     },
     'definitions': {
-      'Result': {
+      // 'Result': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'type': {
+      //       'type': 'string',
+      //       'description': 'data entity type',
+      //       'enum': [
+      //         'node',
+      //         'props',
+      //         'node'
+      //       ]
+      //     },
+      //     'result': {
+      //       '$ref': '#/definitions/Node'
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'Results'
+      //   }
+      // },
+      // 'Node': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'model': {
+      //       'type': 'string'
+      //     },
+      //     'category': {
+      //       'type': 'string'
+      //     },
+      //     'node_name': {
+      //       'type': 'string'
+      //     },
+      //     'ncit_code': {
+      //       'type': 'string'
+      //     },
+      //     'properties': {
+      //       'type': 'array',
+      //       'items': {
+      //         '$ref': '#/definitions/Property'
+      //       }
+      //     },
+      //     'relationship': {
+      //       'type': 'object',
+      //       'properties': {
+      //         'incoming': {
+      //           'type': 'array',
+      //           'items': {
+      //             '$ref': '#/definitions/Relationship'
+      //           }
+      //         },
+      //         'outgoing': {
+      //           'type': 'array',
+      //           'items': {
+      //             '$ref': '#/definitions/Relationship'
+      //           }
+      //         }
+      //       }
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'Node'
+      //   }
+      // },
+      // 'Property': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'property_name': {
+      //       'type': 'string'
+      //     },
+      //     'ncit_code': {
+      //       'type': 'string'
+      //     },
+      //     'value_type': {
+      //       'type': 'string'
+      //     },
+      //     'values': {
+      //       'type': 'array',
+      //       'items': {
+      //         '$ref': '#/definitions/TermWithNCIt'
+      //       }
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'Property'
+      //   }
+      // },
+      // 'TermWithNCIt': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'term': {
+      //       'type': 'string'
+      //     },
+      //     'ncit_code': {
+      //       'type': 'string'
+      //     },
+      //     'term_PT': {
+      //       'type': 'string'
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'Value'
+      //   }
+      // },
+      // 'Relationship': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'relationship_type': {
+      //       'type': 'string'
+      //     },
+      //     'multiplicity': {
+      //       'type': 'string'
+      //     },
+      //     'relationship_entity': {
+      //       'type': 'array',
+      //       'items': {
+      //         '$ref': '#/definitions/RelationshipEntity'
+      //       }
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'Relationship'
+      //   }
+      // },
+      // 'RelationshipEntity': {
+      //   'type': 'object',
+      //   'properties': {
+      //     'source': {
+      //       'type': 'string'
+      //     },
+      //     'destination': {
+      //       'type': 'string'
+      //     }
+      //   },
+      //   'xml': {
+      //     'name': 'RelationshipEntity'
+      //   }
+      // },
+      'ESDictResults': {
         'type': 'object',
         'properties': {
-          'type': {
-            'type': 'string',
-            'description': 'data entity type',
-            'enum': [
-              'node',
-              'props',
-              'node'
-            ]
+          'status': {
+            'type': 'integer'
           },
-          'result': {
-            '$ref': '#/definitions/Node'
+          'results': {
+            'type': 'object',
+            'properties': {
+              'model': {
+                'type': 'string',
+              },
+              'category': {
+                'type': 'string'
+              },
+              'node_name': {
+                'type': 'string'
+              },
+              'node_description': {
+                'type': 'string'
+              },
+              'properties': {
+                'type': 'array',
+                'items': {
+                  'type': 'object',
+                  'properties': {
+                    'property_name': {
+                      'type': 'string'
+                    },
+                    'property_description':{
+                      'type': 'string'
+                    },
+                    'type': {
+                      'type': 'string'
+                    },
+                    'values': {
+                      'type': 'array',
+                      'items': {
+                        'type': 'object',
+                        'properties': {
+                          'values': {
+                            'type': 'string'
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              'required':{
+                'type': 'array',
+                'items': {
+                  'type': 'string'
+                }
+              },
+              'relationship': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                      'relationship_type': {
+                        'type': 'string'
+                      },
+                      'multiplicity': {
+                        'type': 'string'
+                      },
+                      'relationship_entity': {
+                        'type': 'array',
+                        'items': {
+                          'type': 'object',
+                          'properties': {
+                            'source': {
+                              'type': 'string'
+                            },
+                            'destination': {
+                              'type': 'string'
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+              }
+            }
           }
         },
         'xml': {
           'name': 'Results'
         }
       },
-      'Node': {
+      'ESDictPropertiesResults': {
         'type': 'object',
         'properties': {
-          'model': {
-            'type': 'string'
+          'status': {
+            'type': 'integer'
           },
-          'category': {
-            'type': 'string'
-          },
-          'node_name': {
-            'type': 'string'
-          },
-          'ncit_code': {
-            'type': 'string'
-          },
-          'properties': {
-            'type': 'array',
-            'items': {
-              '$ref': '#/definitions/Property'
-            }
-          },
-          'relationship': {
+          'results': {
             'type': 'object',
             'properties': {
-              'incoming': {
-                'type': 'array',
-                'items': {
-                  '$ref': '#/definitions/Relationship'
-                }
+              'model': {
+                'type': 'string',
               },
-              'outgoing': {
+              'category': {
+                'type': 'string'
+              },
+              'node_name': {
+                'type': 'string'
+              },
+              'property_name': {
+                'type': 'string'
+              },
+              'property_description': {
+                'type': 'string'
+              },
+              'type': {
+                'type': 'string'
+              },
+              'values': {
                 'type': 'array',
                 'items': {
-                  '$ref': '#/definitions/Relationship'
+                  'type': 'string',
                 }
               }
             }
           }
         },
         'xml': {
-          'name': 'Node'
-        }
-      },
-      'Property': {
-        'type': 'object',
-        'properties': {
-          'property_name': {
-            'type': 'string'
-          },
-          'ncit_code': {
-            'type': 'string'
-          },
-          'value_type': {
-            'type': 'string'
-          },
-          'values': {
-            'type': 'array',
-            'items': {
-              '$ref': '#/definitions/TermWithNCIt'
-            }
-          }
-        },
-        'xml': {
-          'name': 'Property'
-        }
-      },
-      'Term': {
-        'type': 'object',
-        'properties': {
-          'values': {
-            'type': 'string'
-          }
-        },
-        'xml': {
-          'name': 'Value'
-        }
-      },
-      'TermWithNCIt': {
-        'type': 'object',
-        'properties': {
-          'term': {
-            'type': 'string'
-          },
-          'ncit_code': {
-            'type': 'string'
-          },
-          'term_PT': {
-            'type': 'string'
-          }
-        },
-        'xml': {
-          'name': 'Value'
-        }
-      },
-      'Relationship': {
-        'type': 'object',
-        'properties': {
-          'relationship_type': {
-            'type': 'string'
-          },
-          'multiplicity': {
-            'type': 'string'
-          },
-          'relationship_entity': {
-            'type': 'array',
-            'items': {
-              '$ref': '#/definitions/RelationshipEntity'
-            }
-          }
-        },
-        'xml': {
-          'name': 'Relationship'
-        }
-      },
-      'RelationshipEntity': {
-        'type': 'object',
-        'properties': {
-          'source': {
-            'type': 'string'
-          },
-          'destination': {
-            'type': 'string'
-          }
-        },
-        'xml': {
-          'name': 'RelationshipEntity'
-        }
-      },
-      'ESDictResults': {
-        'type': 'object',
-        'properties': {
-          'type': {
-            'type': 'string',
-            'description': 'data entity type',
-            'enum': [
-              'node',
-              'props',
-              'node'
-            ]
-          },
-          'result': {
-            '$ref': '#/definitions/ESDictNode'
-          }
-        },
-        'xml': {
           'name': 'Results'
         }
       },
-      'ESDictNode': {
-        'type': 'object',
-        'properties': {
-          'model': {
-            'type': 'string',
-          },
-          'category': {
-            'type': 'string'
-          },
-          'node_name': {
-            'type': 'string'
-          },
-          'properties': {
-            'type': 'array',
-            'items': {
-              '$ref': '#/definitions/ESDictProperty'
-            }
-          },
-          'required':{
-            'type': 'array',
-            'items': {
-              'type': 'string'
-            }
-          },
-          'relationship': {
-            'type': 'array',
-            'items': {
-                  '$ref': '#/definitions/Relationship'
-                }
-          }
-        },
-        'xml': {
-          'name': 'Node'
-        }
-      },
-      'ESDictProperty': {
-        'type': 'object',
-        'properties': {
-          'property_name': {
-            'type': 'string'
-          },
-          'description':{
-            'type': 'string'
-          },
-          'value_type': {
-            'type': 'string'
-          },
-          'values': {
-            'type': 'array',
-            'items': {
-              '$ref': '#/definitions/Term'
-            }
-          }
-        },
-        'xml': {
-          'name': 'Property'
-        }
-      },
-      'results': {
+      'Results': {
         'type': 'array',
         'items': {
           'properties': {
             '_source': {
-              '$ref': '#/definitions/_source'
+              'type': 'object',
+              'properties': {
+                'property': {
+                  'type': 'string'
+                },
+                'node': {
+                  'type': 'string'
+                },
+                'nodeDescription': {
+                  'type': 'string'
+                },
+                'category': {
+                  'type': 'string'
+                },
+                'propertyDescription': {
+                  'type': 'string'
+                },
+                'type': {
+                  'type': 'string'
+                },
+                'cde': {
+                  'type': 'object',
+                  'properties': {
+                    'id': {
+                      'type': 'string'
+                    },
+                    'url': {
+                      'type': 'string'
+                    }
+                  }
+                }
+              }
             },
             'matches': {
-              '$ref': '#/definitions/matches'
+              'type': 'array',
+              'items': {
+                'properties': {
+                  'value': {
+                    'type': 'string'
+                  },
+                  'icdo3Code': {
+                    'type': 'string'
+                  },
+                  'allSynonyms': {
+                    'type': 'array',
+                    'items': {
+                      'properties': {
+                        'conceptCode': {
+                          'type': 'string'
+                        },
+                        'synonyms': {
+                          'type': 'array',
+                          'items': {
+                            'properties': {
+                              'termName': {
+                                'type': 'string'
+                              },
+                              'termGroup': {
+                                'type': 'string'
+                              },
+                              'termSource': {
+                                'type': 'string'
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  'icdo3Strings': {
+                    'type': 'array',
+                    'items': {
+                      'properties': {
+                        'value': {
+                          'type': 'string'
+                        },
+                        'termGroup': {
+                          'type': 'string'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
-      },
-      '_source': {
-        'properties': {
-          'property': {
-            'type': 'string'
-          },
-          'node': {
-            'type': 'string'
-          },
-          'nodeDescription': {
-            'type': 'string'
-          },
-          'category': {
-            'type': 'string'
-          },
-          'propertyDescription': {
-            'type': 'string'
-          },
-          'type': {
-            'type': 'string'
-          },
-          'cde': {
-            '$ref': '#/definitions/cde'
-          }
-        }
-      },
-      'cde': {
-        'properties': {
-          'id': {
-            'type': 'string'
-          },
-          'url': {
-            'type': 'string'
-          }
-        }
-      },
-      'matches': {
-        'type': 'array',
-        'items': {
-          'properties': {
-            'value': {
-              'type': 'string'
-            },
-            'icdo3Code': {
-              'type': 'string'
-            },
-            'allSynonyms': {
-              '$ref': '#/definitions/allSynonyms'
-            },
-            'icdo3Strings': {
-              '$ref': '#/definitions/icdo3Strings'
-            }
-          }
-        }
-      },
-      'allSynonyms': {
-        'type': 'array',
-        'items': {
-          'properties': {
-            'conceptCode': {
-              'type': 'string'
-            },
-            'synonyms': {
-              '$ref': '#/definitions/synonyms'
-            }
-          }
-        }
-      },
-      'synonyms': {
-        'type': 'array',
-        'items': {
-          'properties': {
-            'termName': {
-              'type': 'string'
-            },
-            'termGroup': {
-              'type': 'string'
-            },
-            'termSource': {
-              'type': 'string'
-            }
-          }
-        }
-      },
-      'icdo3Strings': {
-        'type': 'array',
-        'items': {
-          'properties': {
-            'value': {
-              'type': 'string'
-            },
-            'termGroup': {
-              'type': 'string'
-            }
-          }
-        }
-      }
-    }
-  };
-}
+      } // results 
+    } // description:
+  } // return
+} // end for the function
