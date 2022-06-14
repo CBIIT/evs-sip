@@ -638,25 +638,26 @@ const generatePCDCData = (pcdc_data, filter) => {
       //console.log(key);
       //console.log(value.Category);
       const item = {};
-      item["$schema"] = "http://json-schema.org/draft-06/schema#";
-      item["id"] = key;
-      item["title"] = shared.convert2Title(key);
-      if ("Category" in value) {
-        item["category"] = project;
+      // item['$schema'] = 'http://json-schema.org/draft-06/schema#';
+      // item['title'] = shared.convert2Title(key);
+      item['model'] = 'PCDC';
+      if ('Category' in value) {
+        item['category'] = project;
       } else {
-        item["category"] = project;
+        item['category'] = project;
       }
+      item['id'] = key;
 
-      item["program"] = "*";
-      item["project"] = "*";
-      item["additionalProperties"] = false;
-      item["submittable"] = true;
-      item["constraints"] = null;
-      //item["links"]=[];
+      // item['program'] = '*';
+      // item['project'] = '*';
+      // item['additionalProperties'] = false;
+      // item['submittable'] = true;
+      // item['constraints'] = null;
+      //item['links']=[];
 
-      item["type"] = "object";
+      // item['type'] = 'object';
       const link = [];
-      const properties = {};
+      const properties = [];
       const pRequired = [];
 
       if (value.properties.length > 0) {
@@ -664,23 +665,26 @@ const generatePCDCData = (pcdc_data, filter) => {
           //console.log(icdcMData.Nodes[key].Props[i]);
           const nodeP = value.properties[i];
           const propertiesItem = {};
-          propertiesItem["description"] = nodeP.p_desc;
-          propertiesItem["type"] = nodeP.p_type;
-          propertiesItem["src"] = value.n_PT;
+          propertiesItem['property_name'] = nodeP.p_name;
+          propertiesItem['description'] = nodeP.p_desc;
+          propertiesItem['value_type'] = nodeP.p_type;
+          // propertiesItem['src'] = value.n_PT;
 
-          properties[nodeP.p_name] = propertiesItem;
+          properties.push(propertiesItem);
 
           // Store permissible values as an array of value names
-          propertiesItem["values"] = nodeP.values.map(v => v.v_name);
+          propertiesItem['values'] = nodeP.values.map(v => v.v_name);
         }
 
-        item["properties"] = properties;
-        item["required"] = pRequired;
+        item['properties'] = properties;
+        item['required'] = pRequired;
       } else {
-        item["properties"] = {};
+        item['properties'] = {};
       }
 
-      item["links"] = link;
+      item['relationship'] = [];
+
+      // item['links'] = link;
 
       dataList[project][key] = item;
     }
