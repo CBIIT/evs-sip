@@ -464,30 +464,18 @@ const collapsePcdcNode = (node, desiredProp) => {
   }
 
   // Find the property in the node
-  for (const propName in node.properties) {
+  for (const prop of node.properties) {
+    const propName = prop.property_name;
     const doesPropMatch = propName.toLowerCase() === desiredProp.toLowerCase();
-    const propFields = {
-      description: 'description',
-      type: 'value_type',
-      values: 'values',
-    };
-    let prop;
 
     // Skip if no match
     if (!doesPropMatch) {
       continue;
     }
 
-    prop = node.properties[propName];
-
     // Save property fields to the node
-    formattedNode.property_name = propName;
-
-    for (const fieldName in propFields) {
-      const destName = propFields[fieldName];
-      if (prop.hasOwnProperty(fieldName)) {
-        formattedNode[destName] = prop[fieldName];
-      }
+    for (const field in prop) {
+      formattedNode[field] = prop[field];
     }
 
     delete formattedNode.properties;
