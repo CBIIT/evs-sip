@@ -436,7 +436,7 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
   // Gather desired nodes into an array
   for(const nodeName in nodes) {
     const node = nodes[nodeName];
-    const isCorrectNode = node.id?.toLowerCase() === desiredNode?.toLowerCase();
+    const isCorrectNode = node.node_name?.toLowerCase() === desiredNode?.toLowerCase();
 
     // Include the node if specified, or include it if no node is specified
     if (!desiredNode || isCorrectNode) {
@@ -646,7 +646,7 @@ const generatePCDCData = (pcdc_data, filter) => {
       } else {
         item['category'] = project;
       }
-      item['id'] = key;
+      item['node_name'] = key;
 
       // item['program'] = '*';
       // item['project'] = '*';
