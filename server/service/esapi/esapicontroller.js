@@ -370,6 +370,7 @@ const processGDCDictionaryEnumData = (prop) => {
 const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   // Initialize results
   const project_result = {
+    status: 200,
     results: [],
   };
   let result;
@@ -392,12 +393,13 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   for (const proj in result) {
     const isCorrectProject = proj.toLowerCase() === project?.toLowerCase();
     const projData = result[proj];
-    const desiredNodes = getPcdcNodes(projData, node, prop);
+    let desiredNodes;
 
     if (project !== null && !isCorrectProject) {
       continue;
     }
 
+    desiredNodes = getPcdcNodes(projData, node, prop);
     project_result.results = project_result.results.concat(desiredNodes);
   }
   let nodes = Object.keys(project_result);
@@ -418,7 +420,14 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   });
   cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
 
-  project_result.status = 200;
+  // Handle empty results
+  if (project_result.results.length === 0 ) {
+    return {
+      status: 400,
+      message: " No data found. ",
+    };
+  }
+
   return project_result;
 };
 
@@ -441,7 +450,10 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
     // Include the node if specified, or include it if no node is specified
     if (!desiredNode || isCorrectNode) {
       const formattedNode = collapsePcdcNode(node, desiredProp);
-      desiredNodes.push(formattedNode);
+
+      if (formattedNode) {
+        desiredNodes.push(formattedNode);
+      }
     }
   }
 
@@ -449,11 +461,11 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
 }
 
 /**
- * Replaces a node's list of properties with a single property
+ * Replaces a node's list of properties with a single property's fields
  * 
  * @param {object} node The node to collapse
  * @param {string} desiredProp The name of the only prop the node should have
- * @returns {object} The collapsed node
+ * @returns {object|null} The collapsed node, or null
  */
 const collapsePcdcNode = (node, desiredProp) => {
   const formattedNode = node;
@@ -479,9 +491,11 @@ const collapsePcdcNode = (node, desiredProp) => {
     }
 
     delete formattedNode.properties;
+    return formattedNode;
   }
 
-  return formattedNode;
+  // You only get here if the property wasn't found
+  return null;
 }
 
 const generateICDCorCTDCData = (dc, model, node, prop) => {
