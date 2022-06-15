@@ -532,7 +532,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
 
                 propertiesItem["property_description"] = dcMPData.PropDefinitions[propertyName].Desc;
 
-                propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
+                propertiesItem["type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
                 
                 if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
                   propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
@@ -575,7 +575,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
               propertiesItem["property_description"] =
                 dcMPData.PropDefinitions[propertyName].Desc;
 
-                propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
+                propertiesItem["type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
                 
                 if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
                   propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
@@ -714,7 +714,7 @@ const processGDCResult = function (result, node, prop ) {
               if (propertyName.toLowerCase() === prop.toLowerCase()) {
                 item["property_name"] = propertyName;
                 item["property_description"] = r.properties[propertyName].description;
-                item["value_type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
+                item["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
                 item["values"] = r.properties[propertyName].enum;
                 dataList.push(item);
               }
@@ -729,7 +729,7 @@ const processGDCResult = function (result, node, prop ) {
               let p ={};
                 p["property_name"] = propertyName;
                 p["property_description"] = r.properties[propertyName].description;
-                p["value_type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
+                p["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
                 p["values"] = r.properties[propertyName].enum;
                 propList.push(p);             
             }
