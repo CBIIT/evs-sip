@@ -468,7 +468,11 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
  * @returns {object|null} The collapsed node, or null
  */
 const collapsePcdcNode = (node, desiredProp) => {
-  const formattedNode = node;
+  const formattedNode = {
+    model: node.model,
+    category: node.category,
+    node_name: node.node_name,
+  };
 
   // Don't do anything if no property is specified
   if (!desiredProp) {
@@ -490,7 +494,6 @@ const collapsePcdcNode = (node, desiredProp) => {
       formattedNode[field] = prop[field];
     }
 
-    delete formattedNode.properties;
     return formattedNode;
   }
 
@@ -658,7 +661,7 @@ const generatePCDCData = (pcdc_data, filter) => {
       //item['links']=[];
 
       // item['type'] = 'object';
-      const link = [];
+      // const link = [];
       const properties = [];
       const pRequired = [];
 
@@ -669,7 +672,7 @@ const generatePCDCData = (pcdc_data, filter) => {
           const propertiesItem = {};
           propertiesItem['property_name'] = nodeP.p_name;
           propertiesItem['property_description'] = nodeP.p_desc;
-          propertiesItem['value_type'] = nodeP.p_type;
+          propertiesItem['type'] = nodeP.p_type;
           // propertiesItem['src'] = value.n_PT;
 
           properties.push(propertiesItem);
@@ -681,7 +684,7 @@ const generatePCDCData = (pcdc_data, filter) => {
         item['properties'] = properties;
         item['required'] = pRequired;
       } else {
-        item['properties'] = {};
+        item['properties'] = [];
       }
 
       item['relationship'] = [];
