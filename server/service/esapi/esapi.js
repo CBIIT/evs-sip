@@ -60,7 +60,7 @@ const getEsModelData = async function (req, res) {
                 result =  await getGraphicalICDCDictionary(node, prop);
                 break;
             case 'pcdc':
-                let project = (req.query.project || '') === "" ? "AML" : req.query.project;
+                let project = req.query.project;
                 result =  await getGraphicalPCDCDictionary(project, node, prop);
                 break;
             default:

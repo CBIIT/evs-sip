@@ -359,39 +359,147 @@ const processGDCDictionaryEnumData = (prop) => {
   return result;
 };
 
-const getGraphicalPCDCDictionary = (project, node, prop) => {
-  let project_result = cache.getValue("pcdc_dict_" + project);
-  if (project_result === undefined) {
-    let result = cache.getValue("pcdc_dict");
-    if (result === undefined) {
-      let jsonData = shared.readPCDCMapping();
-      result = generatePCDCData(jsonData, {});
-      //result = generatePCDCData(jsonData, {Relationships: {}});
-      cache.setValue("pcdc_dict", result, config.item_ttl);
-    }
+/**
+ * Retrieves data specified by project, node, and property
+ *
+ * @param {string} project The PCDC project to filter by
+ * @param {string} node The node to filter by
+ * @param {string} prop The property to filter by
+ * @returns {object} A map of values
+ */
+const getGraphicalPCDCDictionary = (project = null, node, prop) => {
+  // Initialize results
+  const project_result = {
+    status: 200,
+    results: [],
+  };
+  let result;
 
-    project_result = result[project];
-    let nodes = Object.keys(project_result);
-    //create fake relationship for graphical display purpose
+  // TODO - fix result being empty after making same request for 2nd time
+  // if (project) {
+  //   result = cache.getValue(`pcdc_dict_${project}`);
+  // } else {
+  //   result = cache.getValue("pcdc_dict");
+  // }
 
-    nodes.forEach((n, i) => {
-      if (i - 4 >= 0) {
-        let linkItem = {};
-        linkItem["name"] = nodes[i - 4];
-        linkItem["backref"] = n;
-        linkItem["label"] = "of_pcdc";
-        linkItem["target_type"] = nodes[i - 4];
-        linkItem["required"] = false;
-
-        project_result[n].links.push(linkItem);
-      }
-    });
-    cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
+  if (true || result === undefined) {
+    let jsonData = shared.readPCDCMapping();
+    result = generatePCDCData(jsonData, {});
+    //result = generatePCDCData(jsonData, {Relationships: {}});
+    cache.setValue("pcdc_dict", result, config.item_ttl);
   }
 
-  project_result.status = 200;
+  // Obtain nodes from specified project
+  for (const proj in result) {
+    const isCorrectProject = proj.toLowerCase() === project?.toLowerCase();
+    const projData = result[proj];
+    let desiredNodes;
+
+    if (project !== null && !isCorrectProject) {
+      continue;
+    }
+
+    desiredNodes = getPcdcNodes(projData, node, prop);
+    project_result.results = project_result.results.concat(desiredNodes);
+  }
+  let nodes = Object.keys(project_result);
+  
+  //create fake relationship for graphical display purpose
+
+  nodes.forEach((n, i) => {
+    if (i - 4 >= 0) {
+      let linkItem = {};
+      linkItem["name"] = nodes[i - 4];
+      linkItem["backref"] = n;
+      linkItem["label"] = "of_pcdc";
+      linkItem["target_type"] = nodes[i - 4];
+      linkItem["required"] = false;
+
+      project_result[n].links.push(linkItem);
+    }
+  });
+  cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
+
+  // Handle empty results
+  if (project_result.results.length === 0 ) {
+    return {
+      status: 400,
+      message: " No data found. ",
+    };
+  }
+
   return project_result;
 };
+
+/**
+ * Retrieves specified nodes
+ *
+ * @param {object} nodes A mapping of nodes to consider
+ * @param {string} desiredNode The name of the node to retrieve
+ * @param {string} desiredProp The name of the property to retrieve
+ * @returns {object[]} The target nodes
+ */
+const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
+  const desiredNodes = [];
+
+  // Gather desired nodes into an array
+  for(const nodeName in nodes) {
+    const node = nodes[nodeName];
+    const isCorrectNode = node.node_name?.toLowerCase() === desiredNode?.toLowerCase();
+
+    // Include the node if specified, or include it if no node is specified
+    if (!desiredNode || isCorrectNode) {
+      const formattedNode = collapsePcdcNode(node, desiredProp);
+
+      if (formattedNode) {
+        desiredNodes.push(formattedNode);
+      }
+    }
+  }
+
+  return desiredNodes;
+}
+
+/**
+ * Replaces a node's list of properties with a single property's fields
+ * 
+ * @param {object} node The node to collapse
+ * @param {string} desiredProp The name of the only prop the node should have
+ * @returns {object|null} The collapsed node, or null
+ */
+const collapsePcdcNode = (node, desiredProp) => {
+  const formattedNode = {
+    model: node.model,
+    category: node.category,
+    node_name: node.node_name,
+  };
+
+  // Don't do anything if no property is specified
+  if (!desiredProp) {
+    return node;
+  }
+
+  // Find the property in the node
+  for (const prop of node.properties) {
+    const propName = prop.property_name;
+    const doesPropMatch = propName.toLowerCase() === desiredProp.toLowerCase();
+
+    // Skip if no match
+    if (!doesPropMatch) {
+      continue;
+    }
+
+    // Save property fields to the node
+    for (const field in prop) {
+      formattedNode[field] = prop[field];
+    }
+
+    return formattedNode;
+  }
+
+  // You only get here if the property wasn't found
+  return null;
+}
 
 const generateICDCorCTDCData = (dc, model, node, prop) => {
   const dcMData = dc.mData;
@@ -422,7 +530,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
                 propertiesItem["node_name"] = key;
                 propertiesItem["property_name"] = nodeP;
 
-                propertiesItem["description"] = dcMPData.PropDefinitions[propertyName].Desc;
+                propertiesItem["property_description"] = dcMPData.PropDefinitions[propertyName].Desc;
 
                 propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
                 
@@ -464,7 +572,7 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
           const propertiesItem = {};
           for (let propertyName in dcMPData.PropDefinitions) {
             if (propertyName === nodeP) {
-              propertiesItem["description"] =
+              propertiesItem["property_description"] =
                 dcMPData.PropDefinitions[propertyName].Desc;
 
                 propertiesItem["value_type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
@@ -535,25 +643,26 @@ const generatePCDCData = (pcdc_data, filter) => {
       //console.log(key);
       //console.log(value.Category);
       const item = {};
-      item["$schema"] = "http://json-schema.org/draft-06/schema#";
-      item["id"] = key;
-      item["title"] = shared.convert2Title(key);
-      if ("Category" in value) {
-        item["category"] = project;
+      // item['$schema'] = 'http://json-schema.org/draft-06/schema#';
+      // item['title'] = shared.convert2Title(key);
+      item['model'] = 'PCDC';
+      if ('Category' in value) {
+        item['category'] = project;
       } else {
-        item["category"] = project;
+        item['category'] = project;
       }
+      item['node_name'] = key;
 
-      item["program"] = "*";
-      item["project"] = "*";
-      item["additionalProperties"] = false;
-      item["submittable"] = true;
-      item["constraints"] = null;
-      //item["links"]=[];
+      // item['program'] = '*';
+      // item['project'] = '*';
+      // item['additionalProperties'] = false;
+      // item['submittable'] = true;
+      // item['constraints'] = null;
+      //item['links']=[];
 
-      item["type"] = "object";
-      const link = [];
-      const properties = {};
+      // item['type'] = 'object';
+      // const link = [];
+      const properties = [];
       const pRequired = [];
 
       if (value.properties.length > 0) {
@@ -561,20 +670,26 @@ const generatePCDCData = (pcdc_data, filter) => {
           //console.log(icdcMData.Nodes[key].Props[i]);
           const nodeP = value.properties[i];
           const propertiesItem = {};
-          propertiesItem["description"] = nodeP.p_desc;
-          propertiesItem["type"] = nodeP.p_type;
-          propertiesItem["src"] = value.n_PT;
+          propertiesItem['property_name'] = nodeP.p_name;
+          propertiesItem['property_description'] = nodeP.p_desc;
+          propertiesItem['type'] = nodeP.p_type;
+          // propertiesItem['src'] = value.n_PT;
 
-          properties[nodeP.p_name] = propertiesItem;
+          properties.push(propertiesItem);
+
+          // Store permissible values as an array of value names
+          propertiesItem['values'] = nodeP.values.map(v => v.v_name);
         }
 
-        item["properties"] = properties;
-        item["required"] = pRequired;
+        item['properties'] = properties;
+        item['required'] = pRequired;
       } else {
-        item["properties"] = {};
+        item['properties'] = [];
       }
 
-      item["links"] = link;
+      item['relationship'] = [];
+
+      // item['links'] = link;
 
       dataList[project][key] = item;
     }
