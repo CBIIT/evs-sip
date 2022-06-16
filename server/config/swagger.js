@@ -16,8 +16,7 @@ module.exports = function (protocol, host, basePath) {
       },
       {
         name: 'Retrieve Dictionary Data',
-        description:
-          'RESTful APIs are used to retrieve data per dictionary source.',
+        description: 'RESTful APIs are used to retrieve data per dictionary source.',
       },
     ],
     schemes: [protocol],
@@ -137,16 +136,19 @@ module.exports = function (protocol, host, basePath) {
             {
               name: 'options',
               in: 'query',
-              description:
-                'The options specifications are: partial or exact, syn, desc.',
-              type: 'string',
-              enum: ['partial', 'exact', 'syn', 'desc'],
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['partial', 'exact', 'syn', 'desc'],
+              },
+              description: 'The options specifications are: partial or exact, syn, desc.',
+              collectionFormat: 'csv',
+              required: false,
             },
             {
               name: 'sources',
               in: 'query',
-              description:
-                'The sources specifications are: ctdc, gdc, icdc or pcdc.',
+              description: 'The sources specifications are: ctdc, gdc, icdc or pcdc.',
               type: 'string',
               enum: ['ctdc', 'gdc', 'icdc', 'pcdc'],
             },
@@ -159,8 +161,7 @@ module.exports = function (protocol, host, basePath) {
               },
             },
             404: {
-              description:
-                'The resource you were trying to reach is not found.',
+              description: 'The resource you were trying to reach is not found.',
             },
           },
         },
@@ -204,8 +205,7 @@ module.exports = function (protocol, host, basePath) {
               },
             },
             404: {
-              description:
-                'The resource you were trying to reach is not found.',
+              description: 'The resource you were trying to reach is not found.',
             },
           },
         },
@@ -244,15 +244,13 @@ module.exports = function (protocol, host, basePath) {
               name: 'node',
               in: 'path',
               required: true,
-              description:
-                'The node name to be searched. Must be a correct name..',
+              description: 'The node name to be searched. Must be a correct name..',
               type: 'string',
             },
             {
               name: 'project',
               in: 'query',
-              description:
-                'The PCDC project name to be searched. Must be a correct name..',
+              description: 'The PCDC project name to be searched. Must be a correct name..',
               type: 'string',
             },
           ],
@@ -264,8 +262,7 @@ module.exports = function (protocol, host, basePath) {
               },
             },
             404: {
-              description:
-                'The resource you were trying to reach is not found.',
+              description: 'The resource you were trying to reach is not found.',
             },
           },
         },
@@ -304,23 +301,20 @@ module.exports = function (protocol, host, basePath) {
               name: 'node',
               in: 'path',
               required: true,
-              description:
-                'The node name to be searched. Must be a correct name..',
+              description: 'The node name to be searched. Must be a correct name..',
               type: 'string',
             },
             {
               name: 'prop',
               in: 'path',
               required: true,
-              description:
-                'The property name to be searched. Must be a correct name..',
+              description: 'The property name to be searched. Must be a correct name..',
               type: 'string',
             },
             {
               name: 'project',
               in: 'query',
-              description:
-                'The PCDC project name to be searched. Must be a correct name..',
+              description: 'The PCDC project name to be searched. Must be a correct name..',
               type: 'string',
             },
           ],
@@ -332,8 +326,7 @@ module.exports = function (protocol, host, basePath) {
               },
             },
             404: {
-              description:
-                'The resource you were trying to reach is not found.',
+              description: 'The resource you were trying to reach is not found.',
             },
           },
         },
@@ -676,30 +669,32 @@ module.exports = function (protocol, host, basePath) {
             type: 'integer',
           },
           results: {
-            type: 'object',
-            properties: {
-              model: {
-                type: 'string',
-              },
-              category: {
-                type: 'string',
-              },
-              node_name: {
-                type: 'string',
-              },
-              property_name: {
-                type: 'string',
-              },
-              property_description: {
-                type: 'string',
-              },
-              type: {
-                type: 'string',
-              },
-              values: {
-                type: 'array',
-                items: {
+            type: 'array',
+            items: {
+              properties: {
+                model: {
                   type: 'string',
+                },
+                category: {
+                  type: 'string',
+                },
+                node_name: {
+                  type: 'string',
+                },
+                property_name: {
+                  type: 'string',
+                },
+                property_description: {
+                  type: 'string',
+                },
+                type: {
+                  type: 'string',
+                },
+                values: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
                 },
               },
             },
