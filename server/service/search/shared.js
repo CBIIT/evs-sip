@@ -1325,7 +1325,10 @@ const getGraphicalPCDCDictionary = (project) => {
         linkItem["target_type"] = nodes[i - 4];
         linkItem["required"] = false;
 
-        project_result[n].links.push(linkItem);
+        // TODO - find out why linkItem is sometimes undefined
+        if (linkItem) {
+          project_result[n].links.push(linkItem);
+        }
       }
     });
     cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
