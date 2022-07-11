@@ -24,6 +24,10 @@ code {
   display: none !important;
 }
 
+.container {
+  max-width: 80rem !important;
+}
+
 @import url(./assets/css/colors.css);
 @import url(./assets/css/fonts.css);
 
