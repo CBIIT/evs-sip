@@ -756,84 +756,70 @@ const convert2Key = (name) => {
 };
 
 const generateICDCorCTDCData = (dc) => {
+  const dataList = {};
   const dcMData = dc.mData;
   const dcMPData = dc.mpData;
 
-  const dataList = {};
-
-  for (let [key, value] of Object.entries(dcMData.Nodes)) {
-    //console.log(key);
-    //console.log(value.Category);
+  Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
     const item = {};
+    const link = [];
+    const pRequired = [];
+    const properties = {};
+
     item["$schema"] = "http://json-schema.org/draft-06/schema#";
-    item["id"] = key;
-    item["title"] = convert2Title(key);
-    if ("Category" in value) {
-      item["category"] = value.Category;
+    item["additionalProperties"] = false;
+    item["constraints"] = null;
+    item["id"] = dcMDataNodeName;
+    item["program"] = "*";
+    item["project"] = "*";
+    item["properties"] = {};
+    item["submittable"] = true;
+    item["title"] = convert2Title(dcMDataNodeName);
+    item["type"] = "object";
+
+    if ("Category" in dcMDataNode) {
+      item["category"] = dcMDataNode.Category;
     }
-    else if ("Tags" in value) {
-      item["category"] = value.Tags.Category;
+    else if ("Tags" in dcMDataNode) {
+      item["category"] = dcMDataNode.Tags.Category;
     } 
     else {
       item["category"] = "Undefined";
     }
 
-    item["program"] = "*";
-    item["project"] = "*";
-    item["additionalProperties"] = false;
-    item["submittable"] = true;
-    item["constraints"] = null;
-    //item["links"]=[];
-
-    item["type"] = "object";
-    const link = [];
-    const properties = {};
-    const pRequired = [];
-
-    if (dcMData.Nodes[key].Props != null) {
-      for (var i = 0; i < dcMData.Nodes[key].Props.length; i++) {
-        //console.log(icdcMData.Nodes[key].Props[i]);
-        const nodeP = dcMData.Nodes[key].Props[i];
+    if (dcMDataNode.Props != null) {
+      dcMDataNode.Props.forEach((nodeP) => {
         const propertiesItem = {};
         for (var propertyName in dcMPData.PropDefinitions) {
-          if (propertyName == nodeP) {
+          if (propertyName === nodeP) {
             propertiesItem["description"] =
               dcMPData.PropDefinitions[propertyName].Desc;
             propertiesItem["type"] =
               dcMPData.PropDefinitions[propertyName].Type;
             propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
 
-            if (dcMPData.PropDefinitions[propertyName].Req == true) {
+            if (dcMPData.PropDefinitions[propertyName].Req === true) {
               pRequired.push(nodeP);
             }
           }
         }
         properties[nodeP] = propertiesItem;
-      }
+      });
 
       item["properties"] = properties;
       item["required"] = pRequired;
-    } else {
-      item["properties"] = {};
     }
 
-    for (var propertyName in dcMData.Relationships) {
+    for (let propertyName in dcMData.Relationships) {
       const linkItem = {};
-      //console.log(propertyName);
-      //console.log(icdcMData.Relationships[propertyName]);
-      //console.log(icdcMData.Relationships[propertyName].Ends);
       const label = propertyName;
       const multiplicity = dcMData.Relationships[propertyName].Mul;
       const required = false;
-      for (
-        var i = 0;
-        i < dcMData.Relationships[propertyName].Ends.length;
-        i++
-      ) {
-        if (dcMData.Relationships[propertyName].Ends[i].Src == key) {
-          const backref = dcMData.Relationships[propertyName].Ends[i].Src;
-          const name = dcMData.Relationships[propertyName].Ends[i].Dst;
-          const target = dcMData.Relationships[propertyName].Ends[i].Dst;
+      dcMData.Relationships[propertyName].Ends.forEach((end) => {
+        if (end.Src === dcMDataNodeName) {
+          const backref = end.Src;
+          const name = end.Dst;
+          const target = end.Dst;
 
           linkItem["name"] = name;
           linkItem["backref"] = backref;
@@ -843,14 +829,18 @@ const generateICDCorCTDCData = (dc) => {
 
           link.push(linkItem);
         }
-      }
+      });
     }
 
-    //console.log(link);
+    // TODO - Create permanent fix for duplicate case-arm relationship
+    if (dcMDataNodeName === 'case') {
+      link.splice(0, 1);
+    }
+
     item["links"] = link;
 
-    dataList[key] = item;
-  }
+    dataList[dcMDataNodeName] = item;
+  });
 
   return dataList;
 };
