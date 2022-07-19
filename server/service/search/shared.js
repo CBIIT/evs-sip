@@ -762,43 +762,42 @@ const generateICDCorCTDCData = (dc) => {
 
   Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
     const item = {};
-    const link = [];
     const pRequired = [];
     const properties = {};
 
-    item["$schema"] = "http://json-schema.org/draft-06/schema#";
-    item["additionalProperties"] = false;
-    item["constraints"] = null;
-    item["id"] = dcMDataNodeName;
-    item["program"] = "*";
-    item["project"] = "*";
-    item["properties"] = {};
-    item["submittable"] = true;
-    item["title"] = convert2Title(dcMDataNodeName);
-    item["type"] = "object";
+    item.$schema = "http://json-schema.org/draft-06/schema#";
+    item.additionalProperties = false;
+    item.constraints = null;
+    item.id = dcMDataNodeName;
+    item.links = [];
+    item.program = "*";
+    item.project = "*";
+    item.properties = {};
+    item.submittable = true;
+    item.title = convert2Title(dcMDataNodeName);
+    item.type = "object";
 
     if ("Category" in dcMDataNode) {
-      item["category"] = dcMDataNode.Category;
+      item.category = dcMDataNode.Category;
     }
     else if ("Tags" in dcMDataNode) {
-      item["category"] = dcMDataNode.Tags.Category;
+      item.category = dcMDataNode.Tags.Category;
     } 
     else {
-      item["category"] = "Undefined";
+      item.category = "Undefined";
     }
 
     if (dcMDataNode.Props != null) {
       dcMDataNode.Props.forEach((nodeP) => {
         const propertiesItem = {};
         for (var propertyName in dcMPData.PropDefinitions) {
+          const propDef = dcMPData.PropDefinitions[propertyName];
           if (propertyName === nodeP) {
-            propertiesItem["description"] =
-              dcMPData.PropDefinitions[propertyName].Desc;
-            propertiesItem["type"] =
-              dcMPData.PropDefinitions[propertyName].Type;
-            propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
+            propertiesItem.description = propDef.Desc;
+            propertiesItem.type = propDef.Type;
+            propertiesItem.src = propDef.Src;
 
-            if (dcMPData.PropDefinitions[propertyName].Req === true) {
+            if (propDef.Req === true) {
               pRequired.push(nodeP);
             }
           }
@@ -806,38 +805,30 @@ const generateICDCorCTDCData = (dc) => {
         properties[nodeP] = propertiesItem;
       });
 
-      item["properties"] = properties;
-      item["required"] = pRequired;
+      item.properties = properties;
+      item.required = pRequired;
     }
 
     for (let propertyName in dcMData.Relationships) {
-      const linkItem = {};
       const label = propertyName;
       const multiplicity = dcMData.Relationships[propertyName].Mul;
       const required = false;
       dcMData.Relationships[propertyName].Ends.forEach((end) => {
-        if (end.Src === dcMDataNodeName) {
-          const backref = end.Src;
-          const name = end.Dst;
-          const target = end.Dst;
+        const linkItem = {
+          backref: end.Src,
+          label: label,
+          name: end.Dst,
+          required: required,
+          target_type: end.Dst,
+        };
 
-          linkItem["name"] = name;
-          linkItem["backref"] = backref;
-          linkItem["label"] = label;
-          linkItem["target_type"] = target;
-          linkItem["required"] = required;
-
-          link.push(linkItem);
+        if (end.Src !== dcMDataNodeName) {
+          return;
         }
+
+        item.links.push(linkItem);
       });
     }
-
-    // TODO - Create permanent fix for duplicate case-arm relationship
-    if (dcMDataNodeName === 'case') {
-      link.splice(0, 1);
-    }
-
-    item["links"] = link;
 
     dataList[dcMDataNodeName] = item;
   });
