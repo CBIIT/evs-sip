@@ -756,101 +756,82 @@ const convert2Key = (name) => {
 };
 
 const generateICDCorCTDCData = (dc) => {
+  const dataList = {};
   const dcMData = dc.mData;
   const dcMPData = dc.mpData;
 
-  const dataList = {};
-
-  for (let [key, value] of Object.entries(dcMData.Nodes)) {
-    //console.log(key);
-    //console.log(value.Category);
+  Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
     const item = {};
-    item["$schema"] = "http://json-schema.org/draft-06/schema#";
-    item["id"] = key;
-    item["title"] = convert2Title(key);
-    if ("Category" in value) {
-      item["category"] = value.Category;
+    const pRequired = [];
+    const properties = {};
+
+    item.$schema = "http://json-schema.org/draft-06/schema#";
+    item.additionalProperties = false;
+    item.constraints = null;
+    item.id = dcMDataNodeName;
+    item.links = [];
+    item.program = "*";
+    item.project = "*";
+    item.properties = {};
+    item.submittable = true;
+    item.title = convert2Title(dcMDataNodeName);
+    item.type = "object";
+
+    if ("Category" in dcMDataNode) {
+      item.category = dcMDataNode.Category;
     }
-    else if ("Tags" in value) {
-      item["category"] = value.Tags.Category;
+    else if ("Tags" in dcMDataNode) {
+      item.category = dcMDataNode.Tags.Category;
     } 
     else {
-      item["category"] = "Undefined";
+      item.category = "Undefined";
     }
 
-    item["program"] = "*";
-    item["project"] = "*";
-    item["additionalProperties"] = false;
-    item["submittable"] = true;
-    item["constraints"] = null;
-    //item["links"]=[];
-
-    item["type"] = "object";
-    const link = [];
-    const properties = {};
-    const pRequired = [];
-
-    if (dcMData.Nodes[key].Props != null) {
-      for (var i = 0; i < dcMData.Nodes[key].Props.length; i++) {
-        //console.log(icdcMData.Nodes[key].Props[i]);
-        const nodeP = dcMData.Nodes[key].Props[i];
+    if (dcMDataNode.Props != null) {
+      dcMDataNode.Props.forEach((nodeP) => {
         const propertiesItem = {};
         for (var propertyName in dcMPData.PropDefinitions) {
-          if (propertyName == nodeP) {
-            propertiesItem["description"] =
-              dcMPData.PropDefinitions[propertyName].Desc;
-            propertiesItem["type"] =
-              dcMPData.PropDefinitions[propertyName].Type;
-            propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
+          const propDef = dcMPData.PropDefinitions[propertyName];
+          if (propertyName === nodeP) {
+            propertiesItem.description = propDef.Desc;
+            propertiesItem.type = propDef.Type;
+            propertiesItem.src = propDef.Src;
 
-            if (dcMPData.PropDefinitions[propertyName].Req == true) {
+            if (propDef.Req === true) {
               pRequired.push(nodeP);
             }
           }
         }
         properties[nodeP] = propertiesItem;
-      }
+      });
 
-      item["properties"] = properties;
-      item["required"] = pRequired;
-    } else {
-      item["properties"] = {};
+      item.properties = properties;
+      item.required = pRequired;
     }
 
-    for (var propertyName in dcMData.Relationships) {
-      const linkItem = {};
-      //console.log(propertyName);
-      //console.log(icdcMData.Relationships[propertyName]);
-      //console.log(icdcMData.Relationships[propertyName].Ends);
+    for (let propertyName in dcMData.Relationships) {
       const label = propertyName;
       const multiplicity = dcMData.Relationships[propertyName].Mul;
       const required = false;
-      for (
-        var i = 0;
-        i < dcMData.Relationships[propertyName].Ends.length;
-        i++
-      ) {
-        if (dcMData.Relationships[propertyName].Ends[i].Src == key) {
-          const backref = dcMData.Relationships[propertyName].Ends[i].Src;
-          const name = dcMData.Relationships[propertyName].Ends[i].Dst;
-          const target = dcMData.Relationships[propertyName].Ends[i].Dst;
+      dcMData.Relationships[propertyName].Ends.forEach((end) => {
+        const linkItem = {
+          backref: end.Src,
+          label: label,
+          name: end.Dst,
+          required: required,
+          target_type: end.Dst,
+        };
 
-          linkItem["name"] = name;
-          linkItem["backref"] = backref;
-          linkItem["label"] = label;
-          linkItem["target_type"] = target;
-          linkItem["required"] = required;
-
-          link.push(linkItem);
+        if (end.Src !== dcMDataNodeName) {
+          return;
         }
-      }
+
+        item.links.push(linkItem);
+      });
     }
 
-    //console.log(link);
-    item["links"] = link;
-
-    dataList[key] = item;
-  }
+    dataList[dcMDataNodeName] = item;
+  });
 
   return dataList;
 };
