@@ -597,6 +597,9 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
         item["properties"] = [];
       }
 
+      // if (item['node_name'] === 'arm') {
+      //   console.log(JSON.stringify(dcMData.Relationships, undefined, 2));
+      // }
       for (let propertyName in dcMData.Relationships) {
         const linkItem = {};
 
@@ -606,19 +609,19 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
         linkItem["multiplicity"] = multiplicity;
         //const required = false;
         let nodeList = [];
-        for (
-          let i = 0;
-          i < dcMData.Relationships[propertyName].Ends.length;
-          i++) {
-          if (dcMData.Relationships[propertyName].Ends[i].Src == key) {
-            const backref = dcMData.Relationships[propertyName].Ends[i].Src;
-            const name = dcMData.Relationships[propertyName].Ends[i].Dst;
-            //const target = dcMData.Relationships[propertyName].Ends[i].Dst;
 
-            nodeList.push({ source: backref, destination: name })
+        dcMData.Relationships[propertyName].Ends.forEach((end) => {
+          const backref = end.Src;
+          const name = end.Dst;
 
+          if (backref === key || name === key) {
+            nodeList.push({
+              source: backref,
+              destination: name,
+            });
           }
-        }
+        });
+
         linkItem["relationship_entity"] = nodeList;
         if (nodeList.length > 0) link.push(linkItem);
       }
