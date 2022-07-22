@@ -294,7 +294,6 @@ const excludeSystemProperties = function (node) {
 };
 
 const getGraphicalICDCDictionary = function (node, prop ) {
-  
   let result = cache.getValue("icdc_dict_api");
   if (result == undefined || node !== '') {
     let jsonData = {};
