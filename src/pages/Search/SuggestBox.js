@@ -49,7 +49,7 @@ const SuggestBox = (props) => {
   useEffect(() => {
     const clickHandler = event => {
       // click inside component
-      if (node.current.contains(event.target)) return;
+      if (node.current?.contains(event.target)) return;
       // click ooutside component
       props.cleanSuggest();
     };

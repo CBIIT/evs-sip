@@ -1,3 +1,77 @@
+# EVS-SIP
+
+## 1 - Introduction
+
+This repository contains both the frontend and the backend for EVS-SIP.
+
+## 2 - How to set up in a local development environment
+
+### 2.1 - Environment variables
+
+Modify `.env` to specify the following variables:
+
+- `NODE_ENV` The type of environment. Set this to `dev`.
+- `PORT` The port on which the frontend is run. Ensure that this is different from the port used by the backend.
+- `LOGDIR` The path in which log files will be stored.
+- `EVSSIP_SERV_API_URL` The URL for the search API. Something like `http://localhost:3000/service/search`.
+- `REACT_APP_DEV_API_URL` I don't know what this is. Something like `http://localhost:3000/api/search`.
+
+### 2.2 - Elasticsearch index
+
+Build an Elasticsearch index by performing the following:
+
+1. Confirm that an ES service is available by running
+
+    ```bash
+    curl -X GET http://localhost:9200
+    ```
+
+2. Delete the current index by running
+
+    ```bash
+    curl -X DELETE http://localhost:9200/_all
+    ```
+
+3. Build a new index by running
+
+    ```bash
+    curl http://localhost:3000/service/search/buildIndex
+    ```
+
+    You may need to uncomment the route.
+
+### 2.3 - Run Elasticsearch
+
+If Elasticsearch is not already running, execute the command
+
+```bash
+elasticsearch
+```
+
+Elasticsearch should default to running on port `9200`.
+
+### 2.4 - Run the backend
+
+Execute the command
+
+```bash
+node app.js
+```
+
+### 2.5 - Run the frontend
+
+Execute the command
+
+```bash
+npm run frontend
+```
+
+## 3 - Project structure
+
+stub
+
+## Default React README below
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

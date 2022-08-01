@@ -10,8 +10,8 @@ import ToCompareModal from '../../components/Modals/ToCompareModal';
 
 const ContainerStyled = styled(Container)`
   font-size: 1rem;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 12px;
+  padding-right: 12px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
   height: 45rem;
@@ -37,7 +37,7 @@ const TableTh = styled.div`
 
 const TableBody = styled(Row)`
   overflow-y: auto;
-  max-height: 39rem;
+  max-height: 42rem;
 `;
 
 const TableRow = styled(Row)`

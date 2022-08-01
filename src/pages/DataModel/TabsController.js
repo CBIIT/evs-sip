@@ -12,6 +12,11 @@ const TabNavsCol = styled(Col)`
   align-items: center;
 `;
 
+const Content = styled.div`
+  position: relative;
+  z-index: 1;
+`;
+
 const NavSpan = styled.span`
   width: 12rem;
   inline-size: 12rem;
@@ -32,6 +37,7 @@ const NavLinkStyled = styled(Nav.Link)`
   align-items: center;
   z-index: 0;
   border-color: transparent !important;
+  cursor: pointer;
 
   &&.active {
     font-family: 'Raleway-Bold', sans-serif;
@@ -120,7 +126,7 @@ const TabsController = (props) => {
                 </NavItemStyled>
               </NavStyled>
             </TabNavsCol>
-            <Col sm={12}>
+            <Content sm={12}>
               <Tab.Content transition="false">
                 <Tab.Pane unmountOnExit={true} eventKey="gdc">
                   <GDCModel/>
@@ -135,7 +141,7 @@ const TabsController = (props) => {
                   <PCDCModel/>
                 </Tab.Pane>
               </Tab.Content>
-            </Col>
+            </Content>
           </Row>
         </Container>
       </Tab.Container>

@@ -58,6 +58,7 @@ const NavLinkStyled = styled(Nav.Link)`
   padding: .7rem 1rem;
   text-align: center;
   margin: 0 0.0625rem;
+  cursor: pointer;
 
   &&.active {
     font-family: 'Raleway-Bold',sans-serif;
