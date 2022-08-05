@@ -9992,14 +9992,12 @@
           "p_n_code": "C161601",
           "p_desc": "A categorization of surgical procedures by type or purpose.",
           "p_type": "enum",
-          "values": []
-        },
-        {
-          "p_name": "Surgery",
-          "p_n_code": "C15329",
-          "p_desc": "A diagnostic or treatment procedure performed by manual and/or instrumental means, often involving an incision and the removal or replacement of a diseased organ or tissue; of or relating to or involving or used in surgery or requiring or amenable to treatment by surgery.",
-          "p_type": "enum",
           "values": [
+            {
+              "v_name": "Surgery",
+              "v_n_code": "C15329",
+              "v_PT": ""
+            },
             {
               "v_name": "Biopsy",
               "v_n_code": "C15189",
@@ -11244,7 +11242,7 @@
         {
           "p_name": "NECROSIS",
           "p_n_code": "C186651",
-          "p_desc": "The quantitative value for the percent of necrosis.",
+          "p_desc": "The qualitative/quantitative value for the percent of necrosis.",
           "p_type": "enum",
           "values": [
             {
@@ -11742,7 +11740,7 @@
               "v_PT": ""
             },
             {
-              "v_name": "GOG116",
+              "v_name": "GOG0116",
               "v_n_code": "C177339",
               "v_PT": ""
             },
@@ -11813,7 +11811,7 @@
             },
             {
               "v_name": "TCGM2004",
-              "v_n_code": "",
+              "v_n_code": "C187201",
               "v_PT": ""
             }
           ]
@@ -14269,14 +14267,12 @@
           "p_n_code": "C161601",
           "p_desc": "A categorization of surgical procedures by type or purpose.",
           "p_type": "enum",
-          "values": []
-        },
-        {
-          "p_name": "Surgery",
-          "p_n_code": "C15329",
-          "p_desc": "A diagnostic or treatment procedure performed by manual and/or instrumental means, often involving an incision and the removal or replacement of a diseased organ or tissue; of or relating to or involving or used in surgery or requiring or amenable to treatment by surgery.",
-          "p_type": "enum",
           "values": [
+            {
+              "v_name": "Surgery",
+              "v_n_code": "C15329",
+              "v_PT": ""
+            },
             {
               "v_name": "Biopsy",
               "v_n_code": "C15189",
@@ -15410,14 +15406,12 @@
           "p_n_code": "C177376",
           "p_desc": "The therapy chosen to treat Growing Teratoma Syndrome.",
           "p_type": "enum",
-          "values": []
-        },
-        {
-          "p_name": "Surgery",
-          "p_n_code": "C15329",
-          "p_desc": "A diagnostic or treatment procedure performed by manual and/or instrumental means, often involving an incision and the removal or replacement of a diseased organ or tissue; of or relating to or involving or used in surgery or requiring or amenable to treatment by surgery.",
-          "p_type": "enum",
           "values": [
+            {
+              "v_name": "Surgery",
+              "v_n_code": "C15329",
+              "v_PT": ""
+            },
             {
               "v_name": "Chemotherapy",
               "v_n_code": "C15632",
@@ -18318,15 +18312,12 @@
               "v_name": "Stem Cell Transplant",
               "v_n_code": "C15431",
               "v_PT": ""
-            }
-          ]
-        },
-        {
-          "p_name": "Surgery",
-          "p_n_code": "C15329",
-          "p_desc": "A diagnostic or treatment procedure performed by manual and/or instrumental means, often involving an incision and the removal or replacement of a diseased organ or tissue; of or relating to or involving or used in surgery or requiring or amenable to treatment by surgery.",
-          "p_type": "enum",
-          "values": [
+            },
+            {
+              "v_name": "Surgery",
+              "v_n_code": "C15329",
+              "v_PT": ""
+            },
             {
               "v_name": "Immunotherapy",
               "v_n_code": "C15262",
@@ -26227,7 +26218,7 @@
         },
         {
           "p_name": "COURSE",
-          "p_n_code": "C168807",
+          "p_n_code": "C187095",
           "p_desc": "The type of protocol treatment course administered with respect to Course Timing.",
           "p_type": "enum",
           "values": [
@@ -29728,15 +29719,12 @@
               "v_name": "Amputation",
               "v_n_code": "C15179",
               "v_PT": ""
-            }
-          ]
-        },
-        {
-          "p_name": "Limb-Salvage",
-          "p_n_code": "C16042",
-          "p_desc": "A procedure to avoid amputation of an arm or leg.",
-          "p_type": "enum",
-          "values": [
+            },
+            {
+              "v_name": "Limb-Salvage",
+              "v_n_code": "C16042",
+              "v_PT": ""
+            },
             {
               "v_name": "Excision",
               "v_n_code": "C15232",
@@ -31517,8 +31505,8 @@
         },
         {
           "p_name": "NECROSIS",
-          "p_n_code": "C159481",
-          "p_desc": "A quantitative measurement of the percent of cells undergoing necrosis compared to the number of total cells present in a sample.",
+          "p_n_code": "C186651",
+          "p_desc": "The qualitative/quantitative value for the percent of necrosis.",
           "p_type": "enum",
           "values": [
             {
@@ -31545,8 +31533,8 @@
         },
         {
           "p_name": "NECROSIS_PCT",
-          "p_n_code": "C186651",
-          "p_desc": "The quantitative value for the percent of necrosis.",
+          "p_n_code": "C159481",
+          "p_desc": "A quantitative measurement of the percent of cells undergoing necrosis compared to the number of total cells present in a sample.",
           "p_type": "number",
           "values": []
         }
