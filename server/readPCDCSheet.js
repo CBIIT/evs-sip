@@ -55,7 +55,7 @@ const readExcelFile = async () => {
   let worksheet = workbook.worksheets[0];
 
   let id = '';
-  let prop = '';
+  //let prop = '';
   let data = {}
   //let data = [];
   worksheet.eachRow(function (row, rowNumber) {
@@ -66,12 +66,13 @@ const readExcelFile = async () => {
       let pt = item[7];
       let ncit = item[4];
       if(item[14] === 'code'){
-        id = project + "/" + lowerNode + "/" + prop;
-        prop = item[7];
-        data[id] = {pj: project, n: node, p: prop, v: []};
+        id = project + "/" + lowerNode + "/" + pt;
+        //prop = item[7];
+        data[id] = {pj: project, n: node, p: pt, v: [], vo: []};
       }
       if(item[14] === ''){
         data[id].v.push({n: pt, nt: ncit});
+        data[id].vo.push(pt);
         //data.push({pj: project, n: node, p: prop, v: pt, nt: ncit})
       }
   });
@@ -82,23 +83,52 @@ const readExcelFile = async () => {
 const repeatedProp = (data) => {
   let props = [];
   let propsConflict = [];
+  let propsVConflict = [];
   let result = {}
+  let rvalues = {}
+
+  let values = [];
 
   for(let key in data){
     let prop = data[key].p;
+    let valueset = data[key].vo.toString();
     if (props.indexOf(prop) === -1) {
       props.push(prop);
     } else {
       if (propsConflict.indexOf(prop) === -1) {
         propsConflict.push(prop);
-        //result[key] = data[key];
+        values.push(valueset);
+        rvalues[prop] = [];
       }
     }
   }
 
   for(let key in data){
     let prop = data[key].p;
-    if(propsConflict.indexOf(prop) !== -1){
+    let valueset = data[key].vo.toString();
+    if (propsConflict.indexOf(prop) !== -1) {
+      rvalues[prop].push(valueset);
+    }
+  }
+
+  for(let key in rvalues){
+    let isDiff = false;
+    rvalues[key].forEach((value_x) => {
+      rvalues[key].forEach((value_y) => {
+        if(value_x !== value_y) {
+          isDiff = true;
+        }
+      }); 
+    });
+
+    if(!isDiff){
+      propsVConflict.push(key)
+    }
+  }
+
+  for(let key in data){
+    let prop = data[key].p;
+    if(propsVConflict.indexOf(prop) !== -1){
       result[key] = data[key];
     }
   }
@@ -126,10 +156,9 @@ const readPCDCMapping = async () => {
       outputStream.write( newPcdcData[key].pj + "," + newPcdcData[key].n  + "," + newPcdcData[key].p  + ",'" +  value.n  + "'," + value.nt + "\n");
       //console.log( newPcdcData[key].pj + "," + newPcdcData[key].n  + "," + newPcdcData[key].p  + ",'" +  value.n  + "'," + value.nt + "\n");
     });
-    //outputStream.write( newPcdcData[key].pj + "," + data.n  + "," + data.p  + "," +  data.v  + "," + data.nt + "\n");
   }
 
-  //outputStream.end();
+  outputStream.end();
 }
 
 function test() {
