@@ -760,6 +760,7 @@ const generateICDCorCTDCData = (dc) => {
   const dcMData = dc.mData;
   const dcMPData = dc.mpData;
 
+  // Build each node
   Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
     const item = {};
     const pRequired = [];
@@ -787,21 +788,23 @@ const generateICDCorCTDCData = (dc) => {
       item.category = "Undefined";
     }
 
+    // Set node's properties
     if (dcMDataNode.Props != null) {
       dcMDataNode.Props.forEach((nodeP) => {
         const propertiesItem = {};
-        for (var propertyName in dcMPData.PropDefinitions) {
-          const propDef = dcMPData.PropDefinitions[propertyName];
-          if (propertyName === nodeP) {
-            propertiesItem.description = propDef.Desc;
-            propertiesItem.type = propDef.Type;
-            propertiesItem.src = propDef.Src;
 
-            if (propDef.Req === true) {
-              pRequired.push(nodeP);
-            }
+        if (dcMPData.PropDefinitions.hasOwnProperty(nodeP)) {
+          const propDef = dcMPData.PropDefinitions[nodeP];
+
+          propertiesItem.description = propDef.Desc;
+          propertiesItem.type = propDef.Type;
+          propertiesItem.src = propDef.Src;
+
+          if (propDef.Req === true) {
+            pRequired.push(nodeP);
           }
         }
+
         properties[nodeP] = propertiesItem;
       });
 
@@ -809,26 +812,27 @@ const generateICDCorCTDCData = (dc) => {
       item.required = pRequired;
     }
 
-    for (let propertyName in dcMData.Relationships) {
+    // Build node's links
+    Object.entries(dcMData.Relationships).forEach(([propertyName, dcMDataRelationship]) => {
       const label = propertyName;
-      const multiplicity = dcMData.Relationships[propertyName].Mul;
+      const multiplicity = dcMDataRelationship.Mul;
       const required = false;
-      dcMData.Relationships[propertyName].Ends.forEach((end) => {
-        const linkItem = {
+
+      dcMDataRelationship.Ends.forEach((end) => {
+        // Skip relationships that don't involve the current node
+        if (end.Src !== dcMDataNodeName) {
+          return;
+        }
+
+        item.links.push({
           backref: end.Src,
           label: label,
           name: end.Dst,
           required: required,
           target_type: end.Dst,
-        };
-
-        if (end.Src !== dcMDataNodeName) {
-          return;
-        }
-
-        item.links.push(linkItem);
+        });
       });
-    }
+    });
 
     dataList[dcMDataNodeName] = item;
   });
