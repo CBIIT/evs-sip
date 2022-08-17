@@ -146,10 +146,11 @@ const getGraphicalGDCDictionary = async function (node, prop) {
   return { status: 200, results: result };
 };
 
-const generateGDCData = async function (schema) {
+const generateGDCData = async (schema) => {
   console.log("Start...");
   let dict = {};
-  for (let [key, value] of Object.entries(schema)) {
+
+  Object.entries(schema).forEach(([key, value]) => {
     delete value["$schema"];
     delete value["namespace"];
     delete value["project"];
@@ -164,9 +165,7 @@ const generateGDCData = async function (schema) {
     }
 
     dict[key.slice(0, -5)] = value;
-  }
-
-  //console.log(dict);
+  });
 
   // Recursivly fix references
   dict = findObjectWithRef(dict, (refObj, rootKey) => {
@@ -245,9 +244,10 @@ const generateGDCData = async function (schema) {
 
     delete obj.systemProperties;
 
+    if (!['_terms','_terms_enum','_definitions'].includes(key)) {
+      filtered.push(newDict[key]);
+    }
 
-
-    if( !['_terms','_terms_enum','_definitions'].includes(key))filtered.push(newDict[key]);
     return filtered;
   }, []);
 
@@ -404,7 +404,6 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   let nodes = Object.keys(project_result);
   
   //create fake relationship for graphical display purpose
-
   nodes.forEach((n, i) => {
     if (i - 4 >= 0) {
       let linkItem = {};

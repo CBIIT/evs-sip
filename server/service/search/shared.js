@@ -629,10 +629,11 @@ const excludeSystemProperties = (node) => {
   return properties;
 };
 
-const generateGDCData = async function (schema) {
+const generateGDCData = async (schema) => {
   console.log("Start...");
   let dict = {};
-  for (let [key, value] of Object.entries(schema)) {
+
+  Object.entries(schema).forEach(([key, value]) => {
     delete value["$schema"];
     delete value["namespace"];
     delete value["project"];
@@ -647,9 +648,7 @@ const generateGDCData = async function (schema) {
     }
 
     dict[key.slice(0, -5)] = value;
-  }
-
-  //console.log(dict);
+  });
 
   // Recursivly fix references
   dict = findObjectWithRef(dict, (refObj, rootKey) => {
@@ -1299,8 +1298,8 @@ const getGraphicalPCDCDictionary = (project) => {
 
     project_result = result[project];
     let nodes = Object.keys(project_result);
-    //create fake relationship for graphical display purpose
 
+    //create fake relationship for graphical display purpose
     nodes.forEach((n, i) => {
       if (i - 4 >= 0) {
         let linkItem = {};
@@ -1310,10 +1309,7 @@ const getGraphicalPCDCDictionary = (project) => {
         linkItem["target_type"] = nodes[i - 4];
         linkItem["required"] = false;
 
-        // TODO - find out why linkItem is sometimes undefined
-        if (linkItem) {
-          project_result[n].links.push(linkItem);
-        }
+        project_result[n].links.push(linkItem);
       }
     });
     cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
