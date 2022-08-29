@@ -107,7 +107,7 @@ const getGraphicalGDCDictionary = async function (node, prop) {
     var termsEnumJson = yaml.load(folderPath + "/_terms_enum.yaml");
     jsonData["_terms_enum.yaml"] = termsEnumJson;
     // let bulkBody = [];
-   
+
     fs.readdirSync(folderPath).forEach((file) => {
       if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
       let fileJson = yaml.load(folderPath + "/" + file);
@@ -708,56 +708,93 @@ const generatePCDCData = (pcdc_data, filter) => {
   return dataList;
 };
 
-const processGDCResult = function (result, node, prop ) {
+const processGDCResult = (result, node, prop) => {
   const dataList = [];
-  if(result.length > 0){
-    result.forEach((r) => {
-      if(!node || r.id.toLowerCase() === node.toLowerCase()){
-        let item = {};
-        item["model"] = "GDC";
-        item["category"] = r.category;
-        item["node_name"] = r.id;
-        item["node_description"] = r.description;
-        if(prop && prop !== ''){
-          if(r.properties){
-            for (let propertyName in r.properties) {
-              if (propertyName.toLowerCase() === prop.toLowerCase()) {
-                item["property_name"] = propertyName;
-                item["property_description"] = r.properties[propertyName].description;
-                item["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
-                item["values"] = r.properties[propertyName].enum;
-                dataList.push(item);
-              }
-            }
 
-          }
-
-        } else {
-          let propList =[];
-          if(r.properties){
-            for (let propertyName in r.properties) {
-              let p ={};
-                p["property_name"] = propertyName;
-                p["property_description"] = r.properties[propertyName].description;
-                p["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
-                p["values"] = r.properties[propertyName].enum;
-                propList.push(p);             
-            }
-
-          }
-          item["properties"] = propList;
-          item["required"] = r.required;     
-          item["relationship"] = r.links;
-
-          dataList.push(item);
-        }
-      }
-
-    });
+  // No results
+  if (result.length <= 0) {
+    return dataList;
   }
 
-  return dataList
+  result.forEach((r) => {
+    // Skip nodes that we didn't ask for
+    if (node && r.id.toLowerCase() !== node.toLowerCase()) {
+      return;
+    }
 
+    let item = {
+      model: 'GDC',
+      category: r.category,
+      node_name: r.id,
+      node_description: r.description,
+    };
+
+    if (prop && prop !== '') {
+      if (r.properties) {
+        Object.entries(r.properties).forEach(([propertyName, property]) => {
+          // Skip properties that we didn't ask for
+          if (propertyName.toLowerCase() !== prop.toLowerCase()) {
+            return;
+          }
+
+          // Preprocess the property
+          property = transformGdcProperty(property);
+
+          item['property_name'] = propertyName;
+          item['property_description'] = property.description;
+          item['type'] = (!property.enum) ? property.type : 'enum';
+          item['values'] = property.enum;
+          dataList.push(item);
+        });
+      }
+    } else {
+      let propList =[];
+      if (r.properties) {
+        Object.entries(r.properties).forEach(([propertyName, property]) => {
+          // Preprocess the property
+          property = transformGdcProperty(property);
+
+          let p ={
+            property_name: propertyName,
+            property_description: property.description,
+          };
+
+          p['type'] = (!property.enum) ? property.type : 'enum';
+          p['values'] = property.enum;
+          propList.push(p);             
+        });
+      }
+      item['properties'] = propList;
+      item["required"] = r.required;     
+      item["relationship"] = r.links;
+
+      dataList.push(item);
+    }
+  });
+
+  return dataList;
+};
+
+/**
+ * Formats a GDC property:
+ * - <items.enum> becomes just <enum>
+ * - <type> is removed if property is an enum
+ * 
+ * @param {Object} property 
+ */
+const transformGdcProperty = (property) => {
+  // Move <items.enum> to <enum>
+  if (property.hasOwnProperty('items')) {
+    property.enum = property.items.enum;
+    delete property.items;
+  }
+
+  // Remove <type> if the property is an enum
+  if (property.hasOwnProperty('enum')) {
+    delete property.type;
+  }
+
+  return property;
 };
 
 module.exports = {
@@ -765,5 +802,6 @@ module.exports = {
   getGraphicalICDCDictionary,
   getGraphicalCTDCDictionary,
   getGraphicalPCDCDictionary,
-  getGraphicalGDCDictionary
+  getGraphicalGDCDictionary,
+  transformGdcProperty,
 };

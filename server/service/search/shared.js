@@ -9,6 +9,7 @@ let db = Datastore.create();
 const _ = require("lodash");
 const handleError = require("../../components/handleError");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
+const esapicontroller = require('../esapi/esapicontroller.js');
 
 const folderPath = path.join(
   __dirname,
@@ -932,6 +933,7 @@ const getGraphicalGDCDictionary = async function () {
       }
     });
     result = await generateGDCData(jsonData);
+    result = processGdcResult(result);
     console.log("Cached:");
     console.log(Object.keys(result).length);
     cache.setValue("gdc_dict", result, config.item_ttl);
@@ -1020,6 +1022,23 @@ const getGraphicalCTDCDictionary = () => {
   }
   return result;
 }
+
+const processGdcResult = (result) => {
+  for (const nodeName in result) {
+    const node = result[nodeName];
+
+    if (!node.properties) {
+      continue;
+    }
+
+    for (const propName in node.properties) {
+      let prop = node.properties[propName];
+      result[nodeName].properties[propName] = esapicontroller.transformGdcProperty(prop);
+    }
+  }
+
+  return result;
+};
 
 const processGDCDictionaryEnumData = (prop) => {
 	const enums = prop.enum;
