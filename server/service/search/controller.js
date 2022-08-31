@@ -1292,26 +1292,30 @@ const exportAllCompareResult = async function(req, res){
 
 const generateProperties = async function(req, res) {
 	const dataset = [];
-	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
+	//let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
+  let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
 		let entry = GDCDict[node];
-		let uid = node + "/" + entry.category + "/gdc";
+		//let uid = node + "/" + entry.category + "/gdc";
 		if(entry.properties){
 			let prop_dict = entry.properties;
+      console.log(prop_dict);
 			for(let prop in prop_dict){
 				let tmp = {};
 				tmp.category = entry.category;
 				tmp.node = node;
 				tmp.property = prop;
 				let dict = prop_dict[prop];
-				tmp.ncit = dict.termDef && dict.termDef.source  && dict.termDef.source == "NCIt" ? (dict.termDef.term_id || dict.termDef.cde_id ) : "";
+        let uid = entry.category + "." + node + "." + prop;
+				//tmp.ncit = dict.termDef && dict.termDef.source  && dict.termDef.source == "NCIt" ? (dict.termDef.term_id || dict.termDef.cde_id ) : "";
+        tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
 				dataset.push(tmp);
 			}
 		} 
 	}
-
+  
   // You can define styles as json object
 	const styles = {
     cellPink: {
