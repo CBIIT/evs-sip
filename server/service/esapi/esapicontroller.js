@@ -742,7 +742,7 @@ const processGDCResult = (result, node, prop) => {
 
           item['property_name'] = propertyName;
           item['property_description'] = property.description;
-          item['type'] = (!property.enum) ? property.type : 'enum';
+          item['type'] = property.type;
           item['values'] = property.enum;
           dataList.push(item);
         });
@@ -783,15 +783,15 @@ const processGDCResult = (result, node, prop) => {
  * @param {Object} property 
  */
 const transformGdcProperty = (property) => {
-  // Move <items.enum> to <enum>
-  if (property.hasOwnProperty('items')) {
+  // Move array-type property's <items.enum> to <enum>
+  if (property.type === 'array' && property.hasOwnProperty('items')) {
     property.enum = property.items.enum;
     delete property.items;
   }
 
-  // Remove <type> if the property is an enum
-  if (property.hasOwnProperty('enum')) {
-    delete property.type;
+  // Assign type `enum` to enum-type properties
+  if (!property.type && property.hasOwnProperty('enum')) {
+    property.type = 'enum';
   }
 
   return property;
