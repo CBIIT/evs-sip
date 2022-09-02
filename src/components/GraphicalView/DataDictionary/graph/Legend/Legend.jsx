@@ -52,7 +52,7 @@ class Legend extends React.Component {
     if(this.props.graphType.indexOf("pcdc") === 0){
 
       const current_project = this.props.currentProject === "" ? "AML" : this.props.currentProject;
-      legend_content = ["AML", "EWS", "GCT", "ALL"].map((project, i) => {
+      legend_content = ["AML", "EWS", "GCT", "ALL", "HL", "OS"].map((project, i) => {
         const itemColor = getCategoryColor(project.toLowerCase());
         const IconSvg = getCategoryIconSVG(project.toLowerCase());
         const active = current_project === project;

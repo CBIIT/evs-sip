@@ -138,12 +138,12 @@ const compareICDCMapping = () => {
 
         if(icdc_value[key].v_n_code !== new_icdc_value[key].v_n_code) {
           //console.log("ICDC Value Terminology," + icdc_value[key].v_name  + "," + new_icdc_value[key].v_name  + "," + icdc_value[key].v_n_code + "," + new_icdc_value[key].v_n_code + "\n");
-          outputStream.write("ICDC Value Terminology," + icdc_value[key].v_name  + "," + new_icdc_value[key].v_name  + "," + icdc_value[key].v_n_code + "," + new_icdc_value[key].v_n_code + "\n");
+          outputStream.write("ICDC Value Terminology,'" + icdc_value[key].v_name  + "','" + new_icdc_value[key].v_name  + "'," + icdc_value[key].v_n_code + "," + new_icdc_value[key].v_n_code + "\n");
         }
     } else {
         //outputStream.write("node, no match," + key + ", ," + newicdcmapping[key].n_n_code + "\n");
         //console.log("ICDC Value Terminology, no match," + new_icdc_value[key].v_name + ", ," + new_icdc_value[key].v_n_code + "\n");
-        outputStream.write("ICDC Value Terminology, no match," + new_icdc_value[key].v_name + ", ," + new_icdc_value[key].v_n_code + "\n");
+        outputStream.write("ICDC Value Terminology, no match,'" + new_icdc_value[key].v_name + "', ," + new_icdc_value[key].v_n_code + "\n");
     }
   } //end for loop in content
 
@@ -151,7 +151,7 @@ const compareICDCMapping = () => {
       if(new_icdc_value[key] === undefined){
         //outputStream.write("node," + key + "no match ," + icdcmapping[key].n_n_code + ", \n");
         //console.log("ICDC Value Terminology," + icdc_value[key].v_name + ", no match," + icdc_value[key].v_n_code + ", \n");
-        outputStream.write("ICDC Value Terminology," + icdc_value[key].v_name + ", no match," + icdc_value[key].v_n_code + ", \n");
+        outputStream.write("ICDC Value Terminology,'" + icdc_value[key].v_name + "', no match," + icdc_value[key].v_n_code + ", \n");
       }
   }
 

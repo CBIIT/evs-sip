@@ -96,6 +96,14 @@ const nodeCategoryList = {
     icon: IconMetadata,
     color: "#AD91FF",
   },
+  hl: {
+    icon: IconMetadata,
+    color: "#05b8ee",
+  },
+  os: {
+    icon: IconMetadata,
+    color: "#5d74f5",
+  },
 };
 
 const defaultCategory = {
