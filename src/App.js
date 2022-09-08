@@ -14,6 +14,7 @@ import Layout from './components/Layout';
 // Pages
 import Home from './pages/Home';
 import About from './pages/About';
+import APIDocs from './pages/APIDocs';
 import Search from './pages/Search';
 import DataModel from './pages/DataModel';
 import ReportDiff from './pages/ReportDiff';
@@ -36,6 +37,7 @@ function App() {
               <Route exact path="/" component={Home} />
               <Route path="/search" component={Search} />
               <Route path="/datamodel" component={DataModel} />
+              <Route path="/apidocs" component={APIDocs} />
               <Route path="/about" component={About} />
               <Route path="/reportdiff" component={ReportDiff} />
               <Route component={NotFound} />

@@ -38,6 +38,7 @@ const GraphicBkgdRight = styled.div`
 const ContainerStyled = styled(Container)`
   max-width: 80rem;
   height: 100%;
+  position: relative;
 `;
 
 const RowStyled = styled(Row)`

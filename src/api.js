@@ -1,7 +1,7 @@
-const baseUrl = process.env.REACT_APP_DEV_API_URL || "./api/search";
+const baseUrl = process.env.REACT_APP_DEV_API_URL || "./service/search";
 
 export const apiSuggest = async (keyword) => {
-  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
+  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26").replace(/%/g, "%25");;
   const response = await fetch(`${baseUrl}/suggest?keyword=${encoded_keyword}`);
   return response.json();
 };
@@ -14,7 +14,7 @@ export const apiSearchAll = async (keyword, match, options, dataSources) => {
       sources.push(key);
     }
   }
-  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26");
+  let encoded_keyword = keyword.replace(/\+/g, "%2B").replace(/&/g, "%26").replace(/%/g, "%25");
   const response = await fetch(`${baseUrl}/all/p?keyword=${encoded_keyword}&options=${opts}&sources=${sources.join()}`);
   return response.json();
 };
@@ -64,6 +64,13 @@ export const exportCompareResult = async(type ='all', search='') => {
 };
 
 export const exportAllCompareResult = async() => {
+  const response = await fetch(`${baseUrl}/exportAllCompareResult`);
+  //return response.json();
+
+  return response.blob();
+};
+
+export const swaggerDocs = async() => {
   const response = await fetch(`${baseUrl}/exportAllCompareResult`);
   //return response.json();
 

@@ -77,7 +77,7 @@ const NavDropdownItem = styled(NavDropdown.Item)`
 `;
 
 const NavigationBar = () => (
-  <NavbarStyled bg="dark" expand="lg" role="navigation">
+  <NavbarStyled bg="dark" role="navigation">
     <NavbarContainer>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
@@ -110,6 +110,7 @@ const NavigationBar = () => (
               }
             }}>PCDC</NavDropdownItem>
           </NavDropdownStyled>
+          <Nav.Link as={Link} to="/apidocs">API</Nav.Link>
           <Nav.Link as={Link} to="/about">About</Nav.Link>
         </Nav>
       </Navbar.Collapse>

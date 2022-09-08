@@ -609,6 +609,8 @@ const generateICDCorCTDCData = (dc) => {
         item["title"] = convert2Title(key);
         if ("Category" in value) {
             item["category"] = value.Category;
+        } else if ("Tags" in value) {
+            item["category"] = value.Tags.Category; 
         } else {
             item["category"] = "Undefined";
         }
@@ -704,8 +706,10 @@ const generateNewICDCorCTDCData = (dc) => {
         item["$schema"] = "http://json-schema.org/draft-06/schema#";
         item["id"] = key;
         item["title"] = convert2Title(key);
-        if ("Category" in value.Tags) {
-            item["category"] = value.Tags.Category;
+        if ("Category" in value) {
+            item["category"] = value.Category;
+        } else if ("Tags" in value) {
+            item["category"] = value.Tags.Category; 
         } else {
             item["category"] = "Undefined";
         }

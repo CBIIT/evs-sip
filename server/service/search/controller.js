@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const shared = require("./shared");
 // const git = require('nodegit');
-//const Excel = require("exceljs");
+// const Excel = require("exceljs");
 const export_excel = require('node-excel-export');
 const dataFilesPath = path.join(__dirname, "..", "..", "data_files");
 var syns = {};
@@ -1377,13 +1377,14 @@ const generateProperties = async function(req, res) {
 
 
 const generateCompareProperties = async function(req, res) {
+  try {
 	const datasetnew = {};
   const datasetold = {};
   const dataset = [];
-	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.3.0");
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.4.1");
   let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
@@ -1412,7 +1413,7 @@ const generateCompareProperties = async function(req, res) {
 				tmp.category = entry.category;
 				tmp.node = node;
 				tmp.property = prop;
-				let dict = prop_dict[prop];
+				// let dict = prop_dict[prop];
         let uid = entry.category + "." + node + "." + prop;
         tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
         datasetold[uid] = tmp;
@@ -1434,7 +1435,7 @@ const generateCompareProperties = async function(req, res) {
   for(let key in datasetold){
     if (!datasetnew[key]) {
       datasetold[key].newprop = 'no match';
-      datasetold[key].oldprop = datasetnew[key].property;
+      datasetold[key].oldprop = datasetold[key].property;
       dataset.push(datasetold[key])
     }
   }
@@ -1505,6 +1506,10 @@ const generateCompareProperties = async function(req, res) {
     // You can then return this straight
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
+  }
+  catch(e) {
+    console.log(e)
+  }
 }
 
 const generateCompareNodes = async function(req, res) {
@@ -1624,7 +1629,7 @@ const updateGDCPropertyMappings = async function(req, res) {
     "GDC_Property.xlsx"
   );
 
-  let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_props.js');
+  let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_props_updated.js');
   
   const workbook = new Excel.Workbook();
   await workbook.xlsx.readFile(file_path.replace(/\\/g, "/"));
@@ -1660,7 +1665,7 @@ const updateGDCPropertyMappings = async function(req, res) {
   const mapped_props = [];
 	const dataset = {};
   const dataoutput = [];
-	let GDCDict = await shared.getGDCDictionaryByVersion("2.3.0");
+	let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
 	
 	for(let node in GDCDict){
 		let entry = GDCDict[node];
@@ -1767,7 +1772,7 @@ const updateGDCPropertyMappings = async function(req, res) {
     // You can then return this straight
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
-    */ 
+    */
 }
 
 const addGDCDataMappings = async (req, res) => {

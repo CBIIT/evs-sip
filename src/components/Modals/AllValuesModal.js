@@ -370,11 +370,9 @@ const AllValuesModal = (props) => {
             <TotalLabel data={data}/>  
           </Modal.Title>
           <InputGroupStyled>
-            <InputGroup.Prepend>
-              <InputGroup.Text id="search-values-input">
-                <FontAwesomeIcon icon={faSearch}/>
-              </InputGroup.Text>
-            </InputGroup.Prepend>
+            <InputGroup.Text id="search-values-input">
+              <FontAwesomeIcon icon={faSearch}/>
+            </InputGroup.Text>
             <FormControl
               placeholder="Type at least 3 characters"
               aria-label="Search"

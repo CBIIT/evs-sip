@@ -8,8 +8,8 @@ import { getHighlightObj, sortSynonyms, browserDetection } from '../../shared';
 
 const ContainerStyled = styled(Container)`
   font-size: 1rem;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 12px;
+  padding-right: 12px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
   height: 45rem;

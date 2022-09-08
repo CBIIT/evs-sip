@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { apiSuggest } from '../../api';
 import styled from 'styled-components';
-import { Container, Row, Col, InputGroup, Button, Form} from 'react-bootstrap';
+import { Container, Row, Col, InputGroup, Button, FormControl} from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faCheck } from '@fortawesome/free-solid-svg-icons';
 import SuggestBox from '../Search/SuggestBox';
@@ -61,7 +61,7 @@ const SearchBox = styled.div`
 //   margin-bottom: 3rem;
 // `;
 
-const InputBox = styled(Form.Control)`
+const InputBox = styled(FormControl)`
   font-family: 'Lato-Bold', sans-serif;
   font-size: 1.125rem;
   padding: 0.5rem 1rem;
@@ -76,15 +76,21 @@ const InputBox = styled(Form.Control)`
   }
 `;
 
-const InputBoxBtnContainer = styled(InputGroup.Append)`
-  position: absolute;
+// const InputBoxBtnContainer = styled(InputGroup.Append)`
+//   position: absolute;
+//   right: 0.3125rem;
+//   top: 0.3125rem;
+//   bottom: 0.3125rem;
+//   z-index: 10;
+// `;
+
+const InputBoxButton = styled(Button)`
+  position: absolute !important;
+  z-index: 3 !important;
   right: 0.3125rem;
   top: 0.3125rem;
   bottom: 0.3125rem;
   z-index: 10;
-`;
-
-const InputBoxButton = styled(Button)`
   background-color: #D2D2D2;
   border-radius: 2rem !important;
   color: var(--white);
@@ -140,7 +146,7 @@ const SelectBtn = styled(Button)`
   }
 `;
 
-const FormGroupStyled = styled(Form.Group)`
+const FormGroupStyled = styled.div`
   width: 30rem;
   display: flex;
   justify-content: space-between;
@@ -156,6 +162,8 @@ const CheckboxLabel = styled.label`
   width: 8rem;
   inline-size: 8rem;
   line-height: 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
 `;
 
 const CheckboxBtn = styled.span`
@@ -273,7 +281,7 @@ const Search = () => {
   const selectDataToggleHandler = event => {
     setSelectDataSource({
       ...selectDataSource,
-      [event.target.name]: !event.target.checked
+      [event.target.name]: event.target.checked
     });
   };
 
@@ -319,11 +327,9 @@ const Search = () => {
                 onChange={suggestHandler}
                 onKeyDown={suggestKeyPressHandler}
               />
-              <InputBoxBtnContainer>
-                <InputBoxButton aria-label="search" onClick={() => searchTriggerRoute(searchState, selectDataSource)}>
-                  <InputBoxIcon icon={faArrowRight}/>
-                </InputBoxButton>
-              </InputBoxBtnContainer>
+              <InputBoxButton aria-label="search" onClick={() => searchTriggerRoute(searchState, selectDataSource)}>
+                <InputBoxIcon icon={faArrowRight}/>
+              </InputBoxButton>
             </InputGroup>
             <SuggestBox
               suggest={suggestState}

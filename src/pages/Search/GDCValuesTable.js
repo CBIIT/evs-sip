@@ -8,8 +8,8 @@ import { getHighlightObj, sortAlphabetically, sortSynonyms, browserDetection } f
 
 const ContainerStyled = styled(Container)`
   font-size: 1rem;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 12px;
+  padding-right: 12px;
   background-color: var(--white-bkgd);
   border-radius: 1rem;
   height: 45rem;
