@@ -378,7 +378,7 @@ const PropsTable = (props) => {
                     }
                   </div>
                 </Collapse>
-                {props.item.type !== undefined && props.item.type === 'enum' &&
+                {(props.item.type !== undefined && (props.item.type === 'enum' || props.item.type === 'array')) &&
                   <Row>
                     <ColRight xs={12}>
                       <AllValuesModal idterm={props.item.id}/>
