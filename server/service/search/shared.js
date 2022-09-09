@@ -9,7 +9,7 @@ let db = Datastore.create();
 const _ = require("lodash");
 const handleError = require("../../components/handleError");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
-const esapicontroller = require('../esapi/esapicontroller.js');
+const Property = require('./../../lib/Property');
 
 const folderPath = path.join(
   __dirname,
@@ -1031,10 +1031,13 @@ const processGdcResult = (result) => {
       continue;
     }
 
-    for (const propName in node.properties) {
-      let prop = node.properties[propName];
-      result[nodeName].properties[propName] = esapicontroller.transformGdcProperty(prop);
-    }
+    Object.entries(node.properties).forEach(([propertyName, property]) => {
+      const p = new Property({
+        name: propertyName,
+        ...property,
+      });
+      result[nodeName].properties[propertyName] = p.json;
+    });
   }
 
   return result;

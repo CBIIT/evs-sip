@@ -8,6 +8,7 @@ const shared = require("../search/shared");
 const xmlBuilder = require("../tools/xmlBuilder");
 const yaml = require("yamljs");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
+const Property = require('./../../lib/Property');
 const folderPath = path.join(
   __dirname,
   "..",
@@ -737,13 +738,16 @@ const processGDCResult = (result, node, prop) => {
             return;
           }
 
-          // Preprocess the property
-          property = transformGdcProperty(property);
+          const p = new Property({
+            name: propertyName,
+            ...property,
+          });
 
-          item['property_name'] = propertyName;
-          item['property_description'] = property.description;
-          item['type'] = property.type;
-          item['values'] = property.enum;
+          item = {
+            ...item,
+            ...p.json,
+          };
+
           dataList.push(item);
         });
       }
@@ -751,17 +755,12 @@ const processGDCResult = (result, node, prop) => {
       let propList =[];
       if (r.properties) {
         Object.entries(r.properties).forEach(([propertyName, property]) => {
-          // Preprocess the property
-          property = transformGdcProperty(property);
+          const p = new Property({
+            name: propertyName,
+            ...property,
+          });
 
-          let p ={
-            property_name: propertyName,
-            property_description: property.description,
-          };
-
-          p['type'] = (!property.enum) ? property.type : 'enum';
-          p['values'] = property.enum;
-          propList.push(p);             
+          propList.push(p.json);
         });
       }
       item['properties'] = propList;
@@ -775,33 +774,10 @@ const processGDCResult = (result, node, prop) => {
   return dataList;
 };
 
-/**
- * Formats a GDC property:
- * - <items.enum> becomes just <enum>
- * - <type> is removed if property is an enum
- * 
- * @param {Object} property 
- */
-const transformGdcProperty = (property) => {
-  // Move array-type property's <items.enum> to <enum>
-  if (property.type === 'array' && property.hasOwnProperty('items')) {
-    property.enum = property.items.enum;
-    delete property.items;
-  }
-
-  // Assign type `enum` to enum-type properties
-  if (!property.type && property.hasOwnProperty('enum')) {
-    property.type = 'enum';
-  }
-
-  return property;
-};
-
 module.exports = {
   searchP,
   getGraphicalICDCDictionary,
   getGraphicalCTDCDictionary,
   getGraphicalPCDCDictionary,
   getGraphicalGDCDictionary,
-  transformGdcProperty,
 };
