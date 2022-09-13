@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const shared = require("./shared");
 // const git = require('nodegit');
-// const Excel = require("exceljs");
+const Excel = require("exceljs");
 const export_excel = require('node-excel-export');
 const dataFilesPath = path.join(__dirname, "..", "..", "data_files");
 var syns = {};
@@ -629,7 +629,7 @@ const synchronziedLoadSynonmysfromNCIT = (ncitids, idx, next) => {
             d.synonyms.forEach((data) => {
               if (
                 checker_arr.indexOf(
-                  (data.name + "@#$" + data.termGroup + "@#$" + data.source)
+                  (data.name + "@#$" + data.termType + "@#$" + data.source)
                     .trim()
                     .toLowerCase()
                 ) !== -1
@@ -637,7 +637,7 @@ const synchronziedLoadSynonmysfromNCIT = (ncitids, idx, next) => {
                 return;
               let obj = {};
               obj.termName = data.name;
-              obj.termGroup = data.termGroup;
+              obj.termGroup = data.termType;
               obj.termSource = data.source;
               //only keep NCI synonyms
               if (obj.termSource == "NCI") {
@@ -648,7 +648,7 @@ const synchronziedLoadSynonmysfromNCIT = (ncitids, idx, next) => {
                 }
               }
               checker_arr.push(
-                (data.name + "@#$" + data.termGroup + "@#$" + data.source)
+                (data.name + "@#$" + data.termType + "@#$" + data.source)
                   .trim()
                   .toLowerCase()
               );
@@ -733,7 +733,6 @@ const preloadNCItSynonyms = (req, res) => {
 };
 
 const preloadGDCDataMappings = async (req, res) => {
-  /*
 	let file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'GDC_Data_Mappings.xlsx');
 	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	console.log(file_path.replace(/\\/g,"/"));
@@ -779,12 +778,11 @@ const preloadGDCDataMappings = async (req, res) => {
 	fs.writeFileSync(output_file_path, JSON.stringify(mappings), err => {
 		if (err) return logger.error(err);
 	});
-	*/
+  
   res.json({ result: "success" });
 };
 
 const updateGDCDataMappings = async (req, res) => {
-  /*
   let file_path = path.join(
     __dirname,
     "..",
@@ -827,13 +825,13 @@ const updateGDCDataMappings = async (req, res) => {
       current_mappings[prop_id].forEach((value_entry) => {
         if (value_entry.nm == value.trim()) {
           found = true;
-          if (ncit != "") {
+          if (ncit !== "") {
             value_entry.n_c = ncit.split("|");
           }
-          if (icdo != "") {
+          if (icdo !== "") {
             value_entry.i_c = icdo;
           }
-          if (icdo_s != "") {
+          if (icdo_s !== "") {
             value_entry.i_c_s = icdo_s.split("|");
           }
         }
@@ -870,7 +868,6 @@ const updateGDCDataMappings = async (req, res) => {
       if (err) return logger.error(err);
     }
   );
-  */
   res.json({ result: "success" });
 };
 
@@ -1619,7 +1616,6 @@ const generateCompareNodes = async function(req, res) {
 
 
 const updateGDCPropertyMappings = async function(req, res) {
-  /*
   let file_path = path.join(
     __dirname,
     "..",
@@ -1772,7 +1768,6 @@ const updateGDCPropertyMappings = async function(req, res) {
     // You can then return this straight
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
-    */
 }
 
 const addGDCDataMappings = async (req, res) => {
