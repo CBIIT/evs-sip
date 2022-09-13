@@ -392,7 +392,7 @@ const helper_gdc = (fileJson, syns) => {
     }
 
     // property type
-    if (p.enum !== undefined && p.enum.length > 0) {
+    if (p.type === undefined && p.enum !== undefined && p.enum.length > 0) {
       p.type = 'enum';
     }
     allProperties.push(p);

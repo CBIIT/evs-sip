@@ -145,6 +145,14 @@ const IndicatorContent = styled.div`
   transform: translateY(-50%);
 `;
 
+const Description = styled.p`
+  margin-bottom: 0;
+`;
+
+const PropType = styled.span`
+  font-size: 14px;
+`;
+
 const PropsTable = (props) => {
   let items = JSON.parse(JSON.stringify(props.properties));
   let properties = [];
@@ -314,7 +322,7 @@ const PropsTable = (props) => {
     };
 
     return (
-      <p>
+      <Description>
         <span dangerouslySetInnerHTML={{ __html: '<b>Definition:</b> ' + props.desc.substring(0, 138)}}></span>
         {props.desc.length >= 138 &&
           <>
@@ -324,7 +332,7 @@ const PropsTable = (props) => {
             </LinkDesc>
           </>
         }
-      </p>
+      </Description>
     );
   };
 
@@ -378,9 +386,12 @@ const PropsTable = (props) => {
                     }
                   </div>
                 </Collapse>
-                {props.item.type !== undefined && props.item.type === 'enum' &&
+                {(props.item.type !== undefined && (props.item.type === 'enum' || props.item.type === 'array')) &&
                   <Row>
-                    <ColRight xs={12}>
+                    <Col xs={4}>
+                      <PropType>type: {props.item.type}</PropType>
+                    </Col>
+                    <ColRight xs={8}>
                       <AllValuesModal idterm={props.item.id}/>
                       <ToCompareModal idterm={props.item.id}/>
                     </ColRight>
