@@ -34,8 +34,25 @@ const Property = class {
       if (schema.hasOwnProperty('enum')) {
         this._type = 'enum';
         this._values = schema.enum;
+      } else if (schema.hasOwnProperty('oneOf')) {
+        const types = [];
+
+        // Pick a type that's not `null`
+        schema.oneOf.forEach(e => {
+          // Skip elements that don't specify a type
+          if (!e.hasOwnProperty('type')) {
+            return;
+          }
+
+          types.push(e.type);
+        });
+
+        types.sort();
+        this._type = types.reduce((finalType, currType) => {
+          return `${finalType} | ${currType}`;
+        });
       } else {
-        // TODO handle things like oneOf
+        // TODO handle other cases
       }
     } else { // Type is explicitly specified
       if (schema.type === 'array') { // Handle arrays
