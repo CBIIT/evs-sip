@@ -1036,7 +1036,8 @@ const processGdcResult = (result) => {
         name: propertyName,
         ...property,
       });
-      result[nodeName].properties[propertyName] = p.json;
+
+      result[nodeName].properties[propertyName] = p.graphJson;
     });
   }
 

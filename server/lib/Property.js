@@ -1,15 +1,22 @@
 /**
  * Models a node's property
+ * TODO describe _termDef
  * 
  * @property {string} _description A description of the property
+ * @property {object} _enumDef Definitions of the property's values
  * @property {string} _name The property's name
+ * @property {object} _termDef Idk
  * @property {string} _type The property's type
  * @property {string[]} _values The values that the property can have
+ * @property {object} json Implemented by a getter
+ * @property {object} graphJson Implemented by a getter
  * @method _determineType
  */
 const Property = class {
   _description;
+  _enumDef;
   _name;
+  _termDef;
   _type;
   _values;
 
@@ -19,9 +26,13 @@ const Property = class {
    * @param {object} schema The JSON read from the property's YAML file
    */
   constructor(schema) {
-    this._determineType(schema);
-    this._name = schema.name;
     this._description = schema.description;
+    this._enumDef = schema.enumDef;
+    this._name = schema.name;
+    this._termDef = schema.termDef;
+
+    // Set the property's type
+    this._determineType(schema);
   }
 
   /**
@@ -70,6 +81,8 @@ const Property = class {
 
   /**
    * The property's JSON representation
+   * 
+   * @returns object
    */
   get json() {
     const json = {
@@ -78,6 +91,23 @@ const Property = class {
       type: this._type,
       values: this._values,
     };
+
+    return json;
+  }
+
+  /**
+   * The property's JSON representation for graph use
+   * 
+   * @returns object
+   */
+  get graphJson() {
+    const json = {
+      description: this._description,
+      enum: this._values,
+      enumDef: this._enumDef,
+      termDef: this._termDef,
+      type: this._type,
+    }
 
     return json;
   }
