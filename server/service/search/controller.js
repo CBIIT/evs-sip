@@ -1301,7 +1301,6 @@ const generateProperties = async function(req, res) {
 		//let uid = node + "/" + entry.category + "/gdc";
 		if(entry.properties){
 			let prop_dict = entry.properties;
-      console.log(prop_dict);
 			for(let prop in prop_dict){
 				let tmp = {};
 				tmp.category = entry.category;
