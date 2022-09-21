@@ -374,18 +374,18 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   };
   let result;
 
-  // TODO - fix result being empty after making same request for 2nd time
-  // if (project) {
-  //   result = cache.getValue(`pcdc_dict_${project}`);
-  // } else {
-  //   result = cache.getValue("pcdc_dict");
-  // }
+  // Read from cache
+  if (project) {
+    result = cache.getValue(`public_pcdc_dict_${project}`);
+  } else {
+    result = cache.getValue("public_pcdc_dict");
+  }
 
   if (true || result === undefined) {
     let jsonData = shared.readPCDCMapping();
     result = generatePCDCData(jsonData, {});
     //result = generatePCDCData(jsonData, {Relationships: {}});
-    cache.setValue("pcdc_dict", result, config.item_ttl);
+    cache.setValue("public_pcdc_dict", result, config.item_ttl);
   }
 
   // Obtain nodes from specified project
@@ -417,7 +417,13 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
       project_result[n].links.push(linkItem);
     }
   });
-  cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
+
+  // Cache the results
+  if (project) {
+    cache.setValue(`public_pcdc_dict_${project}`, project_result, config.item_ttl);
+  } else {
+    cache.setValue("public_pcdc_dict", project_result, config.item_ttl);
+  }
 
   // Handle empty results
   if (project_result.results.length === 0 ) {
@@ -442,7 +448,7 @@ const getPcdcNodes = (nodes, desiredNode, desiredProp) => {
   const desiredNodes = [];
 
   // Gather desired nodes into an array
-  for(const nodeName in nodes) {
+  for (const nodeName in nodes) {
     const node = nodes[nodeName];
     const isCorrectNode = node.node_name?.toLowerCase() === desiredNode?.toLowerCase();
 
