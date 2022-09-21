@@ -1310,32 +1310,43 @@ const getCompareResult_conflict = async function(searchText, from , limit) {
 
 const getGraphicalPCDCDictionary = (project) => {
   let project_result = cache.getValue("pcdc_dict_" + project);
-  if (project_result == undefined) {
-    let result = cache.getValue("pcdc_dict");
-    if (result == undefined) {
-      let jsonData = readPCDCMapping();
-      result = generatePCDCData(jsonData, {});
-      //result = generatePCDCData(jsonData, {Relationships: {}});
-      cache.setValue("pcdc_dict", result, config.item_ttl);
+
+  // Early return for successful cache retrieval
+  if (project_result !== undefined) {
+    return project_result;
+  }
+
+  let result = cache.getValue("pcdc_dict");
+
+  if (result === undefined) {
+    let jsonData = readPCDCMapping();
+    result = generatePCDCData(jsonData, {});
+    //result = generatePCDCData(jsonData, {Relationships: {}});
+    cache.setValue("pcdc_dict", result, config.item_ttl);
+  }
+
+  project_result = result[project];
+  let nodes = Object.keys(project_result);
+
+  //create fake relationship for graphical display purpose
+  nodes.forEach((n, i) => {
+    if (i - 4 >= 0) {
+      let linkItem = {};
+      linkItem["name"] = nodes[i - 4];
+      linkItem["backref"] = n;
+      linkItem["label"] = "of_pcdc";
+      linkItem["target_type"] = nodes[i - 4];
+      linkItem["required"] = false;
+
+      project_result[n].links.push(linkItem);
     }
+  });
 
-    project_result = result[project];
-    let nodes = Object.keys(project_result);
-
-    //create fake relationship for graphical display purpose
-    nodes.forEach((n, i) => {
-      if (i - 4 >= 0) {
-        let linkItem = {};
-        linkItem["name"] = nodes[i - 4];
-        linkItem["backref"] = n;
-        linkItem["label"] = "of_pcdc";
-        linkItem["target_type"] = nodes[i - 4];
-        linkItem["required"] = false;
-
-        project_result[n].links.push(linkItem);
-      }
-    });
-    cache.setValue("pcdc_dict_" + project, project_result, config.item_ttl);
+  // Cache the results
+  if (project) {
+    result = cache.setValue(`pcdc_dict_${project}`, project_result, config.item_ttl);
+  } else {
+    result = cache.setValue("pcdc_dict", project_result, config.item_ttl);
   }
 
   return project_result;

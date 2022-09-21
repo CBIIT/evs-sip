@@ -48,7 +48,7 @@ const Property = class {
       } else if (schema.hasOwnProperty('oneOf')) {
         const types = [];
 
-        // Pick a type that's not `null`
+        // Gather the possible types
         schema.oneOf.forEach(e => {
           // Skip elements that don't specify a type
           if (!e.hasOwnProperty('type')) {
