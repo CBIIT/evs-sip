@@ -25,10 +25,10 @@ router.get("/p/local/vs", controller.getGDCData);
 router.get('/compareAllWithGDCDictionary', controller.compareAllWithGDCDictionary);
 router.get('/exportCompareResult', controller.exportCompareResult);
 router.get('/exportAllCompareResult', controller.exportAllCompareResult);
-//router.get('/generateProperties', controller.generateProperties);
+router.get('/generateGDCPropertiesReport', controller.generateGDCPropertiesReport);
 //router.get('/generateCompareProperties', controller.generateCompareProperties);
 //router.get('/generateCompareNodes', controller.generateCompareNodes);
-//router.get('/updateGDCPropertyMappings', controller.updateGDCPropertyMappings);
+router.get('/updateGDCPropertyMappings', controller.updateGDCPropertyMappings);
 //router.get("/updateGDCDataMappings", controller.updateGDCDataMappings);
 //router.get("/preloadPCDCDataMappings", controller.preloadPCDCDataMappings);
 

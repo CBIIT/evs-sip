@@ -1290,23 +1290,25 @@ const exportAllCompareResult = async function(req, res){
 	res.send(report);
 }
 
-const generateProperties = async function(req, res) {
+const generateGDCPropertiesReport = async function(req, res) {
 	const dataset = [];
-	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
+	let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
+	let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
 		let entry = GDCDict[node];
-		let uid = node + "/" + entry.category + "/gdc";
 		if(entry.properties){
 			let prop_dict = entry.properties;
 			for(let prop in prop_dict){
 				let tmp = {};
+				let uid = entry.category + "." + node + "." + prop;
 				tmp.category = entry.category;
 				tmp.node = node;
 				tmp.property = prop;
 				let dict = prop_dict[prop];
-				tmp.ncit = dict.termDef && dict.termDef.source  && dict.termDef.source == "NCIt" ? (dict.termDef.term_id || dict.termDef.cde_id ) : "";
+				tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
+				//tmp.ncit = dict.termDef && dict.termDef.source && dict.termDef.source === "NCIt" ? (dict.termDef.term_id) : "";
+				tmp.cdeid = dict.termDef && dict.termDef.source && dict.termDef.source === "caDSR" ? (dict.termDef.cde_id) : "";
 				dataset.push(tmp);
 			}
 		} 
@@ -1346,6 +1348,11 @@ const generateProperties = async function(req, res) {
       },
       ncit: {
         displayName: 'NCIt Code',
+        headerStyle: styles.cellPink,
+        width: 220 // <- width in pixels
+      },
+      cdeid: {
+        displayName: 'CDE ID',
         headerStyle: styles.cellPink,
         width: 220 // <- width in pixels
       }
@@ -1959,7 +1966,7 @@ module.exports = {
 	compareAllWithGDCDictionary,
 	exportCompareResult,
 	exportAllCompareResult,
-	generateProperties,
+	generateGDCPropertiesReport,
   generateCompareProperties,
   generateCompareNodes,
   updateGDCPropertyMappings,
