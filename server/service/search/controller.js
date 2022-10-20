@@ -468,7 +468,7 @@ const getGraphicalCTDCDictionary = (req, res) => {
 };
 
 const getGraphicalPCDCDictionary = (req, res) => {
-  let project = req.query.project == "" ? "AML" : req.query.project;
+  let project = (req.query.project !== undefined && req.query.project !== '') ? req.query.project : 'AML';
   let jsonData = shared.getGraphicalPCDCDictionary(project);
   res.json(jsonData);
 };
@@ -1290,90 +1290,234 @@ const exportAllCompareResult = async function(req, res){
 	res.send(report);
 }
 
-const generateProperties = async function(req, res) {
-	const dataset = [];
-	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
-	
-	for(let node in GDCDict){
-		let entry = GDCDict[node];
-		let uid = node + "/" + entry.category + "/gdc";
-		if(entry.properties){
-			let prop_dict = entry.properties;
-			for(let prop in prop_dict){
-				let tmp = {};
-				tmp.category = entry.category;
-				tmp.node = node;
-				tmp.property = prop;
-				let dict = prop_dict[prop];
-				tmp.ncit = dict.termDef && dict.termDef.source  && dict.termDef.source == "NCIt" ? (dict.termDef.term_id || dict.termDef.cde_id ) : "";
-				dataset.push(tmp);
-			}
-		} 
-	}
+const generateGDCPropertiesReport = async function(req, res) {
+  const dataset = [];
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
+  let prop_mapping = shared.readGDCProps();
+  
+  for(let node in GDCDict){
+    let entry = GDCDict[node];
+    if(entry.properties){
+      let prop_dict = entry.properties;
+      for(let prop in prop_dict){
+        let tmp = {};
+        let uid = entry.category + "." + node + "." + prop;
+        tmp.category = entry.category;
+        tmp.node = node;
+        tmp.property = prop;
+        let dict = prop_dict[prop];
+        tmp.ncit = prop_mapping[uid] !== undefined ? prop_mapping[uid] : '';
+        tmp.cdeid = dict.termDef && dict.termDef.source && dict.termDef.source === "caDSR" ? (dict.termDef.cde_id) : "";
+        dataset.push(tmp);
+      }
+    } 
+  }
 
   // You can define styles as json object
-	const styles = {
+  const styles = {
     cellPink: {
       fill: {
-      fgColor: {
-        rgb: 'FF00FF00'
-      }
+        fgColor: {
+          rgb: '1F497D'
+        }
+      },
+      font:{
+        color: {
+          rgb: 'FFFFFF'
+        }
       }
     }
-    };
+  };
     
-    //Array of objects representing heading rows (very top)
-    const heading = [
-    ];
+  //Array of objects representing heading rows (very top)
+  const heading = [
+  ];
     
-    //Here you specify the export structure
-    const specification = {
-      category: { // <- the key should match the actual data key
-        displayName: 'Category', // <- Here you specify the column header
-        headerStyle: styles.cellPink, // <- Header style
-        width: 220 // <- width in pixels
-      },
-      node: {
-        displayName: 'Node',
-        headerStyle: styles.cellPink,
-        width: 220 // <- width in chars (when the number is passed as string)
-      },
-      property: {
-        displayName: 'Property',
-        headerStyle: styles.cellPink,
-        width: 220 // <- width in pixels
-      },
-      ncit: {
-        displayName: 'NCIt Code',
-        headerStyle: styles.cellPink,
-        width: 220 // <- width in pixels
-      }
+  //Here you specify the export structure
+  const specification = {
+    category: { // <- the key should match the actual data key
+      displayName: 'Category', // <- Here you specify the column header
+      headerStyle: styles.cellPink, // <- Header style
+      width: 220 // <- width in pixels
+    },
+    node: {
+      displayName: 'Node',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in chars (when the number is passed as string)
+    },
+    property: {
+      displayName: 'Property',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    ncit: {
+      displayName: 'NCIt Code',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    cdeid: {
+      displayName: 'CDE ID',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
     }
+  }
     
-    // Define an array of merges. 1-1 = A:1
-    // The merges are independent of the data.
-    // A merge will overwrite all data _not_ in the top-left cell.
-    const merges = [];
-    
-    // Create the excel report.
-    // This function will return Buffer
-    const report = export_excel.buildExport(
-    [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
-      {
-      name: 'Report', // <- Specify sheet name (optional)
-      heading: heading, // <- Raw heading array (optional)
-      merges: merges, // <- Merge cell ranges
-      specification: specification, // <- Report specification
-      data: dataset // <-- Report data
-      }
-    ]
-    );
-    
-    // You can then return this straight
-    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
-    res.send(report);
+  // Define an array of merges. 1-1 = A:1
+  // The merges are independent of the data.
+  // A merge will overwrite all data _not_ in the top-left cell.
+  const merges = [];
+  
+  // Create the excel report.
+  // This function will return Buffer
+  const report = export_excel.buildExport(
+  [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+    {
+    name: 'Report', // <- Specify sheet name (optional)
+    heading: heading, // <- Raw heading array (optional)
+    merges: merges, // <- Merge cell ranges
+    specification: specification, // <- Report specification
+    data: dataset // <-- Report data
+    }
+  ]
+  );
+  
+  // You can then return this straight
+  res.attachment('GDC_Properties_Data_Mapping.xlsx'); // This is sails.js specific (in general you need to set headers)
+  res.send(report);
 }
+
+
+const generateGDCValuesReport = async function(req, res) {
+  const dataset = [];
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
+  let gdc_values = shared.readGDCValues();
+  let syns = shared.readNCItDetails();
+
+  for(let node in GDCDict){
+    let entry = GDCDict[node];
+    if(entry.properties){
+      let prop_dict = entry.properties;
+      for(let prop in prop_dict){
+        let uid = entry.category + "." + node + "." + prop;
+        let prop_enum = prop_dict[prop] !== undefined && prop_dict[prop].enum !== undefined && prop_dict[prop].enum.length > 0 ? prop_dict[prop].enum : [];
+        let mappings = gdc_values[uid] !== undefined ? gdc_values[uid] : [];
+
+        for(let value of prop_enum){
+          let tmp = {};
+          tmp.category = entry.category;
+          tmp.node = node;
+          tmp.property = prop;
+          tmp.value = value;
+          tmp.ncit = [];
+          tmp.icdo3 = '';
+          tmp.icdoS = [];
+          tmp.ncitPV = [];
+
+          let map = mappings.find(({ nm }) => nm === value);
+          if(map !== undefined){
+            tmp.ncit = Array.isArray(map.n_c) ? map.n_c.join('|') : '';
+            tmp.icdo3 = map.i_c;
+            tmp.icdoS = Array.isArray(map.i_c_s) ? map.i_c_s.join('|') : ''
+            for(let code of map.n_c){
+              tmp.ncitPV.push(syns[code] !== undefined ? syns[code].label : '');
+            }
+            tmp.ncitPV = Array.isArray(tmp.ncitPV) ? tmp.ncitPV.join('|') : '';
+          }
+
+          dataset.push(tmp);
+        }
+      }
+    } 
+  }
+
+  // You can define styles as json object
+  const styles = {
+    cellPink: {
+      fill: {
+        fgColor: {
+          rgb: '1F497D'
+        }
+      },
+      font:{
+        color: {
+          rgb: 'FFFFFF'
+        }
+      }
+    }
+  };
+    
+  //Array of objects representing heading rows (very top)
+  const heading = [
+  ];
+  
+  //Here you specify the export structure
+  const specification = {
+    category: { // <- the key should match the actual data key
+      displayName: 'Category', // <- Here you specify the column header
+      headerStyle: styles.cellPink, // <- Header style
+      width: 220 // <- width in pixels
+    },
+    node: {
+      displayName: 'Node',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in chars (when the number is passed as string)
+    },
+    property: {
+      displayName: 'Property',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    value: {
+      displayName: 'GDC Values',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    ncit: {
+      displayName: 'NCIt Code',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    ncitPV: {
+      displayName: 'NCIt PV',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    icdo3: {
+      displayName: 'ICDO3 Code',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    },
+    icdoS: {
+      displayName: 'ICDO3 String',
+      headerStyle: styles.cellPink,
+      width: 220 // <- width in pixels
+    }
+  }
+  
+  // Define an array of merges. 1-1 = A:1
+  // The merges are independent of the data.
+  // A merge will overwrite all data _not_ in the top-left cell.
+  const merges = [];
+  
+  // Create the excel report.
+  // This function will return Buffer
+  const report = export_excel.buildExport(
+  [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+    {
+    name: 'Report', // <- Specify sheet name (optional)
+    heading: heading, // <- Raw heading array (optional)
+    merges: merges, // <- Merge cell ranges
+    specification: specification, // <- Report specification
+    data: dataset // <-- Report data
+    }
+  ]
+  );
+  
+  // You can then return this straight
+  res.attachment('GDC_Values_Data_Mapping.xlsx'); // This is sails.js specific (in general you need to set headers)
+  res.send(report);
+}
+
 
 
 const generateCompareProperties = async function(req, res) {
@@ -1959,7 +2103,8 @@ module.exports = {
 	compareAllWithGDCDictionary,
 	exportCompareResult,
 	exportAllCompareResult,
-	generateProperties,
+	generateGDCPropertiesReport,
+  generateGDCValuesReport,
   generateCompareProperties,
   generateCompareNodes,
   updateGDCPropertyMappings,
