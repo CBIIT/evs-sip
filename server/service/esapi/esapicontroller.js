@@ -420,9 +420,9 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
 
   // Cache the results
   if (project) {
-    result = cache.setValue(`public_pcdc_dict_${project}`, project_result, config.item_ttl);
+    cache.setValue(`public_pcdc_dict_${project}`, project_result, config.item_ttl);
   } else {
-    result = cache.setValue("public_pcdc_dict", project_result, config.item_ttl);
+    cache.setValue("public_pcdc_dict", project_result, config.item_ttl);
   }
 
   // Handle empty results

@@ -1327,7 +1327,6 @@ const getGraphicalPCDCDictionary = (project) => {
 
   project_result = result[project];
   let nodes = Object.keys(project_result);
-
   //create fake relationship for graphical display purpose
   nodes.forEach((n, i) => {
     if (i - 4 >= 0) {
@@ -1344,9 +1343,9 @@ const getGraphicalPCDCDictionary = (project) => {
 
   // Cache the results
   if (project) {
-    result = cache.setValue(`pcdc_dict_${project}`, project_result, config.item_ttl);
+    cache.setValue(`pcdc_dict_${project}`, project_result, config.item_ttl);
   } else {
-    result = cache.setValue("pcdc_dict", project_result, config.item_ttl);
+    cache.setValue("pcdc_dict", project_result, config.item_ttl);
   }
 
   return project_result;
