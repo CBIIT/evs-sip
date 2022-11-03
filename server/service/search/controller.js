@@ -1400,6 +1400,8 @@ const generateGDCValuesReport = async function(req, res) {
       for(let prop in prop_dict){
         let uid = entry.category + "." + node + "." + prop;
         let prop_enum = prop_dict[prop] !== undefined && prop_dict[prop].enum !== undefined && prop_dict[prop].enum.length > 0 ? prop_dict[prop].enum : [];
+        prop_enum = prop_dict[prop] !== undefined && prop_dict[prop].items !== undefined && prop_dict[prop].items.enum !== undefined && prop_dict[prop].items.enum.length > 0 ? prop_dict[prop].items.enum : prop_enum;
+
         let mappings = gdc_values[uid] !== undefined ? gdc_values[uid] : [];
         let deprecated_enum = prop_dict[prop] !== undefined && prop_dict[prop].deprecated_enum !== undefined && prop_dict[prop].deprecated_enum.length > 0 ? prop_dict[prop].deprecated_enum : [];
 
