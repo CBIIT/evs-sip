@@ -1401,6 +1401,7 @@ const generateGDCValuesReport = async function(req, res) {
         let uid = entry.category + "." + node + "." + prop;
         let prop_enum = prop_dict[prop] !== undefined && prop_dict[prop].enum !== undefined && prop_dict[prop].enum.length > 0 ? prop_dict[prop].enum : [];
         let mappings = gdc_values[uid] !== undefined ? gdc_values[uid] : [];
+        let deprecated_enum = prop_dict[prop] !== undefined && prop_dict[prop].deprecated_enum !== undefined && prop_dict[prop].deprecated_enum.length > 0 ? prop_dict[prop].deprecated_enum : [];
 
         for(let value of prop_enum){
           let tmp = {};
@@ -1412,6 +1413,10 @@ const generateGDCValuesReport = async function(req, res) {
           tmp.icdo3 = '';
           tmp.icdoS = [];
           tmp.ncitPV = [];
+
+          if (deprecated_enum.includes(value)) {
+            continue;
+          }
 
           let map = mappings.find(({ nm }) => nm === value);
           if(map !== undefined){
@@ -1427,7 +1432,7 @@ const generateGDCValuesReport = async function(req, res) {
           dataset.push(tmp);
         }
       }
-    } 
+    }
   }
 
   // You can define styles as json object
