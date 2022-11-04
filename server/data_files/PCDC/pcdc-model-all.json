@@ -1304,6 +1304,11 @@
               "v_PT": ""
             },
             {
+              "v_name": "",
+              "v_n_code": "C190021",
+              "v_PT": ""
+            },
+            {
               "v_name": "Other",
               "v_n_code": "C17649",
               "v_PT": ""
@@ -2646,7 +2651,7 @@
         {
           "p_name": "CHROMOSOME",
           "p_n_code": "C13202",
-          "p_desc": "One of the bodies in the cell nucleus that is the bearer of genes, has the form of a delicate chromatin filament during interphase, contracts to form a compact cylinder segmented into two arms by the centromere during metaphase and anaphase stages of cell division, and is capable of reproducing its physical and chemical structure through successive cell divisions.",
+          "p_desc": "A structure found in cells that is comprised of a strand of linearized double-stranded DNA plus proteins that package the DNA in a condensed coil form and regulate chromosomal function.",
           "p_type": "string",
           "values": []
         },
@@ -3218,7 +3223,7 @@
           "values": []
         },
         {
-          "p_name": "IMT_TYPE",
+          "p_name": "CIMT_TYPE",
           "p_n_code": "C173289",
           "p_desc": "The type of cellular immunotherapy.",
           "p_type": "enum",
@@ -9392,7 +9397,7 @@
         {
           "p_name": "CHROMOSOME",
           "p_n_code": "C13202",
-          "p_desc": "One of the bodies in the cell nucleus that is the bearer of genes, has the form of a delicate chromatin filament during interphase, contracts to form a compact cylinder segmented into two arms by the centromere during metaphase and anaphase stages of cell division, and is capable of reproducing its physical and chemical structure through successive cell divisions.",
+          "p_desc": "A structure found in cells that is comprised of a strand of linearized double-stranded DNA plus proteins that package the DNA in a condensed coil form and regulate chromosomal function.",
           "p_type": "string",
           "values": []
         },
@@ -14000,7 +14005,7 @@
         {
           "p_name": "CHROMOSOME",
           "p_n_code": "C13202",
-          "p_desc": "One of the bodies in the cell nucleus that is the bearer of genes, has the form of a delicate chromatin filament during interphase, contracts to form a compact cylinder segmented into two arms by the centromere during metaphase and anaphase stages of cell division, and is capable of reproducing its physical and chemical structure through successive cell divisions.",
+          "p_desc": "A structure found in cells that is comprised of a strand of linearized double-stranded DNA plus proteins that package the DNA in a condensed coil form and regulate chromosomal function.",
           "p_type": "string",
           "values": []
         },
@@ -17263,7 +17268,7 @@
         {
           "p_name": "CHROMOSOME",
           "p_n_code": "C13202",
-          "p_desc": "One of the bodies in the cell nucleus that is the bearer of genes, has the form of a delicate chromatin filament during interphase, contracts to form a compact cylinder segmented into two arms by the centromere during metaphase and anaphase stages of cell division, and is capable of reproducing its physical and chemical structure through successive cell divisions.",
+          "p_desc": "A structure found in cells that is comprised of a strand of linearized double-stranded DNA plus proteins that package the DNA in a condensed coil form and regulate chromosomal function.",
           "p_type": "string",
           "values": []
         },
@@ -18561,7 +18566,7 @@
         {
           "p_name": "STUDY_TYPE",
           "p_n_code": "C142175",
-          "p_desc": "The nature of the investigation or the investigational use for which clinical study is being done.",
+          "p_desc": "The nature of the investigation or the investigational use for which the study is being done.",
           "p_type": "enum",
           "values": [
             {
@@ -25316,7 +25321,7 @@
             },
             {
               "v_name": "Contraction",
-              "v_n_code": "C30085",
+              "v_n_code": "C75585",
               "v_PT": ""
             },
             {
@@ -25550,7 +25555,7 @@
         {
           "p_name": "LE_CTCAE_VERSION",
           "p_n_code": "C185691",
-          "p_desc": "The version ofthe  Common Terminology Criteria for Adverse Events (CTCAE) Terminology.",
+          "p_desc": "The version of the Common Terminology Criteria for Adverse Events (CTCAE) Terminology.",
           "p_type": "string",
           "values": []
         }
@@ -26224,7 +26229,7 @@
           "values": [
             {
               "v_name": "Neo-Adjuvant",
-              "v_n_code": "C158708",
+              "v_n_code": "C15665",
               "v_PT": ""
             },
             {
@@ -26267,8 +26272,8 @@
         },
         {
           "p_name": "AGE_AT_TXASSIGN",
-          "p_n_code": "C168852",
-          "p_desc": "Age of subject (in days) when their neutrophil count exceeded a threshold of 500 (ANC/mm3) during the course.",
+          "p_n_code": "C175529",
+          "p_desc": "Age of subject (in days) when the treatment was assigned.",
           "p_type": "number",
           "values": []
         }
@@ -31504,10 +31509,10 @@
           "values": []
         },
         {
-          "p_name": "NECROSIS",
-          "p_n_code": "C186651",
-          "p_desc": "The qualitative/quantitative value for the percent of necrosis.",
-          "p_type": "enum",
+          "p_name": "NECROSIS_PCT",
+          "p_n_code": "C159481",
+          "p_desc": "A quantitative measurement of the percent of cells undergoing necrosis compared to the number of total cells present in a sample.",
+          "p_type": "number",
           "values": [
             {
               "v_name": "<= 90% Necrosis",
@@ -31532,10 +31537,10 @@
           ]
         },
         {
-          "p_name": "NECROSIS_PCT",
-          "p_n_code": "C159481",
-          "p_desc": "A quantitative measurement of the percent of cells undergoing necrosis compared to the number of total cells present in a sample.",
-          "p_type": "number",
+          "p_name": "NECROSIS",
+          "p_n_code": "C186651",
+          "p_desc": "The qualitative/quantitative value for the percent of necrosis.",
+          "p_type": "enum",
           "values": []
         }
       ]
@@ -32012,7 +32017,7 @@
           "values": [
             {
               "v_name": "MUGA Scan",
-              "v_n_code": "C141051",
+              "v_n_code": "C38073",
               "v_PT": ""
             },
             {
