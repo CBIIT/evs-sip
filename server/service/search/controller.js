@@ -732,6 +732,22 @@ const preloadNCItSynonyms = (req, res) => {
   }
 };
 
+const listNCItSynonyms = (req, res) => {
+  let unloaded_ncits = [] //create a personal array of ncit code to update manual
+  if (unloaded_ncits && unloaded_ncits.length > 0) {
+    synchronziedLoadSynonmysfromNCIT(unloaded_ncits, 0, (data) => {
+      if (data === "Success") {
+        unloaded_ncits = [];
+        res.end("Success!!");
+      } else {
+        res.write(data);
+      }
+    });
+  } else {
+    res.end("Success with no data processed!!");
+  }
+};
+
 const preloadGDCDataMappings = async (req, res) => {
   /*
 	let file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'GDC_Data_Mappings.xlsx');
@@ -857,7 +873,7 @@ const updateGDCDataMappings = async (req, res) => {
         } else {
           entry.i_c_s = "";
         }
-        entry.term_type = "PT";
+        entry.term_type = "";
         current_mappings[prop_id].push(entry);
       }
     }
@@ -2104,6 +2120,7 @@ module.exports = {
 	getValuesForGraphicalView,
 	preloadNCItSynonyms_old,
   preloadNCItSynonyms,
+  listNCItSynonyms,
 	preloadGDCDataMappings,
   updateGDCDataMappings,
   preloadPCDCDataMappings,
