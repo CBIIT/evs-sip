@@ -386,21 +386,18 @@ const PropsTable = (props) => {
                     }
                   </div>
                 </Collapse>
-                {props.item.type !== undefined && props.item.type !== 'enum' &&
-                  <Row>
-                    <Col xs={12}>
-                      <PropType>type: {props.item.type}</PropType>
-                    </Col>
-                  </Row>
-                }
-                {props.item.type !== undefined && props.item.type === 'enum' &&
+                {props.item.type !== undefined && 
                   <Row>
                     <Col xs={4}>
                       <PropType>type: {props.item.type}</PropType>
                     </Col>
                     <ColRight xs={8}>
-                      <AllValuesModal idterm={props.item.id}/>
-                      <ToCompareModal idterm={props.item.id}/>
+                    {(props.item.type === 'enum' || props.item.type === 'array') &&
+                      <>
+                        <AllValuesModal idterm={props.item.id}/>
+                        <ToCompareModal idterm={props.item.id}/>
+                      </>
+                    }
                     </ColRight>
                   </Row>
                 }

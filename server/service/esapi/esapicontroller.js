@@ -8,6 +8,7 @@ const shared = require("../search/shared");
 const xmlBuilder = require("../tools/xmlBuilder");
 const yaml = require("yamljs");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
+const Property = require('./../../lib/Property');
 const folderPath = path.join(
   __dirname,
   "..",
@@ -107,7 +108,7 @@ const getGraphicalGDCDictionary = async function (node, prop) {
     var termsEnumJson = yaml.load(folderPath + "/_terms_enum.yaml");
     jsonData["_terms_enum.yaml"] = termsEnumJson;
     // let bulkBody = [];
-   
+
     fs.readdirSync(folderPath).forEach((file) => {
       if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
       let fileJson = yaml.load(folderPath + "/" + file);
@@ -146,10 +147,11 @@ const getGraphicalGDCDictionary = async function (node, prop) {
   return { status: 200, results: result };
 };
 
-const generateGDCData = async function (schema) {
+const generateGDCData = async (schema) => {
   console.log("Start...");
   let dict = {};
-  for (let [key, value] of Object.entries(schema)) {
+
+  Object.entries(schema).forEach(([key, value]) => {
     delete value["$schema"];
     delete value["namespace"];
     delete value["project"];
@@ -164,9 +166,7 @@ const generateGDCData = async function (schema) {
     }
 
     dict[key.slice(0, -5)] = value;
-  }
-
-  //console.log(dict);
+  });
 
   // Recursivly fix references
   dict = findObjectWithRef(dict, (refObj, rootKey) => {
@@ -245,9 +245,10 @@ const generateGDCData = async function (schema) {
 
     delete obj.systemProperties;
 
+    if (!['_terms','_terms_enum','_definitions'].includes(key)) {
+      filtered.push(newDict[key]);
+    }
 
-
-    if( !['_terms','_terms_enum','_definitions'].includes(key))filtered.push(newDict[key]);
     return filtered;
   }, []);
 
@@ -404,7 +405,6 @@ const getGraphicalPCDCDictionary = (project = null, node, prop) => {
   let nodes = Object.keys(project_result);
   
   //create fake relationship for graphical display purpose
-
   nodes.forEach((n, i) => {
     if (i - 4 >= 0) {
       let linkItem = {};
@@ -507,136 +507,145 @@ const collapsePcdcNode = (node, desiredProp) => {
 }
 
 const generateICDCorCTDCData = (dc, model, node, prop) => {
+  const dataList = [];
   const dcMData = dc.mData;
   const dcMPData = dc.mpData;
 
-  const dataList = [];
+  // Build each node
+  Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
+    const doesNodeNameMatch = dcMDataNodeName.toLowerCase() === (node.toLowerCase());
+    const isPropEmpty = !prop || prop === '';
+    const isNodeNameEmpty = !node || node === '';
 
-  for (let [key, value] of Object.entries(dcMData.Nodes)) {
-    if (prop && prop !== '' && node && node !== '' && key.toLowerCase() === (node.toLowerCase())) {
-      if (dcMData.Nodes[key].Props != null) {
-        //if(dcMData.Nodes[key].Props.some(item => item.toLowerCase() === prop.toLowerCase())){
-        // console.log ("find match prop ", prop );
-        // }
-        for (var i = 0; i < dcMData.Nodes[key].Props.length; i++) {
-          const nodeP = dcMData.Nodes[key].Props[i];
-          if (nodeP.toLowerCase() === prop.toLowerCase()) {
-            const propertiesItem = {};
-            for (var propertyName in dcMPData.PropDefinitions) {
-              if (propertyName === nodeP) {
-                propertiesItem["model"] = model;
-                if ("Category" in value) {
-                  propertiesItem["category"] = value.Category;
-                } else if ("Tags" in value) {
-                    propertiesItem["category"] = value.Tags.Category;
-                } else {
-                  propertiesItem["category"] = "Undefined";
-                }
-                propertiesItem["node_name"] = key;
-                propertiesItem["property_name"] = nodeP;
+    if (!isPropEmpty && !isNodeNameEmpty && doesNodeNameMatch) {
+      if (dcMDataNode.Props === null) {
+        return dataList;
+      }
 
-                propertiesItem["property_description"] = dcMPData.PropDefinitions[propertyName].Desc;
-
-                propertiesItem["type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
-                
-                if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
-                  propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
-                }
-
-                dataList.push(propertiesItem)
-
-              }
-            }
-          }
+      // Set node's properties
+      dcMDataNode.Props.forEach((nodeP) => {
+        if (nodeP.toLowerCase() !== prop.toLowerCase()) {
+          return;
         }
-      }
-      return dataList;
-    
-    } else if (!node || node === '' || key.toLowerCase() === (node.toLowerCase())) {
-    
-      const item = {};
 
-      item["model"] = model;
-      if ("Category" in value) {
-        item["category"] = value.Category;
-      } else if ("Tags" in value) {
-        item["category"] = value.Tags.Category;
+        Object.entries(dcMPData.PropDefinitions).forEach(([propertyName, propDef]) => {
+          let propertiesItem;
+
+          // Skip properties that don't match the current property
+          if (propertyName !== nodeP) {
+            return;
+          }
+
+          propertiesItem = {
+            model: model,
+            node_name: dcMDataNodeName,
+            property_name: nodeP,
+            property_description: propDef.Desc,
+            type: propDef.Type.constructor === Array ? 'enum' :  propDef.Type,
+          };
+
+          if ('Category' in dcMDataNode) {
+            propertiesItem.category = dcMDataNode.Category;
+          } else if ('Tags' in dcMDataNode) {
+              propertiesItem.category = dcMDataNode.Tags.Category;
+          } else {
+            propertiesItem.category = 'Undefined';
+          }
+          
+          if (!!propDef.Type && propDef.Type.constructor === Array) {
+            propertiesItem.values = propDef.Type.sort();
+          }
+
+          dataList.push(propertiesItem);
+        });
+      });
+
+      return dataList;
+    } else if (isNodeNameEmpty || doesNodeNameMatch) {
+      const item = {
+        model: model,
+        node_name: dcMDataNodeName,
+      };
+
+      if ('Category' in dcMDataNode) {
+        item.category = dcMDataNode.Category;
+      } else if ('Tags' in dcMDataNode) {
+        item.category = dcMDataNode.Tags.Category;
       } else {
-        item["category"] = "Undefined";
+        item.category = 'Undefined';
       }
-      item["node_name"] = key;
 
       const link = [];
       const properties = []; // convert to [] from {}
       const pRequired = [];
 
-      if (dcMData.Nodes[key].Props != null) {
-        for (let i = 0; i < dcMData.Nodes[key].Props.length; i++) {
-          //console.log(icdcMData.Nodes[key].Props[i]);
-          const nodeP = dcMData.Nodes[key].Props[i];
-          const propertiesItem = {};
-          for (let propertyName in dcMPData.PropDefinitions) {
-            if (propertyName === nodeP) {
-              propertiesItem["property_description"] =
-                dcMPData.PropDefinitions[propertyName].Desc;
+      // Set node's properties
+      if (dcMDataNode.Props != null) {
+        dcMDataNode.Props.forEach((nodeP) => {
+          const propertiesItem = {
+            property_name: nodeP,
+          };
 
-                propertiesItem["type"] = (dcMPData.PropDefinitions[propertyName].Type.constructor === Array) ? 'enum' :  dcMPData.PropDefinitions[propertyName].Type;
-                
-                if(!!dcMPData.PropDefinitions[propertyName].Type && dcMPData.PropDefinitions[propertyName].Type.constructor === Array) {
-                  propertiesItem["values"] = dcMPData.PropDefinitions[propertyName].Type.sort()
-                }
-              //propertiesItem["src"] = dcMPData.PropDefinitions[propertyName].Src;
+          if (dcMPData.PropDefinitions.hasOwnProperty(nodeP)) {
+            const propDef = dcMPData.PropDefinitions[nodeP];
 
-              if (dcMPData.PropDefinitions[propertyName].Req === true) {
-                pRequired.push(nodeP);
-              }
+            propertiesItem.property_description = propDef.Desc;
+            propertiesItem.type = (propDef.Type.constructor === Array) ? 'enum' :  propDef.Type;
+
+            if(!!propDef.Type && propDef.Type.constructor === Array) {
+              propertiesItem.values = propDef.Type.sort();
+            }
+
+            if (propDef.Req === true) {
+              pRequired.push(nodeP);
             }
           }
-          //properties[nodeP] = propertiesItem;
-          properties.push({ property_name: nodeP, ...propertiesItem });
-        }
 
-        item["properties"] = properties;
-        item["required"] = pRequired.sort();
+          properties.push(propertiesItem);
+        });
+
+        item.properties = properties;
+        item.required = pRequired.sort();
       } else {
-        item["properties"] = [];
+        item.properties = [];
       }
 
-      // if (item['node_name'] === 'arm') {
-      //   console.log(JSON.stringify(dcMData.Relationships, undefined, 2));
-      // }
-      for (let propertyName in dcMData.Relationships) {
-        const linkItem = {};
-
-        const label = propertyName;
-        const multiplicity = dcMData.Relationships[propertyName].Mul;
-        linkItem["relationship_type"] = label;
-        linkItem["multiplicity"] = multiplicity;
-        //const required = false;
-        let nodeList = [];
-
-        dcMData.Relationships[propertyName].Ends.forEach((end) => {
+      // Set node's relationships
+      Object.entries(dcMData.Relationships).forEach(([propertyName, dcMDataRelationship]) => {
+        const linkItem = {
+          relationship_type: propertyName,
+          multiplicity: dcMDataRelationship.Mul,
+        };
+        const nodeList = dcMDataRelationship.Ends.reduce((nodeList, end) => {
           const backref = end.Src;
           const name = end.Dst;
 
-          if (backref === key || name === key) {
-            nodeList.push({
+          // Skip relationships that don't involve the current node
+          if (!(backref === dcMDataNodeName || name === dcMDataNodeName)) {
+            return nodeList;
+          }
+
+          // Add this relationship to the running list of source-destination pairs
+          return [
+            ...nodeList,
+            {
               source: backref,
               destination: name,
-            });
-          }
-        });
+            },
+          ];
+        }, []);
 
-        linkItem["relationship_entity"] = nodeList;
-        if (nodeList.length > 0) link.push(linkItem);
-      }
+        linkItem.relationship_entity = nodeList;
 
-      //console.log(link);
-      item["relationship"] = link.sort();
+        if (nodeList.length > 0) {
+          link.push(linkItem);
+        }
+      });
 
+      item.relationship = link.sort();
       dataList.push(item);
     }
-  }
+  });
 
   return dataList;
 };
@@ -706,56 +715,69 @@ const generatePCDCData = (pcdc_data, filter) => {
   return dataList;
 };
 
-const processGDCResult = function (result, node, prop ) {
+const processGDCResult = (result, node, prop) => {
   const dataList = [];
-  if(result.length > 0){
-    result.forEach((r) => {
-      if(!node || r.id.toLowerCase() === node.toLowerCase()){
-        let item = {};
-        item["model"] = "GDC";
-        item["category"] = r.category;
-        item["node_name"] = r.id;
-        item["node_description"] = r.description;
-        if(prop && prop !== ''){
-          if(r.properties){
-            for (let propertyName in r.properties) {
-              if (propertyName.toLowerCase() === prop.toLowerCase()) {
-                item["property_name"] = propertyName;
-                item["property_description"] = r.properties[propertyName].description;
-                item["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
-                item["values"] = r.properties[propertyName].enum;
-                dataList.push(item);
-              }
-            }
 
-          }
-
-        } else {
-          let propList =[];
-          if(r.properties){
-            for (let propertyName in r.properties) {
-              let p ={};
-                p["property_name"] = propertyName;
-                p["property_description"] = r.properties[propertyName].description;
-                p["type"] = (!r.properties[propertyName].enum) ? r.properties[propertyName].type : 'enum';
-                p["values"] = r.properties[propertyName].enum;
-                propList.push(p);             
-            }
-
-          }
-          item["properties"] = propList;
-          item["required"] = r.required;     
-          item["relationship"] = r.links;
-
-          dataList.push(item);
-        }
-      }
-
-    });
+  // No results
+  if (result.length <= 0) {
+    return dataList;
   }
 
-  return dataList
+  result.forEach((r) => {
+    // Skip nodes that we didn't ask for
+    if (node && r.id.toLowerCase() !== node.toLowerCase()) {
+      return;
+    }
 
+    let item = {
+      model: 'GDC',
+      category: r.category,
+      node_name: r.id,
+      node_description: r.description,
+    };
+
+    if (prop && prop !== '') {
+      if (r.properties) {
+        Object.entries(r.properties).forEach(([propertyName, property]) => {
+          // Skip properties that we didn't ask for
+          if (propertyName.toLowerCase() !== prop.toLowerCase()) {
+            return;
+          }
+
+          const p = new Property({
+            name: propertyName,
+            ...property,
+          });
+
+          item = {
+            ...item,
+            ...p.json,
+          };
+
+          dataList.push(item);
+        });
+      }
+    } else {
+      let propList =[];
+      if (r.properties) {
+        Object.entries(r.properties).forEach(([propertyName, property]) => {
+          const p = new Property({
+            name: propertyName,
+            ...property,
+          });
+
+          propList.push(p.json);
+        });
+      }
+      item['properties'] = propList;
+      item["required"] = r.required;     
+      item["relationship"] = r.links;
+
+      dataList.push(item);
+    }
+  });
+
+  return dataList;
 };
 
 module.exports = {
@@ -763,5 +785,5 @@ module.exports = {
   getGraphicalICDCDictionary,
   getGraphicalCTDCDictionary,
   getGraphicalPCDCDictionary,
-  getGraphicalGDCDictionary
+  getGraphicalGDCDictionary,
 };
