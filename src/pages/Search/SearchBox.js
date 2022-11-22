@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
+import debounce from 'lodash.debounce';
 import { apiSuggest } from '../../api';
 import { InputGroup, FormControl, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -321,9 +322,20 @@ const SearchBox = (props) => {
     setSelectIndexState(-1);
   };
 
+  const suggestHandlerDebounce = useRef(
+    debounce((value) => {
+      apiSuggest(value)
+        .then(result => setSuggestState(result))
+        .catch(error => {
+          console.log(error);
+        });
+    }, 300)
+  ).current;
+
   const suggestHandler = event => {
-    setSearchState(event.target.value);
-    apiSuggest(event.target.value).then(result => setSuggestState(result));
+    let value =  event.target.value;
+    setSearchState(value);
+    suggestHandlerDebounce(value);
   };
 
   const matchOptionsHandler = event => {

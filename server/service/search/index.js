@@ -20,12 +20,14 @@ router.get("/p/local/vs", controller.getGDCData);
 //for data preprocessing only
 //router.get("/preloadNCItSynonyms_old", controller.preloadNCItSynonyms_old);
 //router.get("/preloadNCItSynonyms", controller.preloadNCItSynonyms);
+//router.get("/listNCItSynonyms", controller.listNCItSynonyms);
 //router.get('/preloadGDCDataMappings', controller.preloadGDCDataMappings);
 //router.get('/compareWithGDCDictionary', controller.compareWithGDCDictionary);
 router.get('/compareAllWithGDCDictionary', controller.compareAllWithGDCDictionary);
 router.get('/exportCompareResult', controller.exportCompareResult);
 router.get('/exportAllCompareResult', controller.exportAllCompareResult);
-//router.get('/generateProperties', controller.generateProperties);
+//router.get('/generateGDCPropertiesReport', controller.generateGDCPropertiesReport);
+//router.get('/generateGDCValuesReport', controller.generateGDCValuesReport);
 //router.get('/generateCompareProperties', controller.generateCompareProperties);
 //router.get('/generateCompareNodes', controller.generateCompareNodes);
 //router.get('/updateGDCPropertyMappings', controller.updateGDCPropertyMappings);
