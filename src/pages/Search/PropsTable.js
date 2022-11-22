@@ -116,6 +116,10 @@ const CodeSpan = styled.span`
   font-weight: bold;
 `;
 
+const RowWithEnum = styled(Row)`
+  align-items: end;
+`;
+
 const ColRight = styled(Col)`
   text-align: right;
 `;
@@ -387,7 +391,7 @@ const PropsTable = (props) => {
                   </div>
                 </Collapse>
                 {props.item.type !== undefined && 
-                  <Row>
+                  <RowWithEnum>
                     <Col xs={4}>
                       <PropType>type: {props.item.type}</PropType>
                     </Col>
@@ -399,7 +403,7 @@ const PropsTable = (props) => {
                       </>
                     }
                     </ColRight>
-                  </Row>
+                  </RowWithEnum>
                 }
               </TableColProps>
             </TableRow>
