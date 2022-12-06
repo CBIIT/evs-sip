@@ -450,7 +450,7 @@ const ICDCValuesTable = (props) => {
           <TableTh>Category / Node / Property</TableTh>
         </Col>
         <Col xs={9}>
-          <TableTh>Matched CTDC Values</TableTh>
+          <TableTh>Matched ICDC Values</TableTh>
         </Col>
       </TableThead>
       <TableBody>
