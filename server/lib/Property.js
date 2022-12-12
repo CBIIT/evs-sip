@@ -107,7 +107,7 @@ const Property = class {
       enumDef: this._enumDef,
       termDef: this._termDef,
       type: this._type,
-    }
+    };
 
     return json;
   }

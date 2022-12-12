@@ -9,6 +9,7 @@ const xmlBuilder = require("../tools/xmlBuilder");
 const yaml = require("yamljs");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const Property = require('./../../lib/Property');
+const DataConnection = require('./../../lib/DataConnection/DataConnection')
 const folderPath = path.join(
   __dirname,
   "..",
@@ -94,6 +95,11 @@ const searchP = (req, res, formatFlag) => {
 };
 
 const getGraphicalGDCDictionary = async function (node, prop) {
+  const dataConnection = new DataConnection('multiYaml');
+  return dataConnection.retriever.get({
+    node,
+    prop
+  });
 
   let result = cache.getValue("gdc_dict_api");
   if (result === undefined || node !== '') {
@@ -543,6 +549,10 @@ const generateICDCorCTDCData = (dc, model, node, prop) => {
             property_description: propDef.Desc,
             type: propDef.Type.constructor === Array ? 'enum' :  propDef.Type,
           };
+          const property = new Property({
+            description: propDef.Desc,
+            name: nodeP,
+          });
 
           if ('Category' in dcMDataNode) {
             propertiesItem.category = dcMDataNode.Category;
