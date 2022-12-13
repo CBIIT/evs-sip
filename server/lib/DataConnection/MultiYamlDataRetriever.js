@@ -92,11 +92,8 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     delete result._terms;
     delete result._terms_enum;
     delete result._definitions;
-    result = this._processGDCResult(result, node, prop)
-    if (result.length ===0 ) {
-      return { status: 400, message: " No data found. " };
-    }
-    return { status: 200, results: result };
+
+    return this._processGDCResult(result, node, prop);
   }
 
 
@@ -306,20 +303,6 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     }
 
     return obj;
-  };
-
-  _excludeSystemProperties = (node) => {
-    const properties =
-      node.properties &&
-      Object.keys(node.properties)
-        .filter((key) =>
-          node.systemProperties ? !node.systemProperties.includes(key) : true
-        )
-        .reduce((acc, key) => {
-          acc[key] = node.properties[key];
-          return acc;
-        }, {});
-    return properties;
   };
 };
 
