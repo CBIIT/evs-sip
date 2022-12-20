@@ -9,6 +9,7 @@ let db = Datastore.create();
 const _ = require("lodash");
 const handleError = require("../../components/handleError");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
+const Property = require('./../../lib/Property');
 
 const folderPath = path.join(
   __dirname,
@@ -629,10 +630,11 @@ const excludeSystemProperties = (node) => {
   return properties;
 };
 
-const generateGDCData = async function (schema) {
+const generateGDCData = async (schema) => {
   console.log("Start...");
   let dict = {};
-  for (let [key, value] of Object.entries(schema)) {
+
+  Object.entries(schema).forEach(([key, value]) => {
     delete value["$schema"];
     delete value["namespace"];
     delete value["project"];
@@ -647,9 +649,7 @@ const generateGDCData = async function (schema) {
     }
 
     dict[key.slice(0, -5)] = value;
-  }
-
-  //console.log(dict);
+  });
 
   // Recursivly fix references
   dict = findObjectWithRef(dict, (refObj, rootKey) => {
@@ -760,6 +760,7 @@ const generateICDCorCTDCData = (dc) => {
   const dcMData = dc.mData;
   const dcMPData = dc.mpData;
 
+  // Build each node
   Object.entries(dcMData.Nodes).forEach(([dcMDataNodeName, dcMDataNode]) => {
     const item = {};
     const pRequired = [];
@@ -787,21 +788,23 @@ const generateICDCorCTDCData = (dc) => {
       item.category = "Undefined";
     }
 
+    // Set node's properties
     if (dcMDataNode.Props != null) {
       dcMDataNode.Props.forEach((nodeP) => {
         const propertiesItem = {};
-        for (var propertyName in dcMPData.PropDefinitions) {
-          const propDef = dcMPData.PropDefinitions[propertyName];
-          if (propertyName === nodeP) {
-            propertiesItem.description = propDef.Desc;
-            propertiesItem.type = propDef.Type;
-            propertiesItem.src = propDef.Src;
 
-            if (propDef.Req === true) {
-              pRequired.push(nodeP);
-            }
+        if (dcMPData.PropDefinitions.hasOwnProperty(nodeP)) {
+          const propDef = dcMPData.PropDefinitions[nodeP];
+
+          propertiesItem.description = propDef.Desc;
+          propertiesItem.type = propDef.Type;
+          propertiesItem.src = propDef.Src;
+
+          if (propDef.Req === true) {
+            pRequired.push(nodeP);
           }
         }
+
         properties[nodeP] = propertiesItem;
       });
 
@@ -809,26 +812,27 @@ const generateICDCorCTDCData = (dc) => {
       item.required = pRequired;
     }
 
-    for (let propertyName in dcMData.Relationships) {
+    // Build node's links
+    Object.entries(dcMData.Relationships).forEach(([propertyName, dcMDataRelationship]) => {
       const label = propertyName;
-      const multiplicity = dcMData.Relationships[propertyName].Mul;
+      const multiplicity = dcMDataRelationship.Mul;
       const required = false;
-      dcMData.Relationships[propertyName].Ends.forEach((end) => {
-        const linkItem = {
+
+      dcMDataRelationship.Ends.forEach((end) => {
+        // Skip relationships that don't involve the current node
+        if (end.Src !== dcMDataNodeName) {
+          return;
+        }
+
+        item.links.push({
           backref: end.Src,
           label: label,
           name: end.Dst,
           required: required,
           target_type: end.Dst,
-        };
-
-        if (end.Src !== dcMDataNodeName) {
-          return;
-        }
-
-        item.links.push(linkItem);
+        });
       });
-    }
+    });
 
     dataList[dcMDataNodeName] = item;
   });
@@ -929,6 +933,7 @@ const getGraphicalGDCDictionary = async function () {
       }
     });
     result = await generateGDCData(jsonData);
+    result = processGdcResult(result);
     console.log("Cached:");
     console.log(Object.keys(result).length);
     cache.setValue("gdc_dict", result, config.item_ttl);
@@ -1017,6 +1022,27 @@ const getGraphicalCTDCDictionary = () => {
   }
   return result;
 }
+
+const processGdcResult = (result) => {
+  for (const nodeName in result) {
+    const node = result[nodeName];
+
+    if (!node.properties) {
+      continue;
+    }
+
+    Object.entries(node.properties).forEach(([propertyName, property]) => {
+      const p = new Property({
+        name: propertyName,
+        ...property,
+      });
+
+      result[nodeName].properties[propertyName] = p.graphJson;
+    });
+  }
+
+  return result;
+};
 
 const processGDCDictionaryEnumData = (prop) => {
 	const enums = prop.enum;

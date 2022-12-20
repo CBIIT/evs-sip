@@ -126,7 +126,7 @@ class DataDictionaryPropertyTable extends React.Component {
                   );
 
                   //let hasValues = properties[pKey].enum.length > 0;
-                  let hasValues = properties[pKey].type === "enum";
+                  let hasValues = properties[pKey].type === "enum" || properties[pKey].type === "array";
 
                   let type = properties[pKey].type;
 
@@ -260,7 +260,7 @@ class DataDictionaryPropertyTable extends React.Component {
                           {propertyNameFragment}
                         </td>
                         <td className='data-dictionary-property-table__data type-col-width'>
-                        <p>{JSON.stringify(type)}</p>
+                        <p>{type}</p>
                         </td>
                         {
                           !this.props.hideIsRequired && (

@@ -116,6 +116,10 @@ const CodeSpan = styled.span`
   font-weight: bold;
 `;
 
+const RowWithEnum = styled(Row)`
+  align-items: end;
+`;
+
 const ColRight = styled(Col)`
   text-align: right;
 `;
@@ -143,6 +147,14 @@ const IndicatorContent = styled.div`
   left: 0;
   right: 0;
   transform: translateY(-50%);
+`;
+
+const Description = styled.p`
+  margin-bottom: 0;
+`;
+
+const PropType = styled.span`
+  font-size: 14px;
 `;
 
 const PropsTable = (props) => {
@@ -314,7 +326,7 @@ const PropsTable = (props) => {
     };
 
     return (
-      <p>
+      <Description>
         <span dangerouslySetInnerHTML={{ __html: '<b>Definition:</b> ' + props.desc.substring(0, 138)}}></span>
         {props.desc.length >= 138 &&
           <>
@@ -324,7 +336,7 @@ const PropsTable = (props) => {
             </LinkDesc>
           </>
         }
-      </p>
+      </Description>
     );
   };
 
@@ -378,13 +390,20 @@ const PropsTable = (props) => {
                     }
                   </div>
                 </Collapse>
-                {props.item.type !== undefined && props.item.type === 'enum' &&
-                  <Row>
-                    <ColRight xs={12}>
-                      <AllValuesModal idterm={props.item.id}/>
-                      <ToCompareModal idterm={props.item.id}/>
+                {props.item.type !== undefined && 
+                  <RowWithEnum>
+                    <Col xs={4}>
+                      <PropType>type: {props.item.type}</PropType>
+                    </Col>
+                    <ColRight xs={8}>
+                    {(props.item.type === 'enum' || props.item.type === 'array') &&
+                      <>
+                        <AllValuesModal idterm={props.item.id}/>
+                        <ToCompareModal idterm={props.item.id}/>
+                      </>
+                    }
                     </ColRight>
-                  </Row>
+                  </RowWithEnum>
                 }
               </TableColProps>
             </TableRow>
