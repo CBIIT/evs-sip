@@ -2,22 +2,12 @@ const elastic = require("../../components/elasticsearch");
 const logger = require("../../components/logger");
 const cache = require("../../components/cache");
 const config = require("../../config");
-const fs = require("fs");
 const path = require("path");
 const shared = require("../search/shared");
 const xmlBuilder = require("../tools/xmlBuilder");
 const yaml = require("yamljs");
-const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const Property = require('./../../lib/Property');
 const DataConnection = require('./../../lib/DataConnection/DataConnection')
-const folderPath = path.join(
-  __dirname,
-  "..",
-  "..",
-  "data_files",
-  "GDC",
-  "model"
-);
 const dataFilesPath = path.join(__dirname, "..", "..", "data_files");
 
 const searchP = (req, res, formatFlag) => {
@@ -101,8 +91,18 @@ const searchP = (req, res, formatFlag) => {
  * @param {string} prop The name of the property to retrieve
  * @returns {object} The results retrieved
  */
-const getGraphicalGDCDictionary = async function (node, prop) {
-  const dataConnection = new DataConnection('multiYaml');
+const getGraphicalGDCDictionary = async (node, prop) => {
+  const folderPath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "data_files",
+    "GDC",
+    "model"
+  );
+  const dataConnection = new DataConnection('multiYaml', {
+    path: folderPath,
+  });
   const results = await dataConnection.retriever.get({
     node,
     prop
@@ -121,39 +121,38 @@ const getGraphicalGDCDictionary = async function (node, prop) {
   };
 };
 
-const getGraphicalICDCDictionary = function (node, prop ) {
-  let result = cache.getValue("icdc_dict_api");
-  if (result == undefined || node !== '') {
-    let jsonData = {};
-    var mpJson = yaml.load(dataFilesPath + "/ICDC/icdc-model-props.yml");
-    jsonData.mpData = mpJson;
-    var mJson = yaml.load(dataFilesPath + "/ICDC/icdc-model.yml");
-    jsonData.mData = mJson;
-    result = generateICDCorCTDCData(jsonData, 'ICDC', node, prop);
-    if (node === '') cache.setValue("icdc_dict_api", result, config.item_ttl);
+const getGraphicalICDCDictionary = async (node, prop ) => {
+  const dataConnection = new DataConnection('mdf', {
+    modelPath: path.join(dataFilesPath, 'ICDC', 'icdc-model.yml'),
+    propsPath: path.join(dataFilesPath, 'ICDC', 'icdc-model-props.yml'),
+  });
+  const results = await dataConnection.retriever.get({
+    node,
+    prop
+  });
+
+  if (results.length === 0 ) {
+    return {
+      status: 400,
+      message: ' No data found. ',
+    };
   }
-  if (result.length === 0) {
-    return { status: 400, message: " No data found. " };
-  }
-  return { status: 200, results: result };
+
+  return {
+    status: 200,
+    results: results,
+  };
 };
 
 const getGraphicalCTDCDictionary = function (node, prop )  {
   let result = cache.getValue("ctdc_dict_api");
   if (result == undefined || node !== '') {
     let jsonData = {};
-    var mpJson = yaml.load(
-      dataFilesPath + "/CTDC/ctdc_model_properties_file.yaml"
-    );
+    var mpJson = yaml.load(dataFilesPath + "/CTDC/ctdc_model_properties_file.yaml");
     jsonData.mpData = mpJson;
     var mJson = yaml.load(dataFilesPath + "/CTDC/ctdc_model_file.yaml");
     jsonData.mData = mJson;
     result = generateICDCorCTDCData(jsonData, 'CTDC', node, prop);
-    /*
-        for(let node in result){
-          result[node].category = "clinical";
-        }
-        */
     if (node === '') cache.setValue("ctdc_dict_api", result, config.item_ttl);
   }
   if (result.length === 0) {

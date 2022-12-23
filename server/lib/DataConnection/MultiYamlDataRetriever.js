@@ -3,7 +3,6 @@ const cache = require("../../components/cache");
 const config = require("../../config");
 const Property = require('./../../lib/Property');
 const fs = require("fs");
-const path = require("path");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const yaml = require("yamljs");
 
@@ -24,7 +23,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
   constructor(source) {
     super(source);
 
-    //this.#path = source.path;
+    this.#path = source.path;
   }
 
   /**
@@ -38,14 +37,6 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     const node = filters.node;
     const prop = filters.prop;
     const results = [];
-    const folderPath = path.join(
-      __dirname,
-      "..",
-      "..",
-      "data_files",
-      "GDC",
-      "model"
-    );
 
     let result = cache.getValue("gdc_dict_api");
     if (result === undefined || node !== '') {
@@ -53,17 +44,17 @@ const MultiYamlDataRetriever = class extends DataRetriever {
         "Start to generate GDC Dictionary Data and load to local cache."
       );
       let jsonData = {};
-      var termsJson = yaml.load(folderPath + "/_terms.yaml");
+      var termsJson = yaml.load(this.#path + "/_terms.yaml");
       jsonData["_terms.yaml"] = termsJson;
-      var defJson = yaml.load(folderPath + "/_definitions.yaml");
+      var defJson = yaml.load(this.#path + "/_definitions.yaml");
       jsonData["_definitions.yaml"] = defJson;
-      var termsEnumJson = yaml.load(folderPath + "/_terms_enum.yaml");
+      var termsEnumJson = yaml.load(this.#path + "/_terms_enum.yaml");
       jsonData["_terms_enum.yaml"] = termsEnumJson;
       // let bulkBody = [];
 
-      fs.readdirSync(folderPath).forEach((file) => {
+      fs.readdirSync(this.#path).forEach((file) => {
         if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
-        let fileJson = yaml.load(folderPath + "/" + file);
+        let fileJson = yaml.load(this.#path + "/" + file);
         // Do not include annotation.yaml, metaschema.yaml
         // Only include node in the gdc_searchable_nodes
         // Do not include node in category "TBD" and "data"

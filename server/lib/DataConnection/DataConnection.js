@@ -1,3 +1,4 @@
+const MdfDataRetriever = require('./MdfDataRetriever');
 const MultiYamlDataRetriever = require('./MultiYamlDataRetriever');
 
 /**
@@ -8,6 +9,7 @@ const MultiYamlDataRetriever = require('./MultiYamlDataRetriever');
 const DataConnection = class {
   _retriever;
   _types = {
+    mdf: MdfDataRetriever,
     multiYaml: MultiYamlDataRetriever,
   };
 
@@ -16,7 +18,7 @@ const DataConnection = class {
    * 
    * @param {object} type The type of data source
    */
-  constructor(type) {
+  constructor(type, params) {
     // Check whether type is valid
     if (!this._types[type]) {
       console.log(`Invalid type ${type}. Cannot create DataConnection`);
@@ -24,7 +26,7 @@ const DataConnection = class {
     }
 
     // Make the DataRetriever
-    this._retriever = new this._types[type]();
+    this._retriever = new this._types[type](params);
   }
 
   /**
