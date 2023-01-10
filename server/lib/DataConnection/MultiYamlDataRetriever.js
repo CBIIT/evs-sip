@@ -1,6 +1,4 @@
 const DataRetriever = require('./DataRetriever');
-const cache = require("../../components/cache");
-const config = require("../../config");
 const Property = require('./../../lib/Property');
 const fs = require("fs");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
