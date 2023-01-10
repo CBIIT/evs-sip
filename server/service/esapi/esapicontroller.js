@@ -128,6 +128,7 @@ const getGraphicalICDCDictionary = async (node, prop ) => {
     propsPath: path.join(dataFilesPath, 'ICDC', 'icdc-model-props.yml'),
   });
   const results = await dataConnection.retriever.get({
+    dict: 'ICDC',
     node,
     prop
   });

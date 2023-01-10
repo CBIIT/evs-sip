@@ -1,10 +1,5 @@
 const DataRetriever = require('./DataRetriever');
-const cache = require("../../components/cache");
-const config = require("../../config");
 const Property = require('./../../lib/Property');
-const fs = require("fs");
-const path = require("path");
-const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const yaml = require("yamljs");
 
 /**
@@ -39,25 +34,20 @@ const MdfDataRetriever = class extends DataRetriever {
    * 
    * @returns object[]
    */
-  get = async (filters) => {
+  retrieve = async (filters) => {
+    const dict = filters.dict;
     const node = filters.node;
     const prop = filters.prop;
-    const results = [];
+    let jsonData = {};
+    let results;
 
-    let result = cache.getValue("icdc_dict_api");
-    if (result == undefined || node !== '') {
-      let jsonData = {};
-      var mpJson = yaml.load(this.#propsPath);
-      jsonData.mpData = mpJson;
-      var mJson = yaml.load(this.#modelPath);
-      jsonData.mData = mJson;
-      result = this._generateData(jsonData, 'ICDC', node, prop);
-      if (node === '') cache.setValue("icdc_dict_api", result, config.item_ttl);
-    }
-    if (result.length === 0) {
-      return { status: 400, message: " No data found. " };
-    }
-    return { status: 200, results: result };
+    var mpJson = yaml.load(this.#propsPath);
+    jsonData.mpData = mpJson;
+    var mJson = yaml.load(this.#modelPath);
+    jsonData.mData = mJson;
+    results = this._generateData(jsonData, dict, node, prop);
+
+    return results;
   }
 
   _generateData = (dc, model, node, prop) => {
