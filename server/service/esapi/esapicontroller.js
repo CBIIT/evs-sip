@@ -104,6 +104,7 @@ const getGraphicalGDCDictionary = async (node, prop) => {
     path: folderPath,
   });
   const results = await dataConnection.retriever.get({
+    dict: 'GDC',
     node,
     prop
   });

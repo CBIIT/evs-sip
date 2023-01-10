@@ -33,63 +33,43 @@ const MultiYamlDataRetriever = class extends DataRetriever {
    * 
    * @returns object[]
    */
-  get = async (filters) => {
+  retrieve = async (filters) => {
     const node = filters.node;
     const prop = filters.prop;
-    const results = [];
+    let results;
 
-    let result = cache.getValue("gdc_dict_api");
-    if (result === undefined || node !== '') {
-      console.log(
-        "Start to generate GDC Dictionary Data and load to local cache."
-      );
-      let jsonData = {};
-      var termsJson = yaml.load(this.#path + "/_terms.yaml");
-      jsonData["_terms.yaml"] = termsJson;
-      var defJson = yaml.load(this.#path + "/_definitions.yaml");
-      jsonData["_definitions.yaml"] = defJson;
-      var termsEnumJson = yaml.load(this.#path + "/_terms_enum.yaml");
-      jsonData["_terms_enum.yaml"] = termsEnumJson;
-      // let bulkBody = [];
+    let jsonData = {};
+    var termsJson = yaml.load(this.#path + "/_terms.yaml");
+    jsonData["_terms.yaml"] = termsJson;
+    var defJson = yaml.load(this.#path + "/_definitions.yaml");
+    jsonData["_definitions.yaml"] = defJson;
+    var termsEnumJson = yaml.load(this.#path + "/_terms_enum.yaml");
+    jsonData["_terms_enum.yaml"] = termsEnumJson;
 
-      fs.readdirSync(this.#path).forEach((file) => {
-        if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
-        let fileJson = yaml.load(this.#path + "/" + file);
-        // Do not include annotation.yaml, metaschema.yaml
-        // Only include node in the gdc_searchable_nodes
-        // Do not include node in category "TBD" and "data"
-        /*
-              if (file.indexOf('_') !== 0 && file !== 'annotation.yaml' && file !== 'metaschema.yaml'  
-                && gdc_searchable_nodes.indexOf(fileJson.id) !== -1 && fileJson.category !== 'TBD' && fileJson.category !== 'data') {
-                jsonData[file] = fileJson;
-              }
-              */
-        if (
-          file.indexOf("_") !== 0 &&
-          file !== "annotation.yaml" &&
-          file !== "metaschema.yaml" &&
-          fileJson.category !== "TBD" &&
-          fileJson.category !== "data"
-        ) {
-          jsonData[file] = fileJson;
-        }
+    fs.readdirSync(this.#path).forEach((file) => {
+      if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
+      let fileJson = yaml.load(this.#path + "/" + file);
+      if (
+        file.indexOf("_") !== 0 &&
+        file !== "annotation.yaml" &&
+        file !== "metaschema.yaml" &&
+        fileJson.category !== "TBD" &&
+        fileJson.category !== "data"
+      ) {
+        jsonData[file] = fileJson;
       }
-      });
-      result = await this._generateGDCData(jsonData);
-      console.log("Cached:");
-      console.log(Object.keys(result).length);
-      if(node === '') cache.setValue("gdc_dict_api", result, config.item_ttl);
     }
-    delete result._terms;
-    delete result._terms_enum;
-    delete result._definitions;
+    });
+    results = await this._generateGDCData(jsonData);
 
-    return this._processGDCResult(result, node, prop);
-  }
+    delete results._terms;
+    delete results._terms_enum;
+    delete results._definitions;
 
+    return this._processGDCResult(results, node, prop);
+  };
 
   _generateGDCData = async (schema) => {
-    console.log("Start...");
     let dict = {};
 
     Object.entries(schema).forEach(([key, value]) => {
@@ -122,30 +102,15 @@ const MultiYamlDataRetriever = class extends DataRetriever {
       }
 
       if (tmp.includes(".yaml")) {
-        // ABS_FIX
-        // "$ref": "_definitions.yaml#/ubiquitous_properties",
-        // ->
-        // "$ref": "#/_definitions/ubiquitous_properties",
-
         tmp = "#/" + tmp.replace(".yaml#", "");
-        // console.log("ABS FIX -- " + rootKey + ": " + refObj);
       } else {
-        // REL FIX
-        // "$ref": "#/state"
-        // ->
-        // "$ref": "#/{_definitions aka root key}/state"
-
         tmp = "#/" + rootKey + "/" + tmp.replace("#/", "");
-        //console.log("REL FIX -- " + rootKey + ": " + refObj);
       }
 
       return tmp;
     });
 
     dict["_terms"]["file_format"] = { description: "wut" };
-    //dict["case"].category = "case";
-
-    console.log("End...");
 
     let newDict = await $RefParser.dereference(dict, {
       continueOnError: false, // Don't throw on the first error
@@ -159,7 +124,6 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     const result = Object.keys(newDict).reduce(function (filtered, key) {
       let obj = newDict[key];
       let deprecated_properties = obj.deprecated ? obj.deprecated : [];
-      //let deprecated_enum = [];
 
       if (obj.properties) {
         deprecated_properties.forEach((d_p) => {
@@ -171,15 +135,6 @@ const MultiYamlDataRetriever = class extends DataRetriever {
             //remove any reference properties
             delete obj.properties[p];
           }
-          /*
-          else{
-            if (obj.properties[p].deprecated_enum) {
-              obj.properties[p].enum = _.differenceWith(obj.properties[p].enum, obj.properties[p].deprecated_enum, _.isEqual);
-              console.log(obj.properties[p].enum);
-            }
-            delete obj.properties[p].deprecated_enum;
-          }
-          */
         }
 
         // from _excludeSystemProperties()
