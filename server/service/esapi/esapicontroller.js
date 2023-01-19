@@ -98,10 +98,10 @@ const getGraphicalGDCDictionary = async (node, prop) => {
     "model"
   );
   const dataConnection = new DataConnection('multiYaml', {
+    dict: 'GDC',
     path: folderPath,
   });
   const results = await dataConnection.retriever.get({
-    dict: 'GDC',
     node,
     prop
   });
@@ -121,11 +121,11 @@ const getGraphicalGDCDictionary = async (node, prop) => {
 
 const getGraphicalICDCDictionary = async (node, prop ) => {
   const dataConnection = new DataConnection('mdf', {
+    dict: 'ICDC',
     modelPath: path.join(dataFilesPath, 'ICDC', 'icdc-model.yml'),
     propsPath: path.join(dataFilesPath, 'ICDC', 'icdc-model-props.yml'),
   });
   const results = await dataConnection.retriever.get({
-    dict: 'ICDC',
     node,
     prop
   });
@@ -145,11 +145,11 @@ const getGraphicalICDCDictionary = async (node, prop ) => {
 
 const getGraphicalCTDCDictionary = async (node, prop ) => {
   const dataConnection = new DataConnection('mdf', {
+    dict: 'CTDC',
     modelPath: path.join(dataFilesPath, 'CTDC', 'ctdc_model_file.yaml'),
     propsPath: path.join(dataFilesPath, 'CTDC', 'ctdc_model_properties_file.yaml'),
   });
   const results = await dataConnection.retriever.get({
-    dict: 'CTDC',
     node,
     prop
   });

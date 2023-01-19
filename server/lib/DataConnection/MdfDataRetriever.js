@@ -1,6 +1,6 @@
 const DataRetriever = require('./DataRetriever');
 const Property = require('./../../lib/Property');
-const yaml = require("yamljs");
+const yaml = require('yamljs');
 
 /**
  * DataRetreiver subclass for MDF files
@@ -35,7 +35,6 @@ const MdfDataRetriever = class extends DataRetriever {
    * @returns object[]
    */
   retrieve = async (filters) => {
-    const dict = filters.dict;
     const node = filters.node;
     const prop = filters.prop;
     let jsonData = {};
@@ -45,7 +44,7 @@ const MdfDataRetriever = class extends DataRetriever {
     jsonData.mpData = mpJson;
     var mJson = yaml.load(this.#modelPath);
     jsonData.mData = mJson;
-    results = this._generateData(jsonData, dict, node, prop);
+    results = this._generateData(jsonData, this.#dict, node, prop);
 
     return results;
   }

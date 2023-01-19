@@ -11,6 +11,7 @@ const yaml = require("yamljs");
  * @property {string} #path The directory containing all of the YAML files
  */
 const MultiYamlDataRetriever = class extends DataRetriever {
+  #dict;
   #path;
 
   /**
@@ -21,6 +22,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
   constructor(source) {
     super(source);
 
+    this.#dict = source.dict;
     this.#path = source.path;
   }
 
@@ -174,7 +176,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
       }
 
       let item = {
-        model: 'GDC',
+        model: this.#dict,
         category: r.category,
         node_name: r.id,
         node_description: r.description,

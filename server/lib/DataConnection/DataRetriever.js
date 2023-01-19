@@ -27,7 +27,7 @@ const DataRetriever = class {
    */
   get = async (filters) => {
     const category = filters.category;
-    const dict = filters.dict;
+    const dict = this._source.dict;
     const node = filters.node;
     const prop = filters.prop;
     const cacheVarName = [dict, category, node, prop].filter(Boolean).join('-');
