@@ -202,73 +202,28 @@ const processGDCDictionaryEnumData = (prop) => {
  * @param {string} prop The property to filter by
  * @returns {object} A map of values
  */
-const getGraphicalPCDCDictionary = (project = null, node, prop) => {
-  // Initialize results
-  const project_result = {
-    status: 200,
-    results: [],
-  };
-  let result;
-
-  // Read from cache
-  if (project) {
-    result = cache.getValue(`public_pcdc_dict_${project}`);
-  } else {
-    result = cache.getValue("public_pcdc_dict");
-  }
-
-  if (true || result === undefined) {
-    let jsonData = shared.readPCDCMapping();
-    result = generatePCDCData(jsonData, {});
-    //result = generatePCDCData(jsonData, {Relationships: {}});
-    cache.setValue("public_pcdc_dict", result, config.item_ttl);
-  }
-
-  // Obtain nodes from specified project
-  for (const proj in result) {
-    const isCorrectProject = proj.toLowerCase() === project?.toLowerCase();
-    const projData = result[proj];
-    let desiredNodes;
-
-    if (project !== null && !isCorrectProject) {
-      continue;
-    }
-
-    desiredNodes = getPcdcNodes(projData, node, prop);
-    project_result.results = project_result.results.concat(desiredNodes);
-  }
-  let nodes = Object.keys(project_result);
-  
-  //create fake relationship for graphical display purpose
-  nodes.forEach((n, i) => {
-    if (i - 4 >= 0) {
-      let linkItem = {};
-      linkItem["name"] = nodes[i - 4];
-      linkItem["backref"] = n;
-      linkItem["label"] = "of_pcdc";
-      linkItem["target_type"] = nodes[i - 4];
-      linkItem["required"] = false;
-
-      project_result[n].links.push(linkItem);
-    }
+const getGraphicalPCDCDictionary = async (project = null, node, prop) => {
+  const dataConnection = new DataConnection('json', {
+    dict: 'PCDC',
+    path: path.join(dataFilesPath, 'PCDC', 'pcdc-model-all.json'),
+  });
+  const results = await dataConnection.retriever.get({
+    category: project,
+    node,
+    prop
   });
 
-  // Cache the results
-  if (project) {
-    cache.setValue(`public_pcdc_dict_${project}`, project_result, config.item_ttl);
-  } else {
-    cache.setValue("public_pcdc_dict", project_result, config.item_ttl);
-  }
-
-  // Handle empty results
-  if (project_result.results.length === 0 ) {
+  if (results.length === 0 ) {
     return {
       status: 400,
-      message: " No data found. ",
+      message: ' No data found. ',
     };
   }
 
-  return project_result;
+  return {
+    status: 200,
+    results: results,
+  };
 };
 
 /**

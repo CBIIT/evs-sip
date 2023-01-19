@@ -1,3 +1,4 @@
+const JsonDataRetriever = require('./JsonDataRetriever');
 const MdfDataRetriever = require('./MdfDataRetriever');
 const MultiYamlDataRetriever = require('./MultiYamlDataRetriever');
 
@@ -9,6 +10,7 @@ const MultiYamlDataRetriever = require('./MultiYamlDataRetriever');
 const DataConnection = class {
   _retriever;
   _types = {
+    json: JsonDataRetriever,
     mdf: MdfDataRetriever,
     multiYaml: MultiYamlDataRetriever,
   };
