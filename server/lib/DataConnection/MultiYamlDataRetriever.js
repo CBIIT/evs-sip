@@ -1,8 +1,9 @@
 const DataRetriever = require('./DataRetriever');
+const Node = require('./../../lib/Node');
 const Property = require('./../../lib/Property');
-const fs = require("fs");
-const $RefParser = require("@apidevtools/json-schema-ref-parser");
-const yaml = require("yamljs");
+const fs = require('fs');
+const $RefParser = require('@apidevtools/json-schema-ref-parser');
+const yaml = require('yamljs');
 
 /**
  * DataRetreiver subclass for multiple YAML files
@@ -39,51 +40,51 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     let results;
 
     let jsonData = {};
-    var termsJson = yaml.load(this.#path + "/_terms.yaml");
-    jsonData["_terms.yaml"] = termsJson;
-    var defJson = yaml.load(this.#path + "/_definitions.yaml");
-    jsonData["_definitions.yaml"] = defJson;
-    var termsEnumJson = yaml.load(this.#path + "/_terms_enum.yaml");
-    jsonData["_terms_enum.yaml"] = termsEnumJson;
+    var termsJson = yaml.load(this.#path + '/_terms.yaml');
+    jsonData['_terms.yaml'] = termsJson;
+    var defJson = yaml.load(this.#path + '/_definitions.yaml');
+    jsonData['_definitions.yaml'] = defJson;
+    var termsEnumJson = yaml.load(this.#path + '/_terms_enum.yaml');
+    jsonData['_terms_enum.yaml'] = termsEnumJson;
 
     fs.readdirSync(this.#path).forEach((file) => {
       if(!node || node ==='' || file.toLowerCase().includes(node.toLowerCase())){
       let fileJson = yaml.load(this.#path + "/" + file);
       if (
-        file.indexOf("_") !== 0 &&
-        file !== "annotation.yaml" &&
-        file !== "metaschema.yaml" &&
-        fileJson.category !== "TBD" &&
-        fileJson.category !== "data"
+        file.indexOf('_') !== 0 &&
+        file !== 'annotation.yaml' &&
+        file !== 'metaschema.yaml' &&
+        fileJson.category !== 'TBD' &&
+        fileJson.category !== 'data'
       ) {
         jsonData[file] = fileJson;
       }
     }
     });
-    results = await this._generateGDCData(jsonData);
+    results = await this._generateData(jsonData);
 
     delete results._terms;
     delete results._terms_enum;
     delete results._definitions;
 
-    return this._processGDCResult(results, node, prop);
+    return this._processResult(results, node, prop);
   };
 
-  _generateGDCData = async (schema) => {
+  _generateData = async (schema) => {
     let dict = {};
 
     Object.entries(schema).forEach(([key, value]) => {
-      delete value["$schema"];
-      delete value["namespace"];
-      delete value["project"];
-      delete value["program"];
-      delete value["submittable"];
-      delete value["downloadable"];
-      delete value["previous_version_downloadable"];
-      delete value["validators"];
-      delete value["uniqueKeys"];
-      if (value["properties"]) {
-        delete value["properties"]["$ref"];
+      delete value['$schema'];
+      delete value['namespace'];
+      delete value['project'];
+      delete value['program'];
+      delete value['submittable'];
+      delete value['downloadable'];
+      delete value['previous_version_downloadable'];
+      delete value['validators'];
+      delete value['uniqueKeys'];
+      if (value['properties']) {
+        delete value['properties']['$ref'];
       }
 
       dict[key.slice(0, -5)] = value;
@@ -93,7 +94,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
     dict = this._findObjectWithRef(dict, (refObj, rootKey) => {
       // This halts for sub objects./...
 
-      let tmp = "";
+      let tmp = '';
 
       if (Array.isArray(refObj)) {
         tmp = refObj[0];
@@ -101,16 +102,16 @@ const MultiYamlDataRetriever = class extends DataRetriever {
         tmp = refObj;
       }
 
-      if (tmp.includes(".yaml")) {
-        tmp = "#/" + tmp.replace(".yaml#", "");
+      if (tmp.includes('.yaml')) {
+        tmp = '#/' + tmp.replace('.yaml#', '');
       } else {
-        tmp = "#/" + rootKey + "/" + tmp.replace("#/", "");
+        tmp = '#/' + rootKey + '/' + tmp.replace('#/', '');
       }
 
       return tmp;
     });
 
-    dict["_terms"]["file_format"] = { description: "wut" };
+    dict['_terms']['file_format'] = { description: 'wut' };
 
     let newDict = await $RefParser.dereference(dict, {
       continueOnError: false, // Don't throw on the first error
@@ -119,7 +120,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
       },
     });
 
-    console.log("End of Dereference...");
+    console.log('End of Dereference...');
 
     const result = Object.keys(newDict).reduce(function (filtered, key) {
       let obj = newDict[key];
@@ -129,7 +130,7 @@ const MultiYamlDataRetriever = class extends DataRetriever {
         deprecated_properties.forEach((d_p) => {
           delete obj.properties[d_p];
         });
-        delete obj["deprecated"];
+        delete obj['deprecated'];
         for (let p in obj.properties) {
           if (obj.properties[p].anyOf) {
             //remove any reference properties
@@ -156,12 +157,10 @@ const MultiYamlDataRetriever = class extends DataRetriever {
       return filtered;
     }, []);
 
-
     return result;
   };
 
-
-  _processGDCResult = (result, node, prop) => {
+  _processResult = (result, node, prop) => {
     const dataList = [];
 
     // No results
@@ -216,8 +215,8 @@ const MultiYamlDataRetriever = class extends DataRetriever {
           });
         }
         item['properties'] = propList;
-        item["required"] = r.required;     
-        item["relationship"] = r.links;
+        item['required'] = r.required;     
+        item['relationship'] = r.links;
 
         dataList.push(item);
       }
@@ -227,17 +226,17 @@ const MultiYamlDataRetriever = class extends DataRetriever {
   };
 
 
-  _findObjectWithRef = (obj, updateFn, root_key = "", level = 0) => {
+  _findObjectWithRef = (obj, updateFn, root_key = '', level = 0) => {
     // iterate over the properties
     for (var propertyName in obj) {
       if (level === 0) root_key = propertyName;
 
-      if (propertyName === "$ref") {
-        obj["$ref"] = updateFn(obj["$ref"], root_key);
+      if (propertyName === '$ref') {
+        obj['$ref'] = updateFn(obj['$ref'], root_key);
       }
 
       // any object that is not a simple value
-      if (obj[propertyName] !== null && typeof obj[propertyName] === "object") {
+      if (obj[propertyName] !== null && typeof obj[propertyName] === 'object') {
         // recurse into the object and write back the result to the object graph
         obj[propertyName] = this._findObjectWithRef(
           obj[propertyName],
