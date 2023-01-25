@@ -128,6 +128,7 @@ const getGraphicalICDCDictionary = async (node, prop ) => {
     propsPath: path.join(dataFilesPath, 'ICDC', 'icdc-model-props.yml'),
   });
   const results = await dataConnection.retriever.get({
+    dict: 'ICDC',
     node,
     prop
   });
@@ -145,21 +146,28 @@ const getGraphicalICDCDictionary = async (node, prop ) => {
   };
 };
 
-const getGraphicalCTDCDictionary = function (node, prop )  {
-  let result = cache.getValue("ctdc_dict_api");
-  if (result == undefined || node !== '') {
-    let jsonData = {};
-    var mpJson = yaml.load(dataFilesPath + "/CTDC/ctdc_model_properties_file.yaml");
-    jsonData.mpData = mpJson;
-    var mJson = yaml.load(dataFilesPath + "/CTDC/ctdc_model_file.yaml");
-    jsonData.mData = mJson;
-    result = generateICDCorCTDCData(jsonData, 'CTDC', node, prop);
-    if (node === '') cache.setValue("ctdc_dict_api", result, config.item_ttl);
+const getGraphicalCTDCDictionary = async (node, prop ) => {
+  const dataConnection = new DataConnection('mdf', {
+    modelPath: path.join(dataFilesPath, 'CTDC', 'ctdc_model_file.yaml'),
+    propsPath: path.join(dataFilesPath, 'CTDC', 'ctdc_model_properties_file.yaml'),
+  });
+  const results = await dataConnection.retriever.get({
+    dict: 'CTDC',
+    node,
+    prop
+  });
+
+  if (results.length === 0 ) {
+    return {
+      status: 400,
+      message: ' No data found. ',
+    };
   }
-  if (result.length === 0) {
-    return { status: 400, message: " No data found. " };
-  }
-  return { status: 200, results: result };
+
+  return {
+    status: 200,
+    results: results,
+  };
 }
 
 const processGDCDictionaryEnumData = (prop) => {
