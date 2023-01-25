@@ -1,5 +1,4 @@
 const DataRetriever = require('./DataRetriever');
-const Node = require('./../../lib/Node');
 const Property = require('./../../lib/Property');
 const fs = require('fs');
 const $RefParser = require('@apidevtools/json-schema-ref-parser');
