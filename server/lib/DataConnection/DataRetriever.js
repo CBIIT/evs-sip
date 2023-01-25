@@ -26,10 +26,11 @@ const DataRetriever = class {
    * @returns object[]
    */
   get = async (filters) => {
-    const dict = filters.dict;
+    const category = filters.category;
+    const dict = this._source.dict;
     const node = filters.node;
     const prop = filters.prop;
-    const cacheVarName = [dict, node, prop].filter(Boolean).join('-');
+    const cacheVarName = [dict, category, node, prop].filter(Boolean).join('-');
     let results = cache.getValue(cacheVarName);
 
     // No cached results, so get new results
