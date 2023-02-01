@@ -26,7 +26,7 @@ const readExcelFile = async () => {
       let lowerNode = item[3].replace(" Table", "").replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
       let node = item[3];
       let node_nc = item[2];
-      let pt = item[7];
+      let pt = (item[7]).toString();
       let p_desc = item[10];
       let ncit = item[4];
       let p_type = item[15];
