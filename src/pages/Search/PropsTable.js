@@ -124,10 +124,6 @@ const ColRight = styled(Col)`
   text-align: right;
 `;
 
-const LinkDesc = styled.a`
-  padding-left: 0.5rem;
-`;
-
 const Indicator = styled.div`
   position: relative;
   padding-bottom: 36%;
@@ -150,7 +146,16 @@ const IndicatorContent = styled.div`
 `;
 
 const Description = styled.p`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   margin-bottom: 0;
+`;
+
+const DescriptionContent = styled.div`
+  position: relative;
 `;
 
 const PropType = styled.span`
@@ -326,18 +331,16 @@ const PropsTable = (props) => {
     };
 
     return (
-      <Description>
-        <span dangerouslySetInnerHTML={{ __html: '<b>Definition:</b> ' + props.desc.substring(0, 138)}}></span>
-        {props.desc.length >= 138 &&
-          <>
-            <span className={isToggleOn === true ? '' : 'd-none'} dangerouslySetInnerHTML={{ __html: props.desc.substring(138)}}></span>
-            <LinkDesc href="/#" aria-label={isToggleOn === true ? 'collapse' : 'expand'} onClick={ToggleTableHandler}>
-              {isToggleOn === true ? <span>Less...</span> : <span>More... </span>}
-            </LinkDesc>
-          </>
+      <DescriptionContent>
+        <Description style={{'WebkitLineClamp': isToggleOn === true ? 'initial' : 3}} dangerouslySetInnerHTML={{ __html: '<b>Definition:</b> ' + props.desc}}></Description>
+        {props.desc.replace(/<b>/g, "").replace(/<\/b>/g, "").length > 200 &&
+          <a href="/#" aria-label={isToggleOn === true ? 'collapse' : 'expand'} onClick={ToggleTableHandler}>
+            {isToggleOn === true ? <span>Less...</span> : <span>More... </span>}
+          </a> 
         }
-      </Description>
+      </DescriptionContent>
     );
+
   };
 
 
