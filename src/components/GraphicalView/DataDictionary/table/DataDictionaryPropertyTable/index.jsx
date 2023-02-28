@@ -63,7 +63,20 @@ class DataDictionaryPropertyTable extends React.Component {
       ? this.props.matchedResult[this.props.nodeID]: {};
 
     const original_source = this.props.source.replace("_readonly","");
-    const properties = matchedPropertiesSummary.props;
+
+    const preprocessed_properties = {}
+    for (const key in this.props.properties) {
+      if (this.props.properties.hasOwnProperty(key)) {
+        preprocessed_properties[key] = {...this.props.properties[key], hits: [], enum: [], desc: this.props.properties[key].description}
+        delete preprocessed_properties[key].description
+      }
+    }
+
+    const properties = {
+      ...preprocessed_properties,
+      ...matchedPropertiesSummary.props,
+    };
+
     const spanClassName = 'data-dictionary-property-table__span';
     
 
@@ -119,7 +132,7 @@ class DataDictionaryPropertyTable extends React.Component {
                       <div
                         key={pKey}
                         className={spanClassName} 
-                        dangerouslySetInnerHTML={{__html: properties[pKey].title}}
+                        dangerouslySetInnerHTML={{__html: properties[pKey].title !== undefined ? properties[pKey].title : pKey}}
                       >
                       </div>
                     ),
