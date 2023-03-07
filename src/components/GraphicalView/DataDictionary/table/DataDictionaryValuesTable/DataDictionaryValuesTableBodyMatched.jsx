@@ -97,6 +97,11 @@ class DataDictionaryValuesTableBodyMatched extends React.Component {
             </thead>
             <tbody>
               {vs_html}
+              {this.props.hits.length === 0 && this.state.matched_show_all === false && 
+                <tr className='display-row'>
+                  <td className="data-dictionary-property-table__data table-row__no_values" colspan="4">No Matched Values</td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>

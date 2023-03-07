@@ -85,3 +85,7 @@ tr.display-row{
     margin-bottom: 1rem;
     color: #212529;
 }
+
+.table-row__no_values{
+  text-align: center !important;
+}
