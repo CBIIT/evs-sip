@@ -1304,7 +1304,7 @@
               "v_PT": ""
             },
             {
-              "v_name": "",
+              "v_name": "Bone Marrow Results",
               "v_n_code": "C190021",
               "v_PT": ""
             },
@@ -3136,9 +3136,9 @@
           "values": []
         },
         {
-          "p_name": "AGE_AT_IMT_START",
+          "p_name": "AGE_AT_CIMT_START",
           "p_n_code": "C173195",
-          "p_desc": "Age of subject (in days) at the start of the immunotherapy.",
+          "p_desc": "Age of subject (in days) at the start of the cellular immunotherapy.",
           "p_type": "number",
           "values": []
         },
@@ -4436,7 +4436,7 @@
           ]
         },
         {
-          "p_name": "MRD_SENSITIVTY",
+          "p_name": "MRD_SENSITIVITY",
           "p_n_code": "C168957",
           "p_desc": "Sensitivity of modality used to determine minimal residual disease.",
           "p_type": "number",
@@ -10242,8 +10242,8 @@
         },
         {
           "p_name": "MARGINS",
-          "p_n_code": "C123560",
-          "p_desc": "The determination of the presence of actual or potential neoplastic tissue which has been left outside the boundary of a resected specimen within the patient.",
+          "p_n_code": "C41227",
+          "p_desc": "One of the criteria for assessment of the effectiveness of given surgical procedure in achieving the local control of a neoplasm and the adequacy of tumor removal. It is defined by the tissue plane through which the dissection has been done and the actual or potential neoplastic tissue which has been left outside the boundary of a resected specimen within the patient. There are four types of surgical margins: intracapsular or intralesional, marginal, wide, and radical.",
           "p_type": "enum",
           "values": [
             {
@@ -10931,7 +10931,7 @@
           ]
         },
         {
-          "p_name": "SCT_CD34_COLL",
+          "p_name": "SCT_CD34_COLLECTED",
           "p_n_code": "C175036",
           "p_desc": "The determination of the amount of CD34 expressing stem cells present in a sample.",
           "p_type": "number",
@@ -14297,8 +14297,8 @@
         },
         {
           "p_name": "MARGINS",
-          "p_n_code": "C123560",
-          "p_desc": "The determination of the presence of actual or potential neoplastic tissue which has been left outside the boundary of a resected specimen within the patient.",
+          "p_n_code": "C41227",
+          "p_desc": "One of the criteria for assessment of the effectiveness of given surgical procedure in achieving the local control of a neoplasm and the adequacy of tumor removal. It is defined by the tissue plane through which the dissection has been done and the actual or potential neoplastic tissue which has been left outside the boundary of a resected specimen within the patient. There are four types of surgical margins: intracapsular or intralesional, marginal, wide, and radical.",
           "p_type": "enum",
           "values": [
             {
@@ -17817,7 +17817,7 @@
           ]
         },
         {
-          "p_name": "MRD_SENSITIVTY",
+          "p_name": "MRD_SENSITIVITY",
           "p_n_code": "C168957",
           "p_desc": "Sensitivity of modality used to determine minimal residual disease.",
           "p_type": "number",
@@ -22490,7 +22490,7 @@
         {
           "p_name": "MOD_RATIONALE",
           "p_n_code": "C185636",
-          "p_desc": "The reasoning behind a treatment modification.",
+          "p_desc": "The rationale for why an entity or event is changed.",
           "p_type": "enum",
           "values": [
             {
@@ -24127,7 +24127,7 @@
           ]
         },
         {
-          "p_name": "SCT_CD34_COLL",
+          "p_name": "SCT_CD34_COLLECTED",
           "p_n_code": "C175036",
           "p_desc": "The determination of the amount of CD34 expressing stem cells present in a sample.",
           "p_type": "number",
@@ -31710,8 +31710,8 @@
         },
         {
           "p_name": "AE_ATTRIBUTION",
-          "p_n_code": "C53255",
-          "p_desc": "A characteristic used to qualify the determination of whether an adverse event is related to medical product or procedure.",
+          "p_n_code": "C41358",
+          "p_desc": "A specific identifiable level (defined qualitatively or quantitatively) of probability of adverse event being caused or associated with the product or procedure administration to a patient.",
           "p_type": "enum",
           "values": [
             {
