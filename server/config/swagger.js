@@ -201,7 +201,7 @@ module.exports = function (protocol, host, basePath) {
             200: {
               description: 'Success.',
               schema: {
-                $ref: '#/definitions/ESDictResults',
+                $ref: '#/definitions/DictResults',
               },
             },
             404: {
@@ -258,7 +258,7 @@ module.exports = function (protocol, host, basePath) {
             200: {
               description: 'Success.',
               schema: {
-                $ref: '#/definitions/ESDictResults',
+                $ref: '#/definitions/DictResults',
               },
             },
             404: {
@@ -322,7 +322,7 @@ module.exports = function (protocol, host, basePath) {
             200: {
               description: 'Success.',
               schema: {
-                $ref: '#/definitions/ESDictPropertiesResults',
+                $ref: '#/definitions/DictPropertiesResults',
               },
             },
             404: {
@@ -575,7 +575,7 @@ module.exports = function (protocol, host, basePath) {
           name: 'ESSearchResults',
         },
       },
-      ESDictResults: {
+      DictResults: {
         type: 'object',
         properties: {
           status: {
@@ -659,10 +659,10 @@ module.exports = function (protocol, host, basePath) {
           },
         },
         xml: {
-          name: 'ESDictResults',
+          name: 'DictResults',
         },
       },
-      ESDictPropertiesResults: {
+      DictPropertiesResults: {
         type: 'object',
         properties: {
           status: {
@@ -701,9 +701,9 @@ module.exports = function (protocol, host, basePath) {
           },
         },
         xml: {
-          name: 'ESDictPropertiesResults',
+          name: 'DictPropertiesResults',
         },
-      }, // end for ESDictPropertiesResults
+      }, // end for DictPropertiesResults
     }, // description:
   } // return
 } // end for the function
