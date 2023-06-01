@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const shared = require("./shared");
 // const git = require('nodegit');
-// const Excel = require("exceljs");
+const Excel = require("exceljs");
 const export_excel = require('node-excel-export');
 const dataFilesPath = path.join(__dirname, "..", "..", "data_files");
 var syns = {};
@@ -1550,8 +1550,8 @@ const generateCompareProperties = async function(req, res) {
   const dataset = [];
 	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.6.3");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.5.0");
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.6.6");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.6.3");
   let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
@@ -1687,8 +1687,8 @@ const generateCompareNodes = async function(req, res) {
   let GDCDictOld = {}
 
   try {
-    GDCDict = await shared.getGDCDictionaryByVersion("2.6.3");
-    GDCDictOld = await shared.getGDCDictionaryByVersion("2.5.0");
+    GDCDict = await shared.getGDCDictionaryByVersion("2.6.6");
+    GDCDictOld = await shared.getGDCDictionaryByVersion("2.6.3");
   } catch(e) {
     console.log(e)
   }
