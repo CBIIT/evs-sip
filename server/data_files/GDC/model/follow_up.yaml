@@ -1377,7 +1377,7 @@ properties:
 
   days_to_comorbidity:
     $ref:
-      - "_terms.yaml#/days_to_comorbidity"
+      - "_terms.yaml#/days_to_comorbidity/common"
     type: integer
     maximum: 32872
     minimum: -32872
