@@ -1372,14 +1372,14 @@ properties:
 
   days_to_comorbidity:
     $ref:
-      - "_terms.yaml#days_to_comorbidity"
+      - "_terms.yaml#/days_to_comorbidity"
     type: integer
     maximum: 32872
     minimum: -32872
 
   days_to_first_event:
     $ref:
-      - "_terms.yaml#days_to_first_event/common"
+      - "_terms.yaml#/days_to_first_event/common"
     type: integer
     maximum: 32872
     minimum: -32872
