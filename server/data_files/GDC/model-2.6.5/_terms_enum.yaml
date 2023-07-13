@@ -28470,8 +28470,8 @@ bcell_lymphoma_unclassifiable_with_features_intermediate_between_diffuse_large_b
       term_id: C80291
       term_version: 20.05a
 
-? bcell_lymphoma_unclassifiable_with_features_intermediate_between_diffuse_large_bcell_lymphoma_and_classical_hodgkin_lymphoma
-: common:
+bcell_lymphoma_unclassifiable_with_features_intermediate_between_diffuse_large_bcell_lymphoma_and_classical_hodgkin_lymphoma:
+  common:
     description: >-
       A group of lymphomas displaying molecular, morphologic, immunophenotypic, and
       clinical overlap between classic Hodgkin lymphoma and diffuse large B-cell lymphoma.  This

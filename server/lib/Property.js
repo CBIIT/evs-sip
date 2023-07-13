@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 /**
  * Models a node's property
  * TODO describe _termDef
@@ -45,6 +47,9 @@ const Property = class {
       if (schema.hasOwnProperty('enum')) {
         this._type = 'enum';
         this._values = schema.enum;
+        if (schema.deprecated_enum) {
+          this._values = _.differenceWith(schema.enum, schema.deprecated_enum, _.isEqual);
+        }
       } else if (schema.hasOwnProperty('oneOf')) {
         const types = [];
 
