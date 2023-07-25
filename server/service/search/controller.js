@@ -1550,8 +1550,8 @@ const generateCompareProperties = async function(req, res) {
   const dataset = [];
 	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.5.0");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.4.1");
+  let GDCDict = await shared.getGDCDictionaryByVersion("2.6.3");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.5.0");
   let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
@@ -1680,12 +1680,19 @@ const generateCompareProperties = async function(req, res) {
 }
 
 const generateCompareNodes = async function(req, res) {
-  /*
   const dataset = [];
 	let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("2.4.1");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.3.0");
+  let GDCDict = {}
+  let GDCDictOld = {}
+
+  try {
+    GDCDict = await shared.getGDCDictionaryByVersion("2.6.3");
+    GDCDictOld = await shared.getGDCDictionaryByVersion("2.5.0");
+  } catch(e) {
+    console.log(e)
+  }
+
   let node_mapping = shared.readGDCNodes();
 	
 	for(let node in GDCDict){
@@ -1781,7 +1788,6 @@ const generateCompareNodes = async function(req, res) {
     // You can then return this straight
     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
-    */
 }
 
 

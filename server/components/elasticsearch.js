@@ -209,9 +209,9 @@ const helper_gdc = (fileJson, syns) => {
       });
     }
 
-    if (entry.deprecated_enum) {
-      values = _.differenceWith(values, entry.deprecated_enum, _.isEqual);
-    }
+    // if (entry.deprecated_enum) {
+    //   values = _.differenceWith(values, entry.deprecated_enum, _.isEqual);
+    // }
 
     //generate p.enum
     if(values.length > 0){

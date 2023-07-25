@@ -3,7 +3,10 @@ const controller = require("./controller");
 
 const router = express.Router();
 
+// build indexes for elasticsearch
 router.get("/buildIndex", controller.indexing);
+
+// suggestions list api
 router.get("/suggest", controller.suggestion);
 
 // property based api

@@ -45,6 +45,9 @@ const Property = class {
       if (schema.hasOwnProperty('enum')) {
         this._type = 'enum';
         this._values = schema.enum;
+        if (schema.deprecated_enum) {
+          this._values = schema.enum.filter(value => !schema.deprecated_enum.includes(value));
+        }
       } else if (schema.hasOwnProperty('oneOf')) {
         const types = [];
 
