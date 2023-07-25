@@ -10709,9 +10709,8 @@ properties:
       B-cell lymphoma, unclassifiable, with features intermediate between diffuse large B-cell lymphoma and Burkitt lymphoma:
         $ref:
           - "_terms_enum.yaml#/bcell_lymphoma_unclassifiable_with_features_intermediate_between_diffuse_large_bcell_lymphoma_and_burkitt_lymphoma/common"
-      ? B-cell lymphoma, unclassifiable, with features intermediate between diffuse
-        large B-cell lymphoma and classical Hodgkin lymphoma
-      : $ref:
+      B-cell lymphoma, unclassifiable, with features intermediate between diffuse large B-cell lymphoma and classical Hodgkin lymphoma:
+        $ref:
           - "_terms_enum.yaml#/bcell_lymphoma_unclassifiable_with_features_intermediate_between_diffuse_large_bcell_lymphoma_and_classical_hodgkin_lymphoma/common"
       Balloon cell melanoma:
         $ref:
