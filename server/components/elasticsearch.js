@@ -150,8 +150,8 @@ const helper_gdc = (fileJson, syns) => {
     let values_icdo_mapping = {};
     // 1. work on entry.enum and entry.enumDef
     entry.enum.forEach(v => {
-      values.push(v);
-      values_ncit_mapping[v.toLowerCase()] = [];
+      values.push(v.toString());
+      values_ncit_mapping[v.toString().toLowerCase()] = [];
     });
 
     /*
