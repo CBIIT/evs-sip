@@ -1,64 +1,123 @@
 # EVS-SIP
 
-## 1 - Introduction
+1. [Introduction](#introduction)
+2. [Requirements](#requirements)
+3. [System overview](#system-overview)
+4. [How to set up in a local development environment](#how-to-set-up-in-a-local-development-environment)
+   1. [Set up repository](#set-up-repository)
+   2. [Environment variables](#environment-variables)
+   3. [Run the EVS-SIP backend](#run-the-evs-sip-backend)
+   4. [Run Elasticsearch](#run-elasticsearch)
+   5. [Build Elasticsearch index](#build-elasticsearch-index)
+   6. [Run the EVS-SIP frontend](#run-the-evs-sip-frontend)
+   7. [Verifying functionality](#verifying-functionality)
+      1. [Search](#search)
+      2. [Swagger API](#swagger-api)
+      3. [Graphical representation API](#graphical-representation-api)
+5. [Project structure](#project-structure)
+
+## Introduction
 
 This repository contains both the frontend and the backend for EVS-SIP.
 
-## 2 - How to set up in a local development environment
+## Requirements
 
-### 2.1 - Environment variables
+- Elasticsearch 7.17.10
+- Node.js 14.16.0
+
+## System overview
+
+The EVS-SIP web application reads through dictionary files to retrieve data for the public API and graphical API. The web application gets results for the search API from Elasticsearch.
+
+```mermaid
+graph TD
+  A[EVS-SIP]
+  B[Dictionary files]
+  C[Elasticsearch]
+  A -->|" "| B
+  B -->|" "| A
+  A -->|" "| C
+  C -->|" "| A
+```
+
+## How to set up in a local development environment
+
+Setup consists of the following steps:
+
+1. Set up repository
+2. Configure environment variables
+3. Run the EVS-SIP backend
+4. Run Elasticsearch
+5. Build Elasticsearch index
+6. Run the EVS-SIP frontend
+
+### Set up repository
+
+```bash
+git clone https://github.com/CBIIT/evs-sip.git
+```
+
+Install Node packages:
+
+```bash
+npm ci
+# or, if necessary:
+npm ci --legacy-peer-deps
+```
+
+### Environment variables
 
 Modify `.env` to specify the following variables:
 
 - `NODE_ENV` The type of environment. Set this to `dev`.
 - `PORT` The port on which the frontend is run. Ensure that this is different from the port used by the backend.
 - `LOGDIR` The path in which log files will be stored.
-- `EVSSIP_SERV_API_URL` The URL for the search API. Something like `http://localhost:3000/service/search`.
-- `REACT_APP_DEV_API_URL` I don't know what this is. Something like `http://localhost:3000/api/search`.
+- `EVSSIP_SERV_API_URL` The URL for the search API. For example, `http://localhost:3000/service/search`.
+- `REACT_APP_DEV_API_URL` I don't know what this is. For example, `http://localhost:3000/service/search`.
+- `EVSSIP_PUB_API_URL`=`http://localhost:3000/api/search`
+- `REACT_APP_SERVER`=`http://localhost:3000`
 
-### 2.2 - Elasticsearch index
+### Run the EVS-SIP backend
 
-Build an Elasticsearch index by performing the following:
+Open a shell, and run the command
 
-1. Confirm that an ES service is available by running
+```bash
+npm run backend
+```
+
+### Run Elasticsearch
+
+Ensure that Elasticsearch is running on port `9200`.
+
+### Build Elasticsearch index
+
+EVS-SIP's search API uses Elasticsearch. To make Elasticsearch ready for use, you must first build an index. Build the Elasticsearch index by following the steps below:
+
+1. Open a shell, and confirm that an ES service is available by running the command
 
     ```bash
     curl -X GET http://localhost:9200
     ```
 
-2. Delete the current index by running
+2. Delete the current index by running the command
 
     ```bash
     curl -X DELETE http://localhost:9200/_all
     ```
 
-3. Build a new index by running
+3. Build a new index by running the command
 
     ```bash
     curl http://localhost:3000/service/search/buildIndex
     ```
 
-    You may need to uncomment the route.
+    You may need to uncomment the following line in `server/service/search/index.js`:
 
-### 2.3 - Run Elasticsearch
+    ```JavaScript
+    router.get("/buildIndex", controller.indexing);
+    ```
 
-If Elasticsearch is not already running, execute the command
-
-```bash
-elasticsearch
-```
-
-Elasticsearch should default to running on port `9200`.
-
-### 2.4 - Run the backend
-
-Execute the command
-
-```bash
-node app.js
-```
-
-### 2.5 - Run the frontend
+### Run the EVS-SIP frontend
 
 Execute the command
 
@@ -66,77 +125,20 @@ Execute the command
 npm run frontend
 ```
 
-## 3 - Project structure
+### Verifying functionality
+
+#### Search
+
+Try searching terms on the homepage or search page. If you see autocomplete suggestions while typing and receive results for your search, then Elasticsearch works.
+
+#### Swagger API
+
+Check out <localhost:3000/api/docs>.
+
+#### Graphical representation API
+
+Check out <localhost:3001/evssip/datamodel> and see if the graphical representation for your selected Data Commons appears.
+
+## Project structure
 
 stub
-
-## Default React README below
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
