@@ -150,21 +150,9 @@ const helper_gdc = (fileJson, syns) => {
     let values_icdo_mapping = {};
     // 1. work on entry.enum and entry.enumDef
     entry.enum.forEach(v => {
-      values.push(v.toString());
-      values_ncit_mapping[v.toString().toLowerCase()] = [];
+      values.push(v);
+      values_ncit_mapping[v.toLowerCase()] = [];
     });
-
-    /*
-    for(let key in entry.enumDef){
-      let obj = entry.enumDef[key];
-      let v = key.toLowerCase();
-      if(v in values_ncit_mapping){
-        if(obj && obj.termDef && obj.termDef.term_id && values_ncit_mapping[v].indexOf(obj.termDef.term_id.trim()) == -1){
-          values_ncit_mapping[v].push(obj.termDef.term_id.trim());
-        }
-      }
-    }
-    */
 
     // 2. work on conceptCode to further combind the ncit code
     // depracted as data mappings in conceptCode.js file have already been included in gdc_values.js file
@@ -208,10 +196,6 @@ const helper_gdc = (fileJson, syns) => {
         
       });
     }
-
-    // if (entry.deprecated_enum) {
-    //   values = _.differenceWith(values, entry.deprecated_enum, _.isEqual);
-    // }
 
     //generate p.enum
     if(values.length > 0){
