@@ -48,6 +48,7 @@ const Property = class {
         if (schema.deprecated_enum) {
           this._values = schema.enum.filter(value => !schema.deprecated_enum.includes(value));
         }
+        this._values = this._values.map(item => String(item).replace(/\n/g, ' '));
       } else if (schema.hasOwnProperty('oneOf')) {
         const types = [];
 
