@@ -31,7 +31,6 @@ function App() {
   return (
       <Router basename={'/evssip'}>
         <MainContainer>
-          <ShutdownBanner/>
           <Header/>
           <NavigationBar/>
           <Layout>
