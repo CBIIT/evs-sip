@@ -19,7 +19,6 @@ import Search from './pages/Search';
 import DataModel from './pages/DataModel';
 import ReportDiff from './pages/ReportDiff';
 import NotFound from './pages/NotFound';
-import ShutdownBanner from './components/ShutdownBanner /ShutdownBanner';
 
 
 const MainContainer = styled.div`
