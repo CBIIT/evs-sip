@@ -1541,6 +1541,168 @@ const generateGDCValuesReport = async function(req, res) {
   res.send(report);
 }
 
+// const generateCompareValues = async function(req, res) {
+//   try {
+// 	const datasetnew = {};
+//   const datasetold = {};
+//   const dataset = [];
+// 	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
+	
+//   let GDCDict = await shared.getGDCDictionaryByVersion("3.1.0");
+//   let GDCDictOld = await shared.getGDCDictionaryByVersion("3.0.0");
+//   let prop_mapping = shared.readGDCProps();
+//   let values_mapping = shared.readGDCValues();
+	
+// 	for(let node in GDCDict){
+// 		let entry = GDCDict[node];
+// 		if(entry.properties){
+// 			let prop_dict = entry.properties;
+// 			for(let prop in prop_dict){
+// 				let tmp = {};
+// 				tmp.category = entry.category;
+// 				tmp.node = node;
+// 				tmp.property = prop;
+//         if(prop_dict[prop].enum){
+
+//           let uid = entry.category + "." + node + "." + prop;
+//           let tmp_enum = values_mapping[uid] !== undefined ? values_mapping[uid] : [];
+
+//             prop_dict[prop].enum.forEach(item => {
+//                 let found = tmp_enum.find(element => element['nm'] === item);
+//                 if (!found) {
+//                     tmp_enum.push({'nm': item, 'n_c': [], 'i_c': '','i_c_s': '', 'term_type': '' });
+//                 } 
+//             });
+
+//           tmp.enum = tmp_enum
+
+//           datasetnew[uid] = tmp;
+//         }
+// 			}
+// 		} 
+// 	}
+
+//   for(let node in GDCDictOld){
+// 		let entry = GDCDictOld[node];
+// 		if(entry.properties){
+// 			let prop_dict = entry.properties;
+// 			for(let prop in prop_dict){
+// 				let tmp = {};
+// 				tmp.category = entry.category;
+// 				tmp.node = node;
+// 				tmp.property = prop;
+        
+//         if(prop_dict[prop].enum){
+
+//           let uid = entry.category + "." + node + "." + prop;
+//           let tmp_enum = values_mapping[uid] !== undefined ? values_mapping[uid] : [];
+
+//           prop_dict[prop].enum.forEach(item => {
+
+//             let found = tmp_enum.find(element => element['nm'] === item);
+//             if (!found) {
+//                 tmp_enum.push({'nm': item, 'n_c': [], 'i_c': '','i_c_s': '', 'term_type': '' });
+//             } 
+//         });
+
+//           tmp.enum = tmp_enum
+
+//           datasetold[uid] = tmp;
+//         }
+// 			}
+// 		} 
+// 	}
+
+//   for(let key in datasetnew){
+//     if (!datasetold[key]) {
+//       datasetnew[key].newprop = datasetnew[key].property;
+//       datasetnew[key].oldprop = 'no match';
+//       dataset.push(datasetnew[key])
+//     }else if (datasetnew[key] && datasetold[key]) {
+//       datasetnew[key].newprop = datasetnew[key].property;
+//       datasetnew[key].oldprop = datasetold[key].property;
+//       dataset.push(datasetnew[key])
+//     }
+//   }
+//   for(let key in datasetold){
+//     if (!datasetnew[key]) {
+//       datasetold[key].newprop = 'no match';
+//       datasetold[key].oldprop = datasetold[key].property;
+//       dataset.push(datasetold[key])
+//     }
+//   }
+
+//   // You can define styles as json object
+// 	const styles = {
+//     cellPink: {
+//       fill: {
+//       fgColor: {
+//         rgb: 'FF00FF00'
+//       }
+//       }
+//     }
+//     };
+    
+//     //Array of objects representing heading rows (very top)
+//     const heading = [
+//     ];
+    
+//     //Here you specify the export structure
+//     const specification = {
+//       category: { // <- the key should match the actual data key
+//         displayName: 'Category', // <- Here you specify the column header
+//         headerStyle: styles.cellPink, // <- Header style
+//         width: 220 // <- width in pixels
+//       },
+//       node: {
+//         displayName: 'Node',
+//         headerStyle: styles.cellPink,
+//         width: 220 // <- width in chars (when the number is passed as string)
+//       },
+//       oldprop: {
+//         displayName: 'Old GDC Property',
+//         headerStyle: styles.cellPink,
+//         width: 220 // <- width in pixels  
+//       },
+//       newprop: {
+//         displayName: 'New GDC Property',
+//         headerStyle: styles.cellPink,
+//         width: 220 // <- width in pixels
+//       },
+//       ncit: {
+//         displayName: 'NCIt Code',
+//         headerStyle: styles.cellPink,
+//         width: 220 // <- width in pixels
+//       }
+//     }
+    
+//     // Define an array of merges. 1-1 = A:1
+//     // The merges are independent of the data.
+//     // A merge will overwrite all data _not_ in the top-left cell.
+//     const merges = [];
+    
+//     // Create the excel report.
+//     // This function will return Buffer
+//     const report = export_excel.buildExport(
+//     [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+//       {
+//       name: 'Report', // <- Specify sheet name (optional)
+//       heading: heading, // <- Raw heading array (optional)
+//       merges: merges, // <- Merge cell ranges
+//       specification: specification, // <- Report specification
+//       data: dataset // <-- Report data
+//       }
+//     ]
+//     );
+    
+//     // You can then return this straight
+//     res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+//     res.send(report);
+//   }
+//   catch(e) {
+//     console.log(e)
+//   }
+// }
 
 
 const generateCompareProperties = async function(req, res) {
@@ -1550,8 +1712,8 @@ const generateCompareProperties = async function(req, res) {
   const dataset = [];
 	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("3.0.0");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("2.6.6");
+  let GDCDict = await shared.getGDCDictionaryByVersion("3.1.0");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("3.0.0");
   let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
@@ -1671,7 +1833,7 @@ const generateCompareProperties = async function(req, res) {
     );
     
     // You can then return this straight
-    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.attachment('prop_diff_report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
   }
   catch(e) {
@@ -1687,8 +1849,8 @@ const generateCompareNodes = async function(req, res) {
   let GDCDictOld = {}
 
   try {
-    GDCDict = await shared.getGDCDictionaryByVersion("3.0.0");
-    GDCDictOld = await shared.getGDCDictionaryByVersion("2.6.6");
+    GDCDict = await shared.getGDCDictionaryByVersion("3.1.0");
+    GDCDictOld = await shared.getGDCDictionaryByVersion("3.0.0");
   } catch(e) {
     console.log(e)
   }
@@ -1786,7 +1948,7 @@ const generateCompareNodes = async function(req, res) {
     );
     
     // You can then return this straight
-    res.attachment('report.xlsx'); // This is sails.js specific (in general you need to set headers)
+    res.attachment('node_diff_report.xlsx'); // This is sails.js specific (in general you need to set headers)
     res.send(report);
 }
 
@@ -2135,6 +2297,7 @@ module.exports = {
 	exportAllCompareResult,
 	generateGDCPropertiesReport,
   generateGDCValuesReport,
+  // generateCompareValues,
   generateCompareProperties,
   generateCompareNodes,
   updateGDCPropertyMappings,
