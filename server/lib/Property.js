@@ -73,7 +73,11 @@ const Property = class {
       if (schema.type === 'array') { // Handle arrays
         // Obtain list of permissible values, if it exists
         if (schema.hasOwnProperty('items')) {
-          this._values = schema.items.enum;
+          if (schema.deprecated_enum) {
+            this._values = schema.items.enum.filter(value => !schema.deprecated_enum.includes(value));
+          } else {
+            this._values = schema.items.enum;
+          }
         } else {
           this._values = [];
         }
