@@ -31,6 +31,7 @@ router.get('/exportCompareResult', controller.exportCompareResult);
 router.get('/exportAllCompareResult', controller.exportAllCompareResult);
 //router.get('/generateGDCPropertiesReport', controller.generateGDCPropertiesReport);
 //router.get('/generateGDCValuesReport', controller.generateGDCValuesReport);
+// router.get('/generateCompareValues', controller.generateCompareValues);
 router.get('/generateCompareProperties', controller.generateCompareProperties);
 router.get('/generateCompareNodes', controller.generateCompareNodes);
 //router.get('/updateGDCPropertyMappings', controller.updateGDCPropertyMappings);

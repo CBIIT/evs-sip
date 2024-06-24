@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Container, Row, Col, Table, Tab, Nav, Collapse} from 'react-bootstrap';
-import LazyLoad from 'react-lazyload';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus, faAngleUp, faAngleDown, faSpinner} from '@fortawesome/free-solid-svg-icons';
-import { getHighlightObj, sortAlphabetically, sortSynonyms, browserDetection } from '../../shared';
+import { faPlus, faMinus, faAngleUp, faAngleDown} from '@fortawesome/free-solid-svg-icons';
+import { getHighlightObj, sortAlphabetically, sortSynonyms } from '../../shared';
 
 const ContainerStyled = styled(Container)`
   font-size: 1rem;
@@ -105,14 +104,6 @@ const IndicatorContent = styled.div`
   transform: translateY(-50%);
 `;
 
-const RowCenter = styled(Row)`
-    height: 180px;
-    align-content: center;
-    justify-content: center;
-    color: #888;
-`;
-
-
 const GDCValuesTable = (props) => {
   let items = JSON.parse(JSON.stringify(props.values));
   let values = [];
@@ -209,14 +200,6 @@ const GDCValuesTable = (props) => {
       values.push(obj);
     }
   });
-
-  const PlaceholderComponent = () => {
-    return (<Col sm={12}>
-        <RowCenter>
-          <FontAwesomeIcon icon={faSpinner} spin size="2x"/>
-        </RowCenter>
-      </Col>);
-  }
 
   const TableSynonyms = (props) => {
     if (props.synonyms !== undefined) {
@@ -495,14 +478,6 @@ const GDCValuesTable = (props) => {
     );
   }
 
-  const LazyLoadContainer = (props) => {
-    return (
-      <LazyLoad height={180} once overflow={true} offset={200} key={props.index} placeholder={<PlaceholderComponent />} classNamePrefix="lazyload-gdc">
-        {props.children}
-      </LazyLoad>
-    );
-  }
-
   if (values.length !== 0) {
     return (
     <ContainerStyled>
@@ -515,22 +490,11 @@ const GDCValuesTable = (props) => {
         </Col>
       </TableThead>
       <TableBody>
-        {(values.length < 6 || browserDetection.isEdge)
-          ? 
-          <Col xs={12}>
-            {values.map((item, index) => 
-              <ValueItem item={item} key={index} />
-            )}
-          </Col>
-          :
-          <Col xs={12}>
-            {values.map((item, index) => 
-              <LazyLoadContainer key={index}>
-                <ValueItem item={item} key={index}/>
-              </LazyLoadContainer>
-            )}
-          </Col>
-        }
+        <Col xs={12}>
+          {values.map((item, index) => 
+            <ValueItem item={item} key={index} />
+          )}
+        </Col>
       </TableBody>
     </ContainerStyled>
     );
