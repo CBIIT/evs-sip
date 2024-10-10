@@ -1,14 +1,14 @@
 $schema: "http://json-schema.org/draft-04/schema#"
 
-id: "submitted_expression_array"
-title: Submitted Expression Array
+id: "clinical_supplement"
+title: Clinical Supplement
 type: object
 namespace: https://gdc.cancer.gov
 category: data_file
 project: '*'
 program: '*'
 description: >-
-  Data file containing raw data from an expression array.
+  Data file containing clinical metadata information.
 additionalProperties: false
 submittable: true
 downloadable: true
@@ -25,12 +25,18 @@ systemProperties:
   - error_type
 
 links:
-  - name: aliquots
-    backref: submitted_expression_arrays
+  - name: cases
+    backref: clinical_supplements
     label: derived_from
-    target_type: aliquot
-    multiplicity: many_to_one
+    target_type: case
+    multiplicity: many_to_many
     required: true
+  - name: archives
+    backref: clinical_supplements
+    label: member_of
+    target_type: archive
+    multiplicity: many_to_one
+    required: false
 
 required:
   - submitter_id
@@ -40,8 +46,6 @@ required:
   - data_category
   - data_format
   - data_type
-  - experimental_strategy
-  - platform
 
 uniqueKeys:
   - [id]
@@ -56,32 +60,28 @@ properties:
     $ref:
       - "_terms.yaml#/data_category/common"
     enum:
-      - Transcriptome Profiling
-
-  data_format:
-    $ref:
-      - "_terms.yaml#/data_format/common"
-    enum:
-      - CEL
+      - Clinical
 
   data_type:
     $ref:
       - "_terms.yaml#/data_type/common"
     enum:
-      - Raw Intensities
+      - Clinical Supplement
 
-  experimental_strategy:
+  data_format:
     $ref:
-      - "_terms.yaml#/experimental_strategy/common"
+      - "_terms.yaml#/data_format/common"
     enum:
-      - Expression Array
+      - BCR Biotab
+      - BCR OMF XML
+      - BCR XML
+      - CDC JSON
+      - FoundationOne XML
+      - TSV
+      - XLSX
 
-  platform:
-    $ref:
-      - "_terms.yaml#/platform/common"
-    enum:
-      - GeneChip U133 Plus 2.0
-      - GeneChip U133A
+  cases:
+    $ref: "_definitions.yaml#/to_many"
 
-  aliquots:
+  archives:
     $ref: "_definitions.yaml#/to_one"
