@@ -1,17 +1,17 @@
 $schema: "http://json-schema.org/draft-04/schema#"
 
-id: "submitted_expression_array"
-title: Submitted Expression Array
+id: "submitted_tangent_copy_number"
+title: Submitted Tangent Copy Number
 type: object
 namespace: https://gdc.cancer.gov
 category: data_file
 project: '*'
 program: '*'
 description: >-
-  Data file containing raw data from an expression array.
+  Data file containing tangent normalized copy number information from an aliquot.
 additionalProperties: false
 submittable: true
-downloadable: true
+downloadable: false
 previous_version_downloadable: true
 validators: null
 
@@ -26,10 +26,10 @@ systemProperties:
 
 links:
   - name: aliquots
-    backref: submitted_expression_arrays
+    backref: submitted_tangent_copy_number
     label: derived_from
     target_type: aliquot
-    multiplicity: many_to_one
+    multiplicity: one_to_one
     required: true
 
 required:
@@ -41,7 +41,6 @@ required:
   - data_format
   - data_type
   - experimental_strategy
-  - platform
 
 uniqueKeys:
   - [id]
@@ -56,32 +55,25 @@ properties:
     $ref:
       - "_terms.yaml#/data_category/common"
     enum:
-      - Transcriptome Profiling
-
-  data_format:
-    $ref:
-      - "_terms.yaml#/data_format/common"
-    enum:
-      - CEL
+      - Copy Number Variation
 
   data_type:
     $ref:
       - "_terms.yaml#/data_type/common"
     enum:
-      - Raw Intensities
+      - Copy Number Estimate
+
+  data_format:
+    $ref:
+      - "_terms.yaml#/data_format/common"
+    enum:
+      - TXT
 
   experimental_strategy:
     $ref:
       - "_terms.yaml#/experimental_strategy/common"
     enum:
-      - Expression Array
-
-  platform:
-    $ref:
-      - "_terms.yaml#/platform/common"
-    enum:
-      - GeneChip U133 Plus 2.0
-      - GeneChip U133A
+      - Genotyping Array
 
   aliquots:
     $ref: "_definitions.yaml#/to_one"

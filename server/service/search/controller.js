@@ -1712,8 +1712,8 @@ const generateCompareProperties = async function(req, res) {
   const dataset = [];
 	// let output_file_path = path.join(__dirname, '..', '..', 'data_files', 'GDC', 'gdc_values_updated.js');
 	
-  let GDCDict = await shared.getGDCDictionaryByVersion("3.1.0");
-  let GDCDictOld = await shared.getGDCDictionaryByVersion("3.0.0");
+  let GDCDict = await shared.getGDCDictionaryByVersion("3.3.0");
+  let GDCDictOld = await shared.getGDCDictionaryByVersion("3.1.0");
   let prop_mapping = shared.readGDCProps();
 	
 	for(let node in GDCDict){
