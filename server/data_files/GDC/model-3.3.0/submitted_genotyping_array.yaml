@@ -1,14 +1,14 @@
 $schema: "http://json-schema.org/draft-04/schema#"
 
-id: "submitted_expression_array"
-title: Submitted Expression Array
+id: "submitted_genotyping_array"
+title: Submitted Genotyping Array
 type: object
 namespace: https://gdc.cancer.gov
 category: data_file
 project: '*'
 program: '*'
 description: >-
-  Data file containing raw data from an expression array.
+  Data file containing raw data from a genotyping array.
 additionalProperties: false
 submittable: true
 downloadable: true
@@ -26,7 +26,7 @@ systemProperties:
 
 links:
   - name: aliquots
-    backref: submitted_expression_arrays
+    backref: submitted_genotyping_arrays
     label: derived_from
     target_type: aliquot
     multiplicity: many_to_one
@@ -56,13 +56,7 @@ properties:
     $ref:
       - "_terms.yaml#/data_category/common"
     enum:
-      - Transcriptome Profiling
-
-  data_format:
-    $ref:
-      - "_terms.yaml#/data_format/common"
-    enum:
-      - CEL
+      - Copy Number Variation
 
   data_type:
     $ref:
@@ -70,18 +64,23 @@ properties:
     enum:
       - Raw Intensities
 
+  data_format:
+    $ref:
+      - "_terms.yaml#/data_format/common"
+    enum:
+      - CEL
+
   experimental_strategy:
     $ref:
       - "_terms.yaml#/experimental_strategy/common"
     enum:
-      - Expression Array
+      - Genotyping Array
 
   platform:
     $ref:
       - "_terms.yaml#/platform/common"
     enum:
-      - GeneChip U133 Plus 2.0
-      - GeneChip U133A
+      - Affymetrix SNP 6.0
 
   aliquots:
     $ref: "_definitions.yaml#/to_one"

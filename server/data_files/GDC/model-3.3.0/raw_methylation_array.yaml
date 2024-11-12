@@ -1,18 +1,18 @@
 $schema: "http://json-schema.org/draft-04/schema#"
 
-id: "submitted_expression_array"
-title: Submitted Expression Array
+id: "raw_methylation_array"
+title: Raw Methylation Array
 type: object
 namespace: https://gdc.cancer.gov
 category: data_file
 project: '*'
 program: '*'
 description: >-
-  Data file containing raw data from an expression array.
+  Data file containing channel data from a methylation array.
 additionalProperties: false
 submittable: true
-downloadable: true
-previous_version_downloadable: true
+downloadable: false
+previous_version_downloadable: false
 validators: null
 
 systemProperties:
@@ -26,8 +26,8 @@ systemProperties:
 
 links:
   - name: aliquots
-    backref: submitted_expression_arrays
-    label: derived_from
+    backref: raw_methylation_arrays
+    label: data_from
     target_type: aliquot
     multiplicity: many_to_one
     required: true
@@ -42,6 +42,7 @@ required:
   - data_type
   - experimental_strategy
   - platform
+  - channel
 
 uniqueKeys:
   - [id]
@@ -52,17 +53,34 @@ properties:
   $ref:
     - "_definitions.yaml#/data_file_properties"
 
+  channel:
+    $ref:
+      - "_terms.yaml#/channel/common"
+    enum:
+      - Green
+      - Red
+
+  chip_id:
+    $ref:
+      - "_terms.yaml#/chip_id/common"
+    type: string
+
+  chip_position:
+    $ref:
+      - "_terms.yaml#/chip_position/common"
+    type: string
+
   data_category:
     $ref:
       - "_terms.yaml#/data_category/common"
     enum:
-      - Transcriptome Profiling
+      - DNA Methylation
 
   data_format:
     $ref:
       - "_terms.yaml#/data_format/common"
     enum:
-      - CEL
+      - IDAT
 
   data_type:
     $ref:
@@ -74,14 +92,26 @@ properties:
     $ref:
       - "_terms.yaml#/experimental_strategy/common"
     enum:
-      - Expression Array
+      - Methylation Array
+
+  plate_name:
+    $ref:
+      - "_terms.yaml#/plate_name/common"
+    type: string
+
+  plate_well:
+    $ref:
+      - "_terms.yaml#/plate_well/common"
+    type: string
 
   platform:
     $ref:
       - "_terms.yaml#/platform/common"
     enum:
-      - GeneChip U133 Plus 2.0
-      - GeneChip U133A
+      - Illumina Human Methylation 27
+      - Illumina Human Methylation 450
+      - Illumina Methylation Epic
+      - Illumina Methylation Epic v2
 
   aliquots:
     $ref: "_definitions.yaml#/to_one"
