@@ -32,7 +32,7 @@ class DataDictionaryValuesTableRows extends React.Component {
 
     const rows = this.props.syns.map((syn, index) => {
 
-      let ncit = "<a target=\"_blank\" href=\"https://ncit.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&code=" + syn.c + "\">" + syn.c + "</a>";
+      let ncit = "<a target=\"_blank\" href=\"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + syn.c + "\">" + syn.c + "</a>";
 
       if(this.props.highlights["enum.ncit.c"] || this.props.highlights["enum.ncit.c.have"]){
         let ncits = this.props.highlights["enum.ncit.c"] || this.props.highlights["enum.ncit.c.have"];
