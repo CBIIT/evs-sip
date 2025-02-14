@@ -256,7 +256,7 @@ const AllValuesModal = (props) => {
                     }
                   </td>
                   <td>
-                    <a href={"https://ncit.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&code=" + nc.c} rel="noopener noreferrer" target="_blank" dangerouslySetInnerHTML={{ __html: nc.c }}></a>
+                    <a href={"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + nc.c} rel="noopener noreferrer" target="_blank" dangerouslySetInnerHTML={{ __html: nc.c }}></a>
                   </td>
                   <td>
                     <TableNCIt ncit={nc}/>
@@ -267,7 +267,7 @@ const AllValuesModal = (props) => {
               return (
                 <tr key={index}>
                   <td>
-                    <a href={"https://ncit.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&code=" + nc.c} rel="noopener noreferrer" target="_blank" dangerouslySetInnerHTML={{ __html: nc.c }}></a>
+                    <a href={"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + nc.c} rel="noopener noreferrer" target="_blank" dangerouslySetInnerHTML={{ __html: nc.c }}></a>
                   </td>
                   <td>
                     <TableNCIt ncit={nc}/>
