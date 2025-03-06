@@ -33,7 +33,6 @@ function App() {
         <SiteAlert
           variant="info"
           info="The EVS website hosts biomedical terminologies that NCI does not own or control. Some of these sources may contain gender-related terminology that does not comply with Executive Order 14168."
-          alertClosable={true}
         />
         <Header />
         <NavigationBar />
