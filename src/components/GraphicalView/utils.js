@@ -1,4 +1,5 @@
-import * as d3 from 'd3-scale';
+// import * as d3 from 'd3-scale';
+import { schemeCategory10 } from 'd3-scale-chromatic';
 
 //import { submissionApiPath } from './localconf';
 
@@ -90,15 +91,16 @@ export const getCategoryColor = (category) => {
     index_file: '#26D9B1',
     clinical_assessment: '#3283C8',
     medical_history: '#05B8EE',
-    satellite: d3.schemeCategory20[11],
-    radar: d3.schemeCategory20[16],
-    stream_gauge: d3.schemeCategory20[19],
-    weather_station: d3.schemeCategory20[10],
-    data_observations: d3.schemeCategory20[3],
-    experimental_methods: d3.schemeCategory20[4],
-    Imaging: d3.schemeCategory20[5],
-    study_administration: d3.schemeCategory20[6],
-    subject_characteristics: d3.schemeCategory20[7],
+    // Replace schemeCategory20 with schemeCategory10 or custom colors
+    satellite: schemeCategory10[1],
+    radar: schemeCategory10[2],
+    stream_gauge: schemeCategory10[3],
+    weather_station: schemeCategory10[4],
+    data_observations: schemeCategory10[5],
+    experimental_methods: schemeCategory10[6],
+    Imaging: schemeCategory10[7],
+    study_administration: schemeCategory10[8],
+    subject_characteristics: schemeCategory10[9],
   };
   const defaultColor = '#9B9B9B';
   return colorMap[category] ? colorMap[category] : defaultColor;

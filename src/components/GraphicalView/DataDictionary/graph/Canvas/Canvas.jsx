@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { select, event } from 'd3-selection';
+import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { easeLinear } from 'd3-ease';
 import { zoom, zoomTransform, zoomIdentity } from 'd3-zoom';
@@ -14,7 +14,8 @@ const d3 = {
   zoomIdentity,
   transition,
   easeLinear,
-  get event() { return event; }, // https://stackoverflow.com/a/40048292
+  // event,
+  //get event() { return event; }, // https://stackoverflow.com/a/40048292
 };
 
 class Canvas extends React.Component {
@@ -36,10 +37,10 @@ class Canvas extends React.Component {
     this.zoomBehavior = d3.zoom()
       .scaleExtent([this.props.minZoom, this.props.maxZoom])
       .translateExtent([this.props.topLeftTranslateLimit, this.props.bottomRightTranslateLimit])
-      .on('zoom', () => {
+      .on('zoom', (event) => {
         this.handleCanvasUpdate();
         this.zoomTarget
-          .attr('transform', d3.event.transform);
+          .attr('transform', event.transform);
       });
     this.zoomTarget = d3.select('#canvas__container_' + this.props.graphType);
     this.zoomCatcher = d3.select('#canvas__overlay_' + this.props.graphType)
@@ -95,7 +96,7 @@ class Canvas extends React.Component {
     const translateSign = k > 1 ? -1 : +1;
 
     this.zoomCatcher
-      .transition(this.transition)
+      .transition()
       .call(
         this.zoomBehavior.transform,
         transform
@@ -117,7 +118,7 @@ class Canvas extends React.Component {
 
   handleReset = () => {
     this.zoomCatcher
-      .transition(this.transition)
+      .transition()
       .call(this.zoomBehavior.transform, d3.zoomIdentity);
   }
 

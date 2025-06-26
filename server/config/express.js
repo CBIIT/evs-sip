@@ -6,8 +6,6 @@ const createError = require('http-errors');
 const logger = require('morgan');
 const config = require('./index');
 const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require('swagger-ui-express');
-
 
 // const indexRouter = require('./routes/index')
 
