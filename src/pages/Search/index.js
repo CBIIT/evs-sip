@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { apiSearchAll } from '../../api';
 import SearchBox from './SearchBox';
-import MainTabsController from './MainTabsController';
+import MainTabsController from './MainTabsController/MainTabsController';
 import LoadingAnimation from '../../components/LoadingAnimation';
 
 const Page = styled.div`

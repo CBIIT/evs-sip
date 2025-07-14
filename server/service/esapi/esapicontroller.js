@@ -27,11 +27,12 @@ const searchP = (req, res, formatFlag) => {
 
     let option = {};
     if (req.query.options) {
-      option.match = req.query.options.indexOf("exact") !== -1 ? "exact" : "partial";
-      option.syn = req.query.options.indexOf('syn') !== -1 ? true : false;
-      option.n_syn = req.query.options.indexOf('n_syn') !== -1 ? true : false;
-      option.p_syn = req.query.options.indexOf('p_syn') !== -1 ? true : false;
-      option.desc = req.query.options.indexOf('desc') !== -1 ? true : false;
+       const optionsReq = Array.isArray(req.query.options) ? req.query.options : [req.query.options];
+      option.match = optionsReq.indexOf("exact") !== -1 ? "exact" : "partial";
+      option.syn = optionsReq.indexOf('syn') !== -1 ? true : false;
+      option.n_syn = optionsReq.indexOf('n_syn') !== -1 ? true : false;
+      option.p_syn = optionsReq.indexOf('p_syn') !== -1 ? true : false;
+      option.desc = optionsReq.indexOf('desc') !== -1 ? true : false;
       option.sources = sources;
     }
     else {

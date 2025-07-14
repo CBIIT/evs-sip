@@ -1,0 +1,108 @@
+.result {
+  border-radius: 5px;
+  background-color: var(--white);
+  padding: 2rem 0;
+}
+
+.nav-tabs {
+  border-bottom: none;
+}
+
+.nav-tabs-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-tabs-text-col {
+  margin: 2rem 0;
+}
+
+.nav-tabs-text {
+  font-family: 'Raleway-Medium', sans-serif;
+  font-size: 1.875rem;
+  color: #042a68;
+  max-width: 100%;
+  text-align: center;
+}
+
+.nav-tabs-span {
+  font-family: 'Raleway-ExtraBold', sans-serif;
+  border-bottom: 0.375rem solid #397ded;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  padding: 1.125rem 1.5rem;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.nav-tabs .nav-link:global(.active) {
+  border-top: 0.125rem solid #397ded;
+  border-left: 0.125rem solid #397ded;
+  border-right: 0.125rem solid #397ded;
+  border-bottom: 0;
+  background-color: #ddeaff;
+  position: relative;
+  bottom: -0.0625rem;
+  z-index: 10;
+  padding-bottom: 1.1rem;
+}
+
+.nav-item {
+  position: relative;
+  display: block;
+  float: left;
+}
+
+.nav-link {
+  font-family: 'Raleway-Medium', sans-serif;
+  font-size: 1.125rem;
+  color: #042a68;
+  width: 18rem;
+  text-transform: uppercase;
+  background-color: #ebebeb;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  margin: 0 0.0625rem;
+  cursor: pointer;
+}
+
+.nav-link:global(.active) {
+  font-family: 'Raleway-Bold', sans-serif;
+  font-size: 1.3125rem;
+  background-color: #ddeaff;
+  color: #042a68;
+  padding: 1rem 1.5rem;
+}
+
+.tab-content {
+  background-color: #ddeaff;
+  border: 2px solid #397ded;
+  border-radius: 2rem;
+  padding: 1rem;
+}
+
+.alert-content {
+  margin-top: 2rem;
+}
+
+.indicator > h2 {
+  font-family: 'Raleway-Medium', sans-serif;
+  font-size: 1.563rem;
+  background-color: #fff;
+  padding: 3em 0;
+  color: #042a68;
+  max-width: 100%;
+  text-align: center;
+}
+
+.indicator > h2 > span {
+  font-family: 'Raleway-ExtraBold', sans-serif;
+  border-bottom: 0.25rem solid #397ded;
+}
+
+.indicator-error > h2 {
+  color: #bf063b;
+}

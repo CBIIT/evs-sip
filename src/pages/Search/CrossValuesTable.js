@@ -518,13 +518,13 @@ const CrossValuesTable = (props) => {
               <Nav variant="tabs">
                 {props.icemun !== undefined &&
                   <Nav.Item>
-                    <Nav.Link eventKey={props.ic.id} dangerouslySetInnerHTML={{ __html: props.ic.c + ' (ICD-O-3)' }}></Nav.Link>
+                    <Nav.Link as="button" eventKey={props.ic.id} dangerouslySetInnerHTML={{ __html: props.ic.c + ' (ICD-O-3)' }}></Nav.Link>
                   </Nav.Item>
                 }
                 {props.ncit !== undefined &&
                   props.ncit.map((syn, index) =>
                     <Nav.Item>
-                      <Nav.Link key={index} eventKey={syn.id} dangerouslySetInnerHTML={{ __html: syn.n_c + ' (NCIt)' }}></Nav.Link>
+                      <Nav.Link as="button" key={index} eventKey={syn.id} dangerouslySetInnerHTML={{ __html: syn.n_c + ' (NCIt)' }}></Nav.Link>
                     </Nav.Item>
                   )
                 }

@@ -388,15 +388,15 @@ const searchP = (req, res) => {
   let keyword = req.query.keyword.trim();
 
   let option = {};
-  if(req.query.options){
-    option.match = req.query.options.indexOf("exact") !== -1 ? "exact" : "partial";
-    option.syn = req.query.options.indexOf('syn') !== -1 ? true : false;
-    option.n_syn = req.query.options.indexOf('n_syn') !== -1 ? true : false;
-    option.p_syn = req.query.options.indexOf('p_syn') !== -1 ? true : false;
-    option.desc = req.query.options.indexOf('desc') !== -1 ? true : false;
-    option.sources = req.query.sources? req.query.sources.split(',') : [];
-  }
-  else{
+  if (req.query.options) {
+    const optionsReq = Array.isArray(req.query.options) ? req.query.options : [req.query.options];
+    option.match = optionsReq.includes("exact") ? "exact" : "partial";
+    option.syn = optionsReq.includes('syn');
+    option.n_syn = optionsReq.includes('n_syn');
+    option.p_syn = optionsReq.includes('p_syn');
+    option.desc = optionsReq.includes('desc');
+    option.sources = req.query.sources ? req.query.sources.split(',') : [];
+  } else {
     option = {
       match: "partial",
       syn: false,
