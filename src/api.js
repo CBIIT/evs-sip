@@ -1,4 +1,15 @@
-const baseUrl = process.env.REACT_APP_DEV_API_URL || "./service/search";
+// Determine API base URL based on environment
+// Local dev (with port :3000 or :80) uses /api/search
+// Production (without port) uses /evssip/api/search
+const getBaseUrl = () => {
+  if (process.env.REACT_APP_DEV_API_URL) {
+    return process.env.REACT_APP_DEV_API_URL;
+  }
+  const hasPort = window.location.port === '3000' || window.location.port === '80' || window.location.port === '300';
+  return hasPort ? '/api/search' : '/evssip/api/search';
+};
+
+const baseUrl = getBaseUrl();
 
 export const apiSuggest = async (keyword) => {
   let encoded_keyword = keyword.replace(/%/g, "%25").replace(/\+/g, "%2B").replace(/&/g, "%26");
