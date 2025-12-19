@@ -1,6 +1,7 @@
 const express = require("express");
 const esapi = require("../service/esapi/esapi");
 const swaggerDocument = require('./swagger');
+const swaggerUi = require('swagger-ui-express');
 
 const router = express.Router();
 
@@ -21,6 +22,15 @@ router.use('/swaggerjson',
         res.json(swaggerdoc);
     }
 );
+
+// Swagger UI documentation endpoint
+router.use('/docs', swaggerUi.serve, function(req, res) {
+    const protocol = req.get('host').includes('gov')?'https':'http';
+    const host = req.get('host');
+    const baseUrl = [':300',':80'].some((e) => host.includes(e))?'/api':'/evssip/api';
+    const swaggerdoc = swaggerDocument(protocol, host, baseUrl);
+    return swaggerUi.setup(swaggerdoc)(req, res);
+});
 
 // api search from elasticSearch
 router.get("/search", esapi.apiEsSearch);

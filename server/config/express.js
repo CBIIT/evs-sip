@@ -59,7 +59,7 @@ var swaggerSpec = swaggerJsdoc(options);
 	});
 
   //Routers
-  app.use('/service/search', require('../service/search'));
+  app.use('/api/search', require('../service/search'));
   app.use('/api', require('./apiroutes'));
 
   // Catch all routes under /evssip/ and serve index.html for client-side routing

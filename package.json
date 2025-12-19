@@ -53,6 +53,7 @@
     "string-similarity": "^3.0.0",
     "styled-components": "^5.3.11",
     "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "swagger-ui-react": "^4.19.1",
     "underscore": "^1.13.7",
     "viz.js": "^2.1.2",
