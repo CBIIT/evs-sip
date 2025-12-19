@@ -16,7 +16,9 @@ module.exports = function(app) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
-  app.use(express.static(path.resolve(config.root, 'build')));
+  
+  // Serve static files at /evssip/ path
+  app.use('/evssip', express.static(path.resolve(config.root, 'build')));
 
   app.use(compression());
 
@@ -60,8 +62,14 @@ var swaggerSpec = swaggerJsdoc(options);
   app.use('/service/search', require('../service/search'));
   app.use('/api', require('./apiroutes'));
 
-  app.get('*', (req, res) => {
+  // Catch all routes under /evssip/ and serve index.html for client-side routing
+  app.get('/evssip/*', (req, res) => {
     res.sendFile('build/index.html', { root: config.root });
+  });
+  
+  // Redirect root to /evssip/
+  app.get('/', (req, res) => {
+    res.redirect('/evssip/');
   });
 
   // catch 404 and forward to error handler
