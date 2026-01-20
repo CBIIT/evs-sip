@@ -1,0 +1,262 @@
+name: Restart Node.js Service
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Environment tier"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+  workflow_call:
+    inputs:
+      tier:
+        description: "Environment tier"
+        required: true
+        type: string
+        default: "dev"
+
+permissions:
+  id-token: write     # Required for GitHub OIDC to assume the AWS role
+  contents: read
+
+jobs:
+  restart-node-service:
+    runs-on: ubuntu-latest
+
+    env:
+      TIER: ${{ inputs.tier || 'dev' }}
+
+    steps:
+      - name: Set environment-specific variables
+        id: set-env
+        run: |
+          TIER="${{ env.TIER }}"
+          echo "Selected tier: $TIER"
+
+          # Set environment-specific role ARN and region
+          case "$TIER" in
+            dev)
+              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_evstools_dev" >> $GITHUB_OUTPUT
+              echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
+              ;;
+            qa)
+              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_evstools_qa" >> $GITHUB_OUTPUT
+              echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
+              ;;
+            stage)
+              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_evstools_stage" >> $GITHUB_OUTPUT
+              echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
+              ;;
+            prod)
+              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_evstools_prod" >> $GITHUB_OUTPUT
+              echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "❌ Error: Invalid tier '$TIER'"
+              exit 1
+              ;;
+          esac
+
+          echo "✅ Configuration set for tier: $TIER"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ steps.set-env.outputs.AWS_ROLE_ARN }}
+          aws-region: ${{ steps.set-env.outputs.AWS_REGION }}
+
+      - name: Discover EC2 instance by tier
+        id: discover-instance
+        run: |
+          set -x
+          TIER="${{ env.TIER }}"
+
+          echo "Discovering EC2 instance for tier: $TIER"
+
+          # Query EC2 instances by tier tag
+          # Assumes instances are tagged with: Tier=dev, Tier=qa, Tier=stage, or Tier=prod
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Tier,Values=$TIER" "Name=instance-state-name,Values=running,stopped" \
+            --query 'Reservations[0].Instances[0].InstanceId' \
+            --output text 2>&1)
+
+          # If no instances found with Tier tag, try Environment tag as fallback
+          if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" == "None" ] || [ "$INSTANCE_ID" == "null" ]; then
+            echo "No instance found with Tier=$TIER tag, trying Environment tag..."
+            INSTANCE_ID=$(aws ec2 describe-instances \
+              --filters "Name=tag:Environment,Values=$TIER" "Name=instance-state-name,Values=running,stopped" \
+              --query 'Reservations[0].Instances[0].InstanceId' \
+              --output text 2>&1)
+          fi
+
+          if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" == "None" ] || [ "$INSTANCE_ID" == "null" ]; then
+            echo "❌ Error: No EC2 instance found for tier '$TIER'"
+            echo "Please ensure your EC2 instance is tagged with either:"
+            echo "  - Tier=$TIER"
+            echo "  - Environment=$TIER"
+            exit 1
+          fi
+
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_OUTPUT
+          echo "✅ Found instance: $INSTANCE_ID for tier: $TIER"
+
+      - name: Verify EC2 instance status
+        run: |
+          set -x
+          INSTANCE_ID="${{ steps.discover-instance.outputs.INSTANCE_ID }}"
+          TIER="${{ env.TIER }}"
+          echo "Checking EC2 instance status for tier: $TIER"
+          echo "Instance ID: $INSTANCE_ID"
+
+          INSTANCE_STATUS=$(aws ec2 describe-instances \
+            --instance-ids "$INSTANCE_ID" \
+            --query 'Reservations[0].Instances[0].[State.Name, InstanceId]' \
+            --output text 2>&1)
+
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to describe instance"
+            echo "$INSTANCE_STATUS"
+            exit 1
+          fi
+
+          STATE=$(echo "$INSTANCE_STATUS" | awk '{print $1}')
+          FOUND_ID=$(echo "$INSTANCE_STATUS" | awk '{print $2}')
+
+          if [ -z "$FOUND_ID" ] || [ "$FOUND_ID" != "$INSTANCE_ID" ]; then
+            echo "❌ Error: Instance $INSTANCE_ID not found"
+            exit 1
+          fi
+
+          echo "Instance state: $STATE"
+
+          if [ "$STATE" != "running" ]; then
+            if [ "$STATE" == "stopped" ]; then
+              echo "⚠️  Instance is stopped. Attempting to start it..."
+              aws ec2 start-instances --instance-ids "$INSTANCE_ID" --output text
+
+              echo "Waiting for instance to start (this may take 30-60 seconds)..."
+              aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+
+              # Wait a bit more for SSM agent to come online
+              echo "Waiting for SSM agent to come online..."
+              MAX_WAIT=120
+              ELAPSED=0
+              while [ $ELAPSED -lt $MAX_WAIT ]; do
+                SSM_STATUS=$(aws ssm describe-instance-information \
+                  --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+                  --query 'InstanceInformationList[0].PingStatus' \
+                  --output text 2>/dev/null || echo "Unknown")
+
+                if [ "$SSM_STATUS" == "Online" ]; then
+                  echo "✅ SSM agent is now online"
+                  break
+                fi
+
+                echo "Waiting for SSM agent... (${ELAPSED}s/${MAX_WAIT}s) - Status: $SSM_STATUS"
+                sleep 5
+                ELAPSED=$((ELAPSED + 5))
+              done
+
+              if [ "$SSM_STATUS" != "Online" ]; then
+                echo "⚠️  Warning: SSM agent may not be ready yet, but proceeding..."
+              fi
+            else
+              echo "❌ Error: Instance is in state '$STATE'. Cannot proceed."
+              echo "Please ensure the instance is running or stopped (will be started automatically)."
+              exit 1
+            fi
+          fi
+
+          # Check if SSM agent is ready
+          echo "Checking SSM agent status..."
+          SSM_STATUS=$(aws ssm describe-instance-information \
+            --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+            --query 'InstanceInformationList[0].PingStatus' \
+            --output text 2>&1)
+
+          if [ "$SSM_STATUS" == "Online" ]; then
+            echo "✅ SSM agent is online"
+          else
+            echo "⚠️  Warning: SSM agent status: $SSM_STATUS"
+            echo "The instance may not be ready for SSM commands yet."
+          fi
+
+      - name: Restart Node.js service on EC2 via SSM
+        run: |
+          set -x
+          INSTANCE_ID="${{ steps.discover-instance.outputs.INSTANCE_ID }}"
+          TIER="${{ env.TIER }}"
+
+          echo "Sending SSM command to restart Node.js service..."
+          echo "Tier: $TIER"
+          echo "Instance ID: $INSTANCE_ID"
+
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Restarting Node.js service on $TIER" \
+            --parameters 'commands=["sudo systemctl restart nodejs"]' \
+            --query "Command.CommandId" \
+            --output text)
+
+          if [ -z "$COMMAND_ID" ] || [ "$COMMAND_ID" == "None" ]; then
+            echo "❌ Error: Failed to send SSM command"
+            echo "This could be due to:"
+            echo "  - Instance not in a valid state (not running, SSM agent not ready)"
+            echo "  - IAM role doesn't have SSM permissions"
+            echo "  - SSM agent not installed or not running on the instance"
+            echo "  - Instance not in the same AWS account"
+            exit 1
+          fi
+
+          echo "✅ Command sent successfully. Command ID: $COMMAND_ID"
+          echo "Waiting for command to complete..."
+          sleep 3
+
+          # Get command status
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID" \
+            --query '[Status, StandardOutputContent, StandardErrorContent]' \
+            --output table
+
+      # Optional: Verify service status (if you want confirmation)
+      - name: Check Node.js service status
+        run: |
+          set -x
+          INSTANCE_ID="${{ steps.discover-instance.outputs.INSTANCE_ID }}"
+          TIER="${{ env.TIER }}"
+
+          echo "Checking Node.js service status on tier: $TIER..."
+
+          STATUS_COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Check Node.js service status on $TIER" \
+            --parameters 'commands=["sudo systemctl status nodejs -l"]' \
+            --query "Command.CommandId" \
+            --output text)
+
+          if [ -z "$STATUS_COMMAND_ID" ] || [ "$STATUS_COMMAND_ID" == "None" ]; then
+            echo "⚠️  Warning: Failed to send status check command"
+          else
+            echo "Status check command ID: $STATUS_COMMAND_ID"
+            echo "Waiting for command to complete..."
+            sleep 5
+
+            aws ssm get-command-invocation \
+              --command-id "$STATUS_COMMAND_ID" \
+              --instance-id "$INSTANCE_ID" \
+              --query '[Status, StandardOutputContent, StandardErrorContent]' \
+              --output table
+          fi
+
