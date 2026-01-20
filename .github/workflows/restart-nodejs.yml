@@ -42,7 +42,7 @@ jobs:
           # Set environment-specific role ARN and region
           case "$TIER" in
             dev)
-              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_evstools_dev" >> $GITHUB_OUTPUT
+              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_sip_dev" >> $GITHUB_OUTPUT
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             qa)
