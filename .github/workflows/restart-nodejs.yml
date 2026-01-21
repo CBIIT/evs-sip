@@ -209,7 +209,7 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Restarting Node.js service on $TIER" \
-            --parameters 'commands=["sudo /bin/bash -c \"systemctl restart nodejs\"']' \
+            --parameters 'commands=["sudo /bin/bash -c \"systemctl restart nodejs\" "]' \
             --query "Command.CommandId" \
             --output text)
 
@@ -247,7 +247,7 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Check Node.js service status on $TIER" \
-            --parameters 'commands=["sudo /bin/bash -c \"systemctl status nodejs -l\"']' \
+            --parameters 'commands=["sudo /bin/bash -c \"systemctl status nodejs -l\" "]' \
             --query "Command.CommandId" \
             --output text)
 
