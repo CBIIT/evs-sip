@@ -94,7 +94,7 @@ jobs:
             echo "No instance found with Tier=$TIER tag, trying Environment tag..."
             INSTANCE_ID=$(aws ec2 describe-instances \
               --filters "Name=tag:Environment,Values=$TIER" "Name=instance-state-name,Values=running,stopped" \
-              --query 'Reservations[0].Instances[0].InstanceId' \
+              --query 'Reservations[].Instances[] | sort_by(@, &InstanceId) | [0].InstanceId' \
               --output text 2>&1)
           fi
 
