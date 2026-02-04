@@ -223,6 +223,10 @@ jobs:
           echo "Waiting for command to complete..."
           sleep 3
 
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID"
+
           # Get command status
           aws ssm get-command-invocation \
             --command-id "$COMMAND_ID" \
@@ -243,7 +247,7 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Check Node.js service status on $TIER" \
-            --parameters 'commands=["sudo /bin/bash -c \"systemctl status nodejs -n 0 \" "]' \
+            --parameters 'commands=["sudo /bin/bash -c \"systemctl status nodejs -n 0\" "]' \
             --query "Command.CommandId" \
             --output text)
 
