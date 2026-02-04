@@ -84,22 +84,18 @@ jobs:
 
           # Query EC2 instances by tier tag
           # Assumes instances are tagged with: Tier=dev, Tier=qa, Tier=stage, or Tier=prod
-          ALLOWED_IDS=("i-077d8fe77f5aa84e9" "i-0e27dae20aeea3988")
- 
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Tier,Values=$TIER" \
-            --query 'Reservations[].Instances[].InstanceId' \
-            --output text \
-            | tr '\t' '\n' \
-            | grep -Fxf <(printf "%s\n" "${ALLOWED_IDS[@]}") \
-            | head -n 1)
+             "Name=tag:App,Values=sip" "Name=instance-state-name,Values=running,stopped" \
+            --query 'Reservations[0].Instances[0].InstanceId' \
+            --output text 2>&1)
 
           # If no instances found with Tier tag, try Environment tag as fallback
           if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" == "None" ] || [ "$INSTANCE_ID" == "null" ]; then
             echo "No instance found with Tier=$TIER tag, trying Environment tag..."
             INSTANCE_ID=$(aws ec2 describe-instances \
-              --filters "Name=tag:Environment,Values=$TIER" "Name=instance-state-name,Values=running,stopped" \
-              --query 'Reservations[].Instances[] | sort_by(@, &InstanceId) | [0].InstanceId' \
+              --filters "Name=tag:Environment,Values=$TIER" "Name=tag:App,Values=sip" "Name=instance-state-name,Values=running,stopped" \
+              --query 'Reservations[0].Instances[0].InstanceId' \
               --output text 2>&1)
           fi
 
