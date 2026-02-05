@@ -324,8 +324,16 @@ jobs:
           echo "Writing .env file..."
           echo "NODE_ENV=${TIER}" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
 
+          echo "Ensuring log directory exists..."
+          sudo mkdir -p /local/content/evssip/logs
+          sudo chown -R evssip:evssip /local/content/evssip/logs
+
           echo "Setting file permissions..."
           sudo chown -R evssip:evssip "${TARGET_FOLDER}"
+
+          echo "Installing dependencies..."
+          cd "${TARGET_FOLDER}"
+          npm i
 
           echo "Cleaning up temporary files..."
           rm -rf "${TEMP_DIR}"
