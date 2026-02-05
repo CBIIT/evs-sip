@@ -14,9 +14,9 @@ on:
           - stage
           - prod
       target_folder:
-        description: "Target folder on EC2 to unzip code (e.g., /local/content/mvs/EVS-SIP)"
+        description: "Target folder on EC2 to unzip code (e.g., /local/content/evssip/evssip)"
         required: true
-        default: "/local/content/mvs/EVS-SIP"
+        default: "/local/content/evssip/evssip"
         type: string
       backup_previous:
         description: "Backup previous version before deploying? (Recommended: yes)"
@@ -325,8 +325,7 @@ jobs:
           echo "NODE_ENV=${TIER}" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
 
           echo "Setting file permissions..."
-          sudo chown -R ec2-user:ec2-user "${TARGET_FOLDER}" || \
-          sudo chown -R ubuntu:ubuntu "${TARGET_FOLDER}" || true
+          sudo chown -R evsip:evssip "${TARGET_FOLDER}"
 
           echo "Cleaning up temporary files..."
           rm -rf "${TEMP_DIR}"
