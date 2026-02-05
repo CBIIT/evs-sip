@@ -325,7 +325,7 @@ jobs:
           echo "NODE_ENV=${TIER}" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
 
           echo "Setting file permissions..."
-          sudo chown -R evsip:evssip "${TARGET_FOLDER}"
+          sudo chown -R evssip:evssip "${TARGET_FOLDER}"
 
           echo "Cleaning up temporary files..."
           rm -rf "${TEMP_DIR}"
