@@ -317,9 +317,8 @@ jobs:
             exit 1
           }
 
-          echo "Moving extracted files to target directory..."
-          sudo mv "${TEMP_DIR}/extracted"/* "${TARGET_FOLDER}/" 2>/dev/null || \
-          sudo mv "${TEMP_DIR}/extracted"/.??* "${TARGET_FOLDER}/" 2>/dev/null || true
+          echo "Syncing extracted files to target directory..."
+          sudo rsync -a --delete "${TEMP_DIR}/extracted"/ "${TARGET_FOLDER}/"
 
           echo "Writing .env file..."
           echo "NODE_ENV=${TIER}" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
