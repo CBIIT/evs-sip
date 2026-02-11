@@ -628,7 +628,7 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Start Elasticsearch and rebuild index on $TIER" \
-            --parameters 'commands=["for i in {1..30}; do curl -fsS http://localhost:3000/evssip/ && exit 0 || true; sleep 5; done; exit 1","sudo systemctl start elasticsearch","curl -X DELETE http://localhost:9200/_all","curl http://localhost:3000/api/search/buildIndex"]' \
+            --parameters 'commands=["for i in {1..30}; do curl -fsS http://localhost:3000/evssip/ && exit 0 || true; sleep 5; done; exit 1","sudo systemctl start elasticsearch","sudo systemctl is-active --quiet elasticsearch","curl -fsS http://localhost:9200 >/dev/null","curl -X DELETE http://localhost:9200/_all","curl http://localhost:3000/api/search/buildIndex"]' \
             --query "Command.CommandId" \
             --output text)
 
