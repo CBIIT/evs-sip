@@ -228,7 +228,7 @@ jobs:
           set -x
           TIER="${{ inputs.tier }}"
           S3_BUCKET="evs-apps-nonprod"
-          S3_KEY="${TIER}/evs-sip/EVS-SIP-${GITHUB_SHA}.zip"
+          S3_KEY="evssip/${TIER}EVS-SIP-${GITHUB_SHA}.zip"
 
           # Upload zip file to S3
           echo "Uploading zip file to S3..."
