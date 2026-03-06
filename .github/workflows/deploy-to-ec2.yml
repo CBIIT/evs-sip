@@ -71,6 +71,39 @@ jobs:
 
           echo "✅ Configuration set for tier: $TIER"
 
+      - name: Validate tier against ref
+        run: |
+          set -euo pipefail
+          TIER="${{ env.TIER }}"
+          REF_TYPE="${{ github.ref_type }}"
+          REF_NAME="${{ github.ref_name }}"
+
+          if [ "$REF_TYPE" == "tag" ]; then
+            echo "✅ Tag deployment allowed for tier: $TIER"
+            exit 0
+          fi
+
+          case "$TIER" in
+            dev|qa)
+              if [ "$REF_NAME" == "nonprod" ] || [ "$REF_NAME" == "master" ]; then
+                echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
+                exit 0
+              fi
+              ;;
+            stage|prod)
+              if [ "$REF_NAME" == "master" ]; then
+                echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
+                exit 0
+              fi
+              ;;
+          esac
+
+          echo "❌ Error: Ref '$REF_NAME' ($REF_TYPE) not allowed for tier '$TIER'"
+          echo "Allowed:"
+          echo "  dev/qa: nonprod, master, or any tag"
+          echo "  stage/prod: master or any tag"
+          exit 1
+
       - name: Checkout code
         uses: actions/checkout@v4
 
