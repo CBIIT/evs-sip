@@ -1,5 +1,4 @@
 name: Restart Node.js Service
-
 on:
   workflow_dispatch:
     inputs:
@@ -28,6 +27,7 @@ permissions:
 jobs:
   restart-node-service:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.tier == 'stage' && 'STAGE' || (inputs.tier == 'prod' && 'PROD' || inputs.tier) }}
 
     env:
       TIER: ${{ inputs.tier || 'dev' }}
@@ -50,11 +50,11 @@ jobs:
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             stage)
-              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_sip_stage" >> $GITHUB_OUTPUT
+              echo "AWS_ROLE_ARN=arn:aws:iam::148687757123:role/github_sip_stage" >> $GITHUB_OUTPUT
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             prod)
-              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_sip_prod" >> $GITHUB_OUTPUT
+              echo "AWS_ROLE_ARN=arn:aws:iam::148687757123:role/github_sip_prod" >> $GITHUB_OUTPUT
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             *)

@@ -34,7 +34,7 @@ permissions:
 jobs:
   deploy-to-ec2:
     runs-on: ubuntu-latest
-
+    environment: ${{ inputs.tier == 'stage' && 'STAGE' || (inputs.tier == 'prod' && 'PROD' || inputs.tier) }}
     env:
       TIER: ${{ inputs.tier || 'dev' }}
 
@@ -56,11 +56,11 @@ jobs:
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             stage)
-              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_sip_stage" >> $GITHUB_OUTPUT
+              echo "AWS_ROLE_ARN=arn:aws:iam::148687757123:role/github_sip_stage" >> $GITHUB_OUTPUT
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             prod)
-              echo "AWS_ROLE_ARN=arn:aws:iam::688132009233:role/github_sip_prod" >> $GITHUB_OUTPUT
+              echo "AWS_ROLE_ARN=arn:aws:iam::148687757123:role/github_sip_prod" >> $GITHUB_OUTPUT
               echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
               ;;
             *)
@@ -261,6 +261,14 @@ jobs:
           set -x
           TIER="${{ inputs.tier }}"
           S3_BUCKET="evs-apps-nonprod"
+          if [[ "$TIER" == "dev" ]] || [[ "$TIER" == "qa" ]]; then
+            S3_BUCKET="evs-apps-nonprod"
+          elif [[ "$TIER" == "stage" ]] || [[ "$TIER" == "prod" ]]; then
+            S3_BUCKET="evs-apps-prod"
+          else
+            echo "❌ Error: Invalid tier '$TIER'"
+            exit 1
+          fi
           S3_KEY="evssip/${TIER}/EVS-SIP-${GITHUB_SHA}.zip"
 
           # Upload zip file to S3
