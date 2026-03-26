@@ -85,7 +85,7 @@ jobs:
               fi
               ;;
             stage|prod)
-              if [ "$REF_NAME" == "master" ]; then
+              if [ "$REF_NAME" == "master" ] || [ "$REF_NAME" == "release" ] || [ "$REF_NAME" == "stage" ]; then
                 echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
                 exit 0
               fi
