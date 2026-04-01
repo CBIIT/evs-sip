@@ -2276,8 +2276,18 @@ const addGDCDataMappings = async (req, res) => {
 
 
 
+const rebuildIndex = (req, res) => {
+  elastic.deleteProjectIndexes((err) => {
+    if (err) {
+      return handleError.error(res, err);
+    }
+    indexing(req, res);
+  });
+};
+
 module.exports = {
 	indexing,
+	rebuildIndex,
 	suggestion,
 	searchP,
 	getGDCData,

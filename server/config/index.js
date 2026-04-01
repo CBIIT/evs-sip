@@ -1,20 +1,22 @@
 var path = require("path");
 var _ = require("lodash");
 
-if (process.env.NODE_ENV !== "prod") {
-  const cfg = require("dotenv").config();
-  if (!cfg.error) {
-    let tmp = cfg.parsed;
-    process.env = {
-      ...process.env,
-      NODE_ENV: tmp.NODE_ENV,
-      PORT: tmp.SERVICE_PORT,
-      LOGDIR: tmp.LOGDIR
-    };
-    //process.env.NODE_ENV = tmp.NODE_ENV;
-  } else {
-    process.env.NODE_ENV = "dev";
+const cfg = require("dotenv").config();
+if (!cfg.error && cfg.parsed) {
+  const tmp = cfg.parsed;
+
+  // Load .env as fallback values only; keep explicit process env highest priority.
+  process.env = {
+    ...tmp,
+    ...process.env,
+  };
+
+  // Backward compatibility: SERVICE_PORT in .env maps to process.env.PORT.
+  if (!process.env.PORT && tmp.SERVICE_PORT) {
+    process.env.PORT = tmp.SERVICE_PORT;
   }
+} else if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = "dev";
 }
 
 // All configurations will extend these options
@@ -106,4 +108,28 @@ var all = {
 
 // Export the config object based on the NODE_ENV
 // ==============================================
-module.exports = _.merge(all, require("./" + all.env + ".js") || {});
+const mergedConfig = _.merge(all, require("./" + all.env + ".js") || {});
+const requiresOpenSearchHost = ["qa", "stage", "prod"].includes(mergedConfig.env);
+const openSearchHost = mergedConfig.opensearch && mergedConfig.opensearch.host;
+
+if (requiresOpenSearchHost && (!openSearchHost || !openSearchHost.trim())) {
+  throw new Error(
+    "Missing required OPENSEARCH_HOST for NODE_ENV=" +
+      mergedConfig.env +
+      ". Set OPENSEARCH_HOST in environment variables."
+  );
+}
+
+if (openSearchHost && openSearchHost.trim()) {
+  const normalizedOpenSearchHost = openSearchHost.trim();
+  if (!/^https?:\/\//i.test(normalizedOpenSearchHost)) {
+    throw new Error(
+      "Invalid OPENSEARCH_HOST '" +
+        normalizedOpenSearchHost +
+        "'. Expected a full URL including protocol, e.g. http://127.0.0.1:9200 or https://example.us-east-1.es.amazonaws.com."
+    );
+  }
+  mergedConfig.opensearch.host = normalizedOpenSearchHost;
+}
+
+module.exports = mergedConfig;

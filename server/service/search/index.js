@@ -3,8 +3,19 @@ const controller = require("./controller");
 
 const router = express.Router();
 
-// build indexes for elasticsearch
-router.get("/buildIndex", controller.indexing);
+const localhostOnly = (req, res, next) => {
+  const addr = req.socket.remoteAddress;
+  if (addr === '127.0.0.1' || addr === '::1' || addr === '::ffff:127.0.0.1') {
+    return next();
+  }
+  return res.status(403).json({ message: 'Forbidden' });
+};
+
+// build indexes for opensearch — localhost only
+router.post("/buildIndex", localhostOnly, controller.indexing);
+
+// delete all indexes and rebuild — localhost only
+router.post("/rebuildIndex", localhostOnly, controller.rebuildIndex);
 
 // suggestions list api
 router.get("/suggest", controller.suggestion);
@@ -21,21 +32,10 @@ router.get("/graph/p/vs", controller.getValuesForGraphicalView);
 router.get("/p/local/vs", controller.getGDCData);
 
 //for data preprocessing only
-//router.get("/preloadNCItSynonyms_old", controller.preloadNCItSynonyms_old);
-//router.get("/preloadNCItSynonyms", controller.preloadNCItSynonyms);
-//router.get("/listNCItSynonyms", controller.listNCItSynonyms);
-//router.get('/preloadGDCDataMappings', controller.preloadGDCDataMappings);
-//router.get('/compareWithGDCDictionary', controller.compareWithGDCDictionary);
-router.get('/compareAllWithGDCDictionary', controller.compareAllWithGDCDictionary);
-router.get('/exportCompareResult', controller.exportCompareResult);
-router.get('/exportAllCompareResult', controller.exportAllCompareResult);
-//router.get('/generateGDCPropertiesReport', controller.generateGDCPropertiesReport);
-//router.get('/generateGDCValuesReport', controller.generateGDCValuesReport);
-// router.get('/generateCompareValues', controller.generateCompareValues);
-router.get('/generateCompareProperties', controller.generateCompareProperties);
-router.get('/generateCompareNodes', controller.generateCompareNodes);
-//router.get('/updateGDCPropertyMappings', controller.updateGDCPropertyMappings);
-//router.get("/updateGDCDataMappings", controller.updateGDCDataMappings);
-//router.get("/preloadPCDCDataMappings", controller.preloadPCDCDataMappings);
+router.get('/compareAllWithGDCDictionary', localhostOnly, controller.compareAllWithGDCDictionary);
+router.get('/exportCompareResult', localhostOnly, controller.exportCompareResult);
+router.get('/exportAllCompareResult', localhostOnly, controller.exportAllCompareResult);
+router.get('/generateCompareProperties', localhostOnly, controller.generateCompareProperties);
+router.get('/generateCompareNodes', localhostOnly, controller.generateCompareNodes);
 
 module.exports = router;
