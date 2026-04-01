@@ -16,39 +16,37 @@ Modify `.env` to specify the following variables:
 - `EVSSIP_SERV_API_URL` The URL for the search API. Something like `http://localhost:3000/service/search`.
 - `REACT_APP_DEV_API_URL` I don't know what this is. Something like `http://localhost:3000/api/search`.
 
-### 2.2 - Elasticsearch index
+### 2.2 - OpenSearch index
 
-Build an Elasticsearch index by performing the following:
+Build an OpenSearch index by performing the following:
 
-1. Confirm that an ES service is available by running
+1. Confirm that OpenSearch is available by running
 
     ```bash
     curl -X GET http://localhost:9200
     ```
 
-2. Delete the current index by running
+2. Build a new index (localhost-only API) by running
 
     ```bash
-    curl -X DELETE http://localhost:9200/_all
+    curl -X POST http://localhost:3000/api/search/buildIndex
     ```
 
-3. Build a new index by running
+3. Delete and rebuild indexes (localhost-only API) by running
 
     ```bash
-    curl http://localhost:3000/service/search/buildIndex
+    curl -X POST http://localhost:3000/api/search/rebuildIndex
     ```
 
-    You may need to uncomment the route.
+### 2.3 - Run OpenSearch
 
-### 2.3 - Run Elasticsearch
-
-If Elasticsearch is not already running, execute the command
+If OpenSearch is not already running, start it with Docker:
 
 ```bash
-elasticsearch
+docker compose up -d
 ```
 
-Elasticsearch should default to running on port `9200`.
+OpenSearch should run on port `9200`.
 
 ### 2.4 - Run the backend
 

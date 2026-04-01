@@ -26,6 +26,11 @@ on:
         options:
           - yes
           - no
+      run_post_deploy:
+        description: "Run post-deploy index rebuild"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write     # Required for GitHub OIDC to assume the AWS role
@@ -37,6 +42,7 @@ jobs:
     environment: ${{ inputs.tier == 'dev' && 'DEV' || inputs.tier == 'qa' && 'QA' || inputs.tier == 'stage' && 'STAGE' || (inputs.tier == 'prod' && 'PROD' || inputs.tier) }}
     env:
       TIER: ${{ inputs.tier || 'dev' }}
+      OPENSEARCH_HOST: ${{ vars.OPENSEARCH_HOST }}
 
     steps:
       - name: Set environment-specific variables
@@ -84,8 +90,12 @@ jobs:
           fi
 
           case "$TIER" in
-            dev|qa)
-              if [ "$REF_NAME" == "nonprod" ] || [ "$REF_NAME" == "master" ]; then
+            dev)
+              echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
+              exit 0
+              ;;
+            qa)
+              if [ "$REF_NAME" == "nonprod" ] || [ "$REF_NAME" == "master" ] || [ "$REF_NAME" == "os_test" ]; then
                 echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
                 exit 0
               fi
@@ -100,9 +110,35 @@ jobs:
 
           echo "❌ Error: Ref '$REF_NAME' ($REF_TYPE) not allowed for tier '$TIER'"
           echo "Allowed:"
-          echo "  dev/qa: nonprod, master, or any tag"
-          echo "  stage/prod: master or any tag"
+          echo "  dev: any branch or any tag"
+          echo "  qa: nonprod, master, os_test, or any tag"
+          echo "  stage/prod: master, release, stage, or any tag"
           exit 1
+
+      - name: Validate OPENSEARCH_HOST for tier
+        run: |
+          set -euo pipefail
+          TIER="${{ env.TIER }}"
+          OPENSEARCH_HOST="${{ env.OPENSEARCH_HOST }}"
+
+          case "$TIER" in
+            qa|stage|prod)
+              OPENSEARCH_HOST_TRIMMED="${OPENSEARCH_HOST// }"
+              if [ -z "$OPENSEARCH_HOST_TRIMMED" ]; then
+                echo "❌ Error: OPENSEARCH_HOST is required for tier '$TIER' but is empty."
+                echo "Set OPENSEARCH_HOST in the corresponding GitHub Environment Variables."
+                exit 1
+              fi
+              if [[ ! "$OPENSEARCH_HOST_TRIMMED" =~ ^https?:// ]]; then
+                echo "❌ Error: OPENSEARCH_HOST must be a full URL including protocol for tier '$TIER'."
+                echo "Example: https://vpc-xxxx.us-east-1.es.amazonaws.com"
+                exit 1
+              fi
+              ;;
+            *)
+              # dev is allowed to be empty for local/non-AWS scenarios
+              ;;
+          esac
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -311,6 +347,7 @@ jobs:
           TARGET_FOLDER="$3"
           BACKUP_ENABLED="$4"
           TIER="$5"
+          OPENSEARCH_HOST="$6"
           TEMP_DIR="/tmp/evs-sip-deploy-$$"
           ZIP_FILE="${TEMP_DIR}/EVS-SIP.zip"
 
@@ -362,7 +399,7 @@ jobs:
           sudo rsync -a --delete "${TEMP_DIR}/extracted"/ "${TARGET_FOLDER}/"
 
           echo "Writing .env file..."
-          echo "NODE_ENV=${TIER}" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
+          printf "NODE_ENV=${TIER}\nOPENSEARCH_HOST=${OPENSEARCH_HOST}\n" | sudo tee "${TARGET_FOLDER}/.env" >/dev/null
 
           echo "Ensuring log directory exists..."
           sudo mkdir -p /local/content/evssip/logs
@@ -372,8 +409,6 @@ jobs:
           sudo chown -R evssip:evssip "${TARGET_FOLDER}"
 
           echo "Installing dependencies..."
-          echo "Stopping Elasticsearch before build..."
-          sudo service elasticsearch stop
           if ! command -v npm >/dev/null 2>&1; then
             export NVM_DIR="/home/evssip/.nvm"
             if [ -s "$NVM_DIR/nvm.sh" ]; then
@@ -400,7 +435,7 @@ jobs:
           jq -n \
             --arg cmd1 "echo '${SCRIPT_B64}' | base64 -d > /tmp/deploy_script.sh" \
             --arg cmd2 "chmod +x /tmp/deploy_script.sh" \
-            --arg cmd3 "bash /tmp/deploy_script.sh '${S3_BUCKET}' '${S3_KEY}' '${TARGET_FOLDER}' '${BACKUP_OPTION}' '${TIER}'" \
+            --arg cmd3 "bash /tmp/deploy_script.sh '${S3_BUCKET}' '${S3_KEY}' '${TARGET_FOLDER}' '${BACKUP_OPTION}' '${TIER}' '${OPENSEARCH_HOST}'" \
             '{commands: [$cmd1, $cmd2, $cmd3]}' > /tmp/ssm_params.json
 
           # Send SSM command to deploy
@@ -466,12 +501,14 @@ jobs:
 
   post-deploy:
     needs: restart-service
+    if: ${{ inputs.run_post_deploy }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier == 'dev' && 'DEV' || inputs.tier == 'qa' && 'QA' || inputs.tier == 'stage' && 'STAGE' || (inputs.tier == 'prod' && 'PROD' || inputs.tier) }}
 
 
     env:
       TIER: ${{ inputs.tier || 'dev' }}
+      OPENSEARCH_HOST: ${{ vars.OPENSEARCH_HOST }}
 
     steps:
       - name: Set environment-specific variables
@@ -632,22 +669,20 @@ jobs:
             echo "The instance may not be ready for SSM commands yet."
           fi
 
-      - name: Start Elasticsearch and rebuild index
+      - name: Rebuild OpenSearch index
         run: |
           set -euo pipefail
           set -x
           INSTANCE_ID="${{ steps.discover-instance.outputs.INSTANCE_ID }}"
           TIER="${{ env.TIER }}"
 
-          echo "Starting Elasticsearch and rebuilding index..."
-          echo "Tier: $TIER"
-          echo "Instance ID: $INSTANCE_ID"
+          echo "Triggering OpenSearch index rebuild..."
 
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Start Elasticsearch and rebuild index on $TIER" \
-            --parameters 'commands=["bash -lc \"set -euo pipefail; set -x; for i in {1..30}; do curl -fsS http://localhost:3000/evssip/ >/dev/null && break; sleep 5; done; curl -fsS http://localhost:3000/evssip/ >/dev/null; sudo service elasticsearch start; sudo service elasticsearch status; for i in {1..30}; do curl -fsS http://localhost:9200 >/dev/null && break; sleep 5; done; curl -fsS http://localhost:9200 >/dev/null; curl -fsS -X DELETE http://localhost:9200/_all; curl -fsS http://localhost:3000/api/search/buildIndex\""]' \
+            --comment "Rebuild OpenSearch index on $TIER" \
+            --parameters 'commands=["bash -lc \"set -euo pipefail; set -x; for i in {1..30}; do curl -fsS http://localhost:3000/evssip/ >/dev/null && break; sleep 5; done; curl -fsS http://localhost:3000/evssip/ >/dev/null; curl -fsS -X POST http://localhost:3000/api/search/rebuildIndex\""]' \
             --query "Command.CommandId" \
             --output text)
 
@@ -656,7 +691,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Command sent successfully. Command ID: $COMMAND_ID"
+          echo "✅ Command sent. Command ID: $COMMAND_ID"
           aws ssm wait command-executed \
             --command-id "$COMMAND_ID" \
             --instance-id "$INSTANCE_ID"
@@ -667,7 +702,7 @@ jobs:
             --query 'Status' \
             --output text)
           if [ "$FINAL_STATUS" != "Success" ]; then
-            echo "❌ Error: Post-deploy command failed with status: $FINAL_STATUS"
+            echo "❌ Error: Rebuild failed with status: $FINAL_STATUS"
             aws ssm get-command-invocation \
               --command-id "$COMMAND_ID" \
               --instance-id "$INSTANCE_ID" \
@@ -675,4 +710,5 @@ jobs:
               --output table
             exit 1
           fi
+          echo "✅ Index rebuild completed successfully"
 
