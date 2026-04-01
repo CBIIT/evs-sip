@@ -40,7 +40,7 @@ const resolveAwsCredentialsProvider = () => {
   );
 };
 
-const esClient = useAWSAuth
+const osClient = useAWSAuth
   ? new Client({
       node: config.opensearch.host,
       ...AwsSigv4Signer({
@@ -1180,7 +1180,7 @@ const bulkIndex = async function(next){
   });
 
   try {
-    const { body: data_p } = await esClient.bulk({ body: propertyBody });
+    const { body: data_p } = await osClient.bulk({ body: propertyBody });
     let errorCount_p = 0;
     data_p.items.forEach(item => {
       if (item.index && item.index.error) {
@@ -1188,7 +1188,7 @@ const bulkIndex = async function(next){
       }
     });
 
-    const { body: data_s } = await esClient.bulk({ body: suggestionBody });
+    const { body: data_s } = await osClient.bulk({ body: suggestionBody });
     let errorCount_s = 0;
     data_s.items.forEach(itm => {
       if (itm.index && itm.index.error) {
@@ -1223,7 +1223,7 @@ const query = async (index, dsl, source_excludes, highlight, next) => {
     if (source_excludes && source_excludes !== '') {
       params._source_excludes = source_excludes;
     }
-    const { body: result } = await esClient.search(params);
+    const { body: result } = await osClient.search(params);
     next(result);
   } catch (err) {
     logger.error(err);
@@ -1246,7 +1246,7 @@ const query_all = async (index, dsl, source_excludes, highlight) => {
   if (source_excludes && source_excludes !== '') {
     params._source_excludes = source_excludes;
   }
-  const { body: result } = await esClient.search(params);
+  const { body: result } = await osClient.search(params);
   return result;
 };
 
@@ -1254,7 +1254,7 @@ exports.query_all = query_all;
 
 const suggest = async (index, suggest, next) => {
   try {
-    const { body: result } = await esClient.search({
+    const { body: result } = await osClient.search({
       index,
       _source: true,
       body: { suggest },
@@ -1272,11 +1272,11 @@ const createIndexes = async (params, next) => {
   try {
     const p0 = { index: params[0].index };
     if (params[0].body) p0.body = params[0].body;
-    await esClient.indices.create(p0);
+    await osClient.indices.create(p0);
 
     const p1 = { index: params[1].index };
     if (params[1].body) p1.body = params[1].body;
-    await esClient.indices.create(p1);
+    await osClient.indices.create(p1);
 
     logger.debug('have built property and suggestion indexes.');
     next({ acknowledged: true });
@@ -1300,7 +1300,7 @@ const deleteProjectIndexes = async (next) => {
       return next(null);
     }
 
-    await esClient.indices.delete({
+    await osClient.indices.delete({
       index: indexesToDelete,
       ignore_unavailable: true,
     });

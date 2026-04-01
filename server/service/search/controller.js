@@ -1,4 +1,4 @@
-const elastic = require("../../components/elasticsearch");
+const opensearch = require("../../components/opensearch");
 const handleError = require("../../components/handleError");
 const logger = require("../../components/logger");
 const cache = require("../../components/cache");
@@ -346,11 +346,11 @@ const indexing = (req, res) => {
     },
   };
   configs.push(config_suggestion);
-  elastic.createIndexes(configs, (result) => {
+  opensearch.createIndexes(configs, (result) => {
     if (result.acknowledged === undefined) {
       return handleError.error(res, result);
     }
-    elastic.bulkIndex((data) => {
+    opensearch.bulkIndex((data) => {
       if (data.property_indexed === undefined) {
         return handleError.error(res, data);
       }
@@ -370,7 +370,7 @@ const suggestion = (req, res) => {
       },
     },
   };
-  elastic.suggest(config.suggestionName, suggest, (result) => {
+  opensearch.suggest(config.suggestionName, suggest, (result) => {
     if (result.suggest === undefined) {
       return handleError.error(res, result);
     }
@@ -411,7 +411,7 @@ const searchP = (req, res) => {
   } else {
     let query = shared.generateQuery(keyword, option);
     let highlight = shared.generateHighlight();
-    elastic.query(config.index_p, query, "enum", highlight, (result) => {
+    opensearch.query(config.index_p, query, "enum", highlight, (result) => {
       if (result.hits === undefined) {
         res.json({ total: 0, returnList: [], timedOut: true });
         //return handleError.error(res, result);
@@ -443,7 +443,7 @@ const getGDCData = (req, res) => {
   query.terms = {};
   query.terms.id = [];
   query.terms.id.push(uid);
-  elastic.query(config.index_p, query, "", null, (result) => {
+  opensearch.query(config.index_p, query, "", null, (result) => {
     if (result.hits === undefined) {
       return handleError.error(res, result);
     }
@@ -481,7 +481,7 @@ const getValuesForGraphicalView = async function (req, res) {
     query.terms = {};
     query.terms.id = [];
     query.terms.id.push(uid);
-    elastic.query(config.index_p, query, "", null, (data) => {
+    opensearch.query(config.index_p, query, "", null, (data) => {
       if (data.hits === undefined) {
         return handleError.error(res, data);
       }
@@ -2277,7 +2277,7 @@ const addGDCDataMappings = async (req, res) => {
 
 
 const rebuildIndex = (req, res) => {
-  elastic.deleteProjectIndexes((err) => {
+  opensearch.deleteProjectIndexes((err) => {
     if (err) {
       return handleError.error(res, err);
     }
