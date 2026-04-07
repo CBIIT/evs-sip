@@ -1,18 +1,22 @@
 /**
- * Client for elasticsearch
+ * Client for opensearch
  */
 const fs = require('fs');
 const path = require('path');
-const elasticsearch = require('elasticsearch');
+const { Client } = require('@opensearch-project/opensearch');
+const { AwsSigv4Signer } = require('@opensearch-project/opensearch/aws');
+const {
+  defaultProvider,
+  fromNodeProviderChain,
+} = require('@aws-sdk/credential-providers');
 const yaml = require('yamljs');
 const config = require('../config');
-const config_dev = require('../config/dev');
 const logger = require('./logger');
 const cache = require('./cache');
 const extend = require('util')._extend;
 const _ = require('lodash');
 const shared = require('../service/search/shared');
-const folderPath = path.join(__dirname, '..', 'data_files','GDC', 'model');
+const folderPath = path.join(__dirname, '..', 'data_files', 'GDC', 'model');
 var allTerm = {};
 var icdo_mapping = shared.getICDOMapping();
 var icdo2Exclude = shared.getParentICDO();
@@ -22,11 +26,30 @@ var gdc_nodes = {};
 var allProperties = [];
 var unloaded_ncits = [];
 
-var esClient = new elasticsearch.Client({
-  host: config_dev.elasticsearch.host,
-  log: config_dev.elasticsearch.log,
-  requestTimeout: config_dev.elasticsearch.requestTimeout
-});
+const useAWSAuth = config.opensearch.host.startsWith('https://');
+const resolveAwsCredentialsProvider = () => {
+  if (typeof defaultProvider === 'function') {
+    return defaultProvider();
+  }
+  if (typeof fromNodeProviderChain === 'function') {
+    return fromNodeProviderChain();
+  }
+
+  throw new Error(
+    'No compatible AWS credential provider found in @aws-sdk/credential-providers.'
+  );
+};
+
+const osClient = useAWSAuth
+  ? new Client({
+      node: config.opensearch.host,
+      ...AwsSigv4Signer({
+        region: config.opensearch.region,
+        service: 'es',
+        getCredentials: resolveAwsCredentialsProvider(),
+      }),
+    })
+  : new Client({ node: config.opensearch.host });
 
 const helper_gdc = (fileJson, syns) => {
   let properties = fileJson.properties;
@@ -1119,16 +1142,17 @@ const bulkIndex = async function(next){
 
   // build suggestion index
   let suggestionBody = [];
+  let suggestionDocsCount = 0;
 
   for (var term in allTerm) {
     let doc = {};
     doc.id = term.toString();
     if(doc.id != ''){
       doc.type = allTerm[term];
+      suggestionDocsCount++;
       suggestionBody.push({
         index: {
           _index: config.suggestionName,
-          _type: '_doc',
           _id: doc.id
         }
       });
@@ -1138,6 +1162,7 @@ const bulkIndex = async function(next){
 
   //build property index
   let propertyBody = [];
+  const propertyDocsCount = allProperties.length;
 
   allProperties.forEach(ap => {
     if (ap.prop.cde && ap.prop.d) { // ADD CDE ID to all property description.
@@ -1148,166 +1173,146 @@ const bulkIndex = async function(next){
     propertyBody.push({
       index: {
         _index: config.index_p,
-        _type: '_doc',
         _id: doc.id
       }
     });
     propertyBody.push(doc);
   });
 
-  esClient.bulk({body: propertyBody}, (err_p, data_p) => {
-    if (err_p) {
-      return next(err_p);
-    }
+  try {
+    const { body: data_p } = await osClient.bulk({ body: propertyBody });
     let errorCount_p = 0;
     data_p.items.forEach(item => {
       if (item.index && item.index.error) {
         logger.error(++errorCount_p, item.index.error);
       }
     });
-    esClient.bulk({body: suggestionBody}, (err_s, data_s) => {
-      if (err_s) {
-        return next(err_s);
+
+    const { body: data_s } = await osClient.bulk({ body: suggestionBody });
+    let errorCount_s = 0;
+    data_s.items.forEach(itm => {
+      if (itm.index && itm.index.error) {
+        logger.error(++errorCount_s, itm.index.error);
       }
-      let errorCount_s = 0;
-      data_s.items.forEach(itm => {
-        if (itm.index && itm.index.error) {
-          logger.error(++errorCount_s, itm.index.error);
-        }
-      });
-      next({
-        property_indexed: (propertyBody.length - errorCount_p),
-        property_total: propertyBody.length,
-        suggestion_indexed: (suggestionBody.length - errorCount_s),
-        suggestion_total: suggestionBody.length
-      });
     });
-  });
+
+    next({
+      property_indexed: Math.max(0, propertyDocsCount - errorCount_p),
+      property_total: propertyDocsCount,
+      suggestion_indexed: Math.max(0, suggestionDocsCount - errorCount_s),
+      suggestion_total: suggestionDocsCount
+    });
+  } catch (err) {
+    logger.error(err);
+    next(err);
+  }
 }
 exports.bulkIndex = bulkIndex;
 
-const query = (index, dsl, source_excludes, highlight, next) => {
-  var body = {
+const query = async (index, dsl, source_excludes, highlight, next) => {
+  const body = {
     size: config.search_result_limit,
-    from: 0
+    from: 0,
+    query: dsl,
   };
-  body.query = dsl;
   if (highlight) {
     body.highlight = highlight;
   }
-  /*
-  body.sort = [{
-    "category": "asc"
-  }, {
-    "node": "asc"
-  }];
-  */
-  if(source_excludes == ""){
-    esClient.search({index: index, body: body}, (err, data) => {
-      if (err) {
-        logger.error(err);
-        next(err);
-      } else {
-        next(data);
-      }
-    });
+  try {
+    const params = { index, body };
+    if (source_excludes && source_excludes !== '') {
+      params._source_excludes = source_excludes;
+    }
+    const { body: result } = await osClient.search(params);
+    next(result);
+  } catch (err) {
+    logger.error(err);
+    next(err);
   }
-  else{
-    esClient.search({index: index, "_source_excludes": source_excludes, body: body}, (err, data) => {
-      if (err) {
-        logger.error(err);
-        next(err);
-      } else {
-        next(data);
-      }
-    });
-  }
-  
-}
+};
 
 exports.query = query;
 
-const query_all = async function(index, dsl, source_excludes, highlight) {
-  var body = {
+const query_all = async (index, dsl, source_excludes, highlight) => {
+  const body = {
     size: 10000,
-    from: 0
+    from: 0,
+    query: dsl,
   };
-  body.query = dsl;
   if (highlight) {
     body.highlight = highlight;
   }
-  /*
-  body.sort = [{
-    "category": "asc"
-  }, {
-    "node": "asc"
-  }];
-  */
-  
-  if(source_excludes == ""){
-    /*
-    esClient.search({index: index, body: body}, (err, data) => {
-      if (err) {
-        logger.error(err);
-        next(err);
-      } else {
-        next(data);
-      }
-    });
-    */
-    const result = await esClient.search({index: index, body: body});
-    return result;
+  const params = { index, body };
+  if (source_excludes && source_excludes !== '') {
+    params._source_excludes = source_excludes;
   }
-  else{
-    /*
-    esClient.search({index: index, "_source_excludes": source_excludes, body: body}, (err, data) => {
-      if (err) {
-        logger.error(err);
-        next(err);
-      } else {
-        next(data);
-      }
-    });
-    */
-   const result = await esClient.search({index: index, "_source_excludes": source_excludes, body: body});
-   return result;
-  }
-}
+  const { body: result } = await osClient.search(params);
+  return result;
+};
 
 exports.query_all = query_all;
 
-const suggest = (index, suggest, next) => {
-  let body = {};
-  body.suggest = suggest;
-  esClient.search({index: index, "_source": true, body: body}, (err, data) => {
-    if (err) {
-      logger.error(err);
-      next(err);
-    } else {
-      next(data);
-    }
-  });
-}
+const suggest = async (index, suggest, next) => {
+  try {
+    const { body: result } = await osClient.search({
+      index,
+      _source: true,
+      body: { suggest },
+    });
+    next(result);
+  } catch (err) {
+    logger.error(err);
+    next(err);
+  }
+};
 
 exports.suggest = suggest;
 
-const createIndexes = (params, next) => {
-  esClient.indices.create(params[0], (err_2, result_2) => {
-    if (err_2) {
-      logger.error(err_2);
-      next(err_2);
-    } else {
-      esClient.indices.create(params[1], (err_3, result_3) => {
-        if (err_3) {
-          logger.error(err_3);
-          next(err_3);
-        } else {
-          logger.debug("have built property and suggestion indexes.");
-          next(result_3);
-        }
-      });
-    }
-  });
-}
+const createIndexes = async (params, next) => {
+  try {
+    const p0 = { index: params[0].index };
+    if (params[0].body) p0.body = params[0].body;
+    await osClient.indices.create(p0);
+
+    const p1 = { index: params[1].index };
+    if (params[1].body) p1.body = params[1].body;
+    await osClient.indices.create(p1);
+
+    logger.debug('have built property and suggestion indexes.');
+    next({ acknowledged: true });
+  } catch (err) {
+    logger.error(err);
+    next(err);
+  }
+};
 
 exports.createIndexes = createIndexes;
+
+const deleteProjectIndexes = async (next) => {
+  try {
+    const indexesToDelete = _.uniq([
+      config.indexName,
+      config.suggestionName,
+      config.index_p,
+    ]).filter(Boolean);
+
+    if (indexesToDelete.length === 0) {
+      return next(null);
+    }
+
+    await osClient.indices.delete({
+      index: indexesToDelete,
+      ignore_unavailable: true,
+    });
+    next(null);
+  } catch (err) {
+    // 404 means no indexes exist — not an error
+    if (err.meta && err.meta.statusCode === 404) {
+      return next(null);
+    }
+    logger.error(err);
+    next(err);
+  }
+};
+
+exports.deleteProjectIndexes = deleteProjectIndexes;

@@ -1,5 +1,5 @@
 const cache = require("../../components/cache");
-const elastic = require('../../components/elasticsearch');
+const opensearch = require('../../components/opensearch');
 const config = require("../../config");
 const fs = require("fs");
 const path = require("path");
@@ -1153,7 +1153,7 @@ const genearteCompareResult = async function(){
 		query.terms.source.push("gdc");
 		// let GDCDict = await getGDCDictionaryByVersion("2.3.0");
     let GDCDict = await getGDCDictionaryByVersion("2.4.1");
-		let data = await elastic.query_all(config.index_p, query, "", null);
+		let data = await opensearch.query_all(config.index_p, query, "", null);
 		if (data.hits === undefined) {
 			//return handleError.error(res, data);
 		}

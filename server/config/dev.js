@@ -3,9 +3,8 @@
  */
 
 module.exports = {
-	elasticsearch: {
-		host: '127.0.0.1:9200',
-		log: 'error',
-		requestTimeout: 30000
-	}
+  opensearch: {
+    host: process.env.OPENSEARCH_HOST || 'http://localhost:9200',
+    region: 'us-east-1',
+  }
 };

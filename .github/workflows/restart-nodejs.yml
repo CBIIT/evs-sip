@@ -78,8 +78,12 @@ jobs:
           fi
 
           case "$TIER" in
-            dev|qa)
-              if [ "$REF_NAME" == "nonprod" ] || [ "$REF_NAME" == "master" ]; then
+            dev)
+              echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
+              exit 0
+              ;;
+            qa)
+              if [ "$REF_NAME" == "nonprod" ] || [ "$REF_NAME" == "master" ] || [ "$REF_NAME" == "os_test" ]; then
                 echo "✅ Branch '$REF_NAME' allowed for tier: $TIER"
                 exit 0
               fi
@@ -94,8 +98,9 @@ jobs:
 
           echo "❌ Error: Ref '$REF_NAME' ($REF_TYPE) not allowed for tier '$TIER'"
           echo "Allowed:"
-          echo "  dev/qa: nonprod, master, or any tag"
-          echo "  stage/prod: master or any tag"
+          echo "  dev: any branch or any tag"
+          echo "  qa: nonprod, master, os_test, or any tag"
+          echo "  stage/prod: master, release, stage, or any tag"
           exit 1
 
       - name: Configure AWS credentials

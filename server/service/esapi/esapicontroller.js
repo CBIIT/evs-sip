@@ -1,4 +1,4 @@
-const elastic = require("../../components/elasticsearch");
+const opensearch = require("../../components/opensearch");
 const logger = require("../../components/logger");
 const cache = require("../../components/cache");
 const config = require("../../config");
@@ -49,7 +49,7 @@ const searchP = (req, res, formatFlag) => {
       logger.debug("keyword: " + keyword)
       logger.debug("------ query ------  %o ", query)
       let highlight = shared.generateHighlight();
-      elastic.query(config.index_p, query, "enum", highlight,(result) => {
+      opensearch.query(config.index_p, query, "enum", highlight,(result) => {
         if (result.hits === undefined) {
           res.json({ total: 0, returnList: [], timedOut: true });
           //return writeError.error(res, result);
