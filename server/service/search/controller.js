@@ -385,18 +385,37 @@ const suggestion = (req, res) => {
 
 const searchP = (req, res) => {
   //let keyword = req.query.keyword.trim().replace(/\+/g, "\\+").replace(/-/g, "\\-").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-  let keyword = req.query.keyword.trim();
+  const keyword =
+    typeof req.query.keyword === "string" ? req.query.keyword.trim() : "";
+
+  const normalizeQueryList = (value) => {
+    if (Array.isArray(value)) {
+      return value
+        .filter((entry) => typeof entry === "string")
+        .flatMap((entry) => entry.split(","))
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+    }
+    if (typeof value === "string") {
+      return value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
 
   let option = {};
-  if(req.query.options){
-    option.match = req.query.options.indexOf("exact") !== -1 ? "exact" : "partial";
-    option.syn = req.query.options.indexOf('syn') !== -1 ? true : false;
-    option.n_syn = req.query.options.indexOf('n_syn') !== -1 ? true : false;
-    option.p_syn = req.query.options.indexOf('p_syn') !== -1 ? true : false;
-    option.desc = req.query.options.indexOf('desc') !== -1 ? true : false;
-    option.sources = req.query.sources? req.query.sources.split(',') : [];
+  if (req.query.options) {
+    const selectedOptions = new Set(normalizeQueryList(req.query.options));
+    option.match = selectedOptions.has("exact") ? "exact" : "partial";
+    option.syn = selectedOptions.has("syn");
+    option.n_syn = selectedOptions.has("n_syn");
+    option.p_syn = selectedOptions.has("p_syn");
+    option.desc = selectedOptions.has("desc");
+    option.sources = normalizeQueryList(req.query.sources);
   }
-  else{
+  else {
     option = {
       match: "partial",
       syn: false,
