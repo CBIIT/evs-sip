@@ -27,3 +27,7 @@ yarn-error.log*
 package-lock.json
 
 .local
+
+.idea
+
+IGNORE/
